@@ -38,7 +38,7 @@ public class ReviewPollActivity extends Activity {
 
 		poll = (Poll)getIntent().getSerializableExtra("poll");
 
-		TextView question = (TextView) findViewById (R.id.poll_question);
+		TextView question = (TextView) findViewById (R.id.textview_poll_question);
 		question.setText(poll.getQuestion());
 
 		lvOptions = (ListView) findViewById (R.id.listview_list_options);

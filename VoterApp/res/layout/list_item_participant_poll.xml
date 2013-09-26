@@ -4,7 +4,7 @@
     android:layout_height="35dp" >
 
     <ImageView
-        android:id="@+id/iamgeview_participant_img"
+        android:id="@+id/imageview_participant_img"
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:layout_alignParentLeft="true"

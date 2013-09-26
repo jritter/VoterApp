@@ -13,7 +13,7 @@ import android.widget.Button;
  * @author Philémon von Bergen
  *
  */
-public class MainActivity extends Activity implements OnClickListener {
+public class VoterAppMainActivity extends Activity implements OnClickListener {
 	
 	private Button btnSetupNetwork;
 	private Button btnPollArchive;

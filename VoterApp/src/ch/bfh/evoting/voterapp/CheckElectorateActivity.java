@@ -121,6 +121,7 @@ public class CheckElectorateActivity extends ListActivity {
 				options.add(yes);
 				options.add(no);
 				poll.setOptions(options);
+				poll.setStartTime(System.currentTimeMillis());
 
 				Intent intentPoll = new Intent(BroadcastIntentTypes.sendPollToReview);
 				intentPoll.putExtra("poll", (Serializable)poll);

@@ -45,7 +45,7 @@
                 android:layout_below="@id/textview_poll_question"
                 android:gravity="left"
                 android:textSize="20sp"
-                android:textStyle=""
+                android:textStyle="bold"
                 android:text="@string/options"
                 android:layout_marginTop="8dip" />
 
@@ -64,7 +64,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="left"
                 android:textSize="20sp"
-                android:textStyle=""
+                android:textStyle="bold"
                 android:text="@string/participants"
                 android:layout_marginTop="8dip" />
 
