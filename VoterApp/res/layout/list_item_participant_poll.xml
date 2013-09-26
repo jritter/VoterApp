@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="35dp" >
+
+    <ImageView
+        android:id="@+id/iamgeview_participant_img"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignParentLeft="true"
+        android:layout_gravity="left"
+        android:contentDescription="@string/participant_avatar"
+        android:src="@drawable/user"
+        android:layout_marginTop="5dip" />
+
+    <TextView
+        android:id="@+id/textview_participant_identification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/imageview_participant_img"
+        android:ellipsize="end"
+        android:gravity="left"
+        android:paddingLeft="9dip"
+        android:paddingRight="3dip"
+        android:paddingTop="3dip"
+        android:singleLine="true"
+        android:textSize="20sp"
+        android:textStyle="" >
+    </TextView>
+
+</RelativeLayout>

@@ -1,0 +1,82 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/scrollview_review_layout" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".ReviewPollActivity" >
+
+        <TextView
+            android:id="@+id/textview_review_poll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/gradient"
+            android:gravity="center_vertical|center_horizontal"
+            android:minHeight="100dp"
+            android:text="@string/review_poll"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/textview_review_poll"
+            android:paddingBottom="@dimen/activity_vertical_margin"
+            android:paddingLeft="@dimen/activity_horizontal_margin"
+            android:paddingRight="@dimen/activity_horizontal_margin"
+            android:paddingTop="@dimen/activity_vertical_margin" >
+
+            <TextView
+                android:id="@+id/textview_poll_question"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:gravity="left"
+                android:textSize="20sp"
+                android:textStyle="" />
+
+            <TextView
+                android:id="@+id/textview_poll_options"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textview_poll_question"
+                android:gravity="left"
+                android:textSize="20sp"
+                android:textStyle=""
+                android:text="@string/options"
+                android:layout_marginTop="8dip" />
+
+            <ListView
+                android:id="@+id/listview_list_options"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textview_poll_options"
+                android:gravity="center_vertical">
+            </ListView>
+
+       
+            <TextView
+                android:id="@+id/textview_poll_participants"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:textSize="20sp"
+                android:textStyle=""
+                android:text="@string/participants"
+                android:layout_marginTop="8dip" />
+
+            <ListView
+                android:id="@+id/listview_list_participants"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/textview_poll_participants"
+                android:gravity="center_vertical">
+                
+            </ListView>
+        </RelativeLayout>
+    </RelativeLayout>
+
+</ScrollView>

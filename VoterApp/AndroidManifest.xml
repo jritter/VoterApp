@@ -11,16 +11,49 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:label="@string/app_name" >
         <activity
-            android:name="ch.bfh.evoting.voterapp.VoterAppMainActivity"
+            android:name="ch.bfh.evoting.voterapp.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="ch.bfh.evoting.voterapp.NetworkConfigActivity"
+            android:label="@string/title_activity_network_config"
+            android:parentActivityName="ch.bfh.evoting.adminapp.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.bfh.instavoteadmin.MainActivity" />
+        </activity>
+
+        <!-- VotingLib activities -->
+        <activity
+            android:name="ch.bfh.evoting.votinglib.ListTerminatedPollsActivity"
+            android:label="@string/title_activity_list_terminated_polls" >
+        </activity>
+        <activity
+            android:name="ch.bfh.evoting.votinglib.DisplayResultActivity"
+            android:label="@string/title_activity_display_result" >
+        </activity>
+        <activity
+            android:name="ch.bfh.evoting.votinglib.VoteActivity"
+            android:label="@string/title_activity_vote" >
+        </activity>
+        <activity
+            android:name="ch.bfh.evoting.votinglib.WaitForVotesActivity"
+            android:label="@string/title_activity_wait_for_votes" >
+        </activity>
+        <activity
+            android:name="ch.bfh.evoting.voterapp.CheckElectorateActivity"
+            android:label="@string/title_activity_check_electorate" >
+        </activity>
+        <activity
+            android:name="ch.bfh.evoting.voterapp.ReviewPollActivity"
+            android:label="@string/title_activity_review_poll" >
         </activity>
     </application>
 
