@@ -45,8 +45,8 @@ public class PollOptionListAdapter extends ArrayAdapter<Option> {
 		}
 
 		//set option text
-		TextView optionText =  (TextView)view.findViewById(R.id.textview_poll_option_review);
-		optionText.setText(this.values.get(position).getText());
+		TextView tvOption =  (TextView)view.findViewById(R.id.textview_poll_option_review);
+		tvOption.setText(this.values.get(position).getText());
 
 		return view;
 	}

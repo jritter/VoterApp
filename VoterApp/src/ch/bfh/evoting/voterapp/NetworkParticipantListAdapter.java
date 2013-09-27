@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 import ch.bfh.evoting.votinglib.entities.Participant;
@@ -48,17 +47,17 @@ public class NetworkParticipantListAdapter extends ArrayAdapter<Participant> {
 		}
 		
 		//Set the corresponding if the administrator has selected the participant a part of the electorate
-		ImageView iv = (ImageView)view.findViewById(R.id.imageview_participant_selected);
+		ImageView ivSelected = (ImageView)view.findViewById(R.id.imageview_participant_selected);
 		if(this.values.get(position).isSelected()){
-			iv.setImageResource(R.drawable.included);
+			ivSelected.setImageResource(R.drawable.included);
 		} else {
-			iv.setImageResource(R.drawable.excluded);
+			ivSelected.setImageResource(R.drawable.excluded);
 		}
 		
 
 		//set the participant identification
-		TextView optionText =  (TextView)view.findViewById(R.id.textview_participant_identification);
-		optionText.setText(this.values.get(position).getIdentification());
+		TextView tvParticipant =  (TextView)view.findViewById(R.id.textview_participant_identification);
+		tvParticipant.setText(this.values.get(position).getIdentification());
 		
 		return view;
 	}

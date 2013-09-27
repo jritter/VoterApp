@@ -46,8 +46,8 @@ public class PollParticipantListAdapter extends ArrayAdapter<Participant> {
 		}
 
 		//set the participant identification
-		TextView optionText =  (TextView)view.findViewById(R.id.textview_participant_identification);
-		optionText.setText(this.values.get(position).getIdentification());
+		TextView tvParticipant =  (TextView)view.findViewById(R.id.textview_participant_identification);
+		tvParticipant.setText(this.values.get(position).getIdentification());
 		
 		return view;
 	}

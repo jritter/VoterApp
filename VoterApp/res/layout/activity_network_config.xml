@@ -8,11 +8,13 @@
         android:id="@+id/textview_text_header"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/gradient"
         android:gravity="center_vertical|center_horizontal"
-        android:minHeight="100dp"
+        android:minHeight="70dp"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
         android:text="@string/choose_network"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:background="@drawable/gradient" />
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <fragment
         android:id="@+id/fragment_network_list"
