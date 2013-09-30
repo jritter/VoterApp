@@ -18,7 +18,8 @@
         android:id="@+id/layout_participants"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/textview_poll_participants" >
+        android:layout_below="@id/textview_poll_participants"
+        android:shrinkColumns="0" >
     </TableLayout>
 
 </RelativeLayout>

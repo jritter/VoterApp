@@ -1,4 +1,4 @@
-package ch.bfh.evoting.voterapp;
+package ch.bfh.evoting.voterapp.adapters;
 
 import java.util.List;
 
@@ -9,6 +9,10 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import ch.bfh.evoting.voterapp.R;
+import ch.bfh.evoting.voterapp.R.drawable;
+import ch.bfh.evoting.voterapp.R.id;
+import ch.bfh.evoting.voterapp.R.layout;
 import ch.bfh.evoting.votinglib.entities.Participant;
 
 /**

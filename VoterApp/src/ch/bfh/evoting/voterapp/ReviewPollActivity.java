@@ -69,7 +69,8 @@ public class ReviewPollActivity extends Activity {
 			tv_option.setText(op.getText());
 
 			tableRow.addView(vItemOption);
-
+			tableRow.setBackgroundResource(R.drawable.borders);
+			
 			optionsTable.addView(tableRow);
 		}
 
@@ -85,7 +86,8 @@ public class ReviewPollActivity extends Activity {
 			tv_option.setText(part.getIdentification());
 
 			tableRow.addView(vItemParticipant);
-
+			tableRow.setBackgroundResource(R.drawable.borders);
+			
 			participantsTable.addView(tableRow);
 		}
 
@@ -96,7 +98,6 @@ public class ReviewPollActivity extends Activity {
 
 				Intent i = new Intent(ReviewPollActivity.this, VoteActivity.class);
 				i.putExtra("poll", (Serializable) poll);
-				i.putExtra("isAdmin", false);
 				startActivity(i);
 
 			}

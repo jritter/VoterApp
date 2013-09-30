@@ -27,7 +27,8 @@
         android:id="@+id/layout_options"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/textview_poll_options" >
+        android:layout_below="@id/textview_poll_options"
+        android:shrinkColumns="0" >
     </TableLayout>
 
 </RelativeLayout>
