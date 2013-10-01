@@ -9,7 +9,7 @@ import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
 /**
- * Activity display the available networks
+ * Activity displaying the available networks
  * @author Philémon von Bergen
  *
  */
@@ -34,13 +34,6 @@ public class NetworkConfigActivity extends Activity  {
 
 	}
 
-	//	@Override
-	//	public boolean onCreateOptionsMenu(Menu menu) {
-	//		// Inflate the menu; this adds items to the action bar if it is present.
-	//		getMenuInflater().inflate(R.menu.network_config, menu);
-	//		return true;
-	//	}
-	//
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {

@@ -9,7 +9,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 /**
- * First activity, displaying the buttons
+ * First activity, displaying the buttons for the different actions
  * @author Philémon von Bergen
  *
  */

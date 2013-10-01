@@ -1,19 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">InstaVote VoterApp</string>
-    <string name="action_settings">Settings</string>
-    <string name="welcome">Welcome to the InstaVote\nVoter App</string>
+    <!-- Generic strings -->
     <string name="join_network">Join electorate</string>
     <string name="poll_archive">Poll Archives</string>
-    <string name="title_activity_network_config">Join Group</string>
-    <string name="choose_network">Choose the network you want to use</string>
-    <string name="title_activity_check_electorate">CheckElectorateActivity</string>
-    <string name="check_electorate">Check electorate and wait</string>
-    <string name="title_activity_review_poll">ReviewPollActivity</string>
-    <string name="review_poll">Review the poll!</string>
-    <string name="tick">Image option</string>
     <string name="options">Options:</string>
     <string name="participants">Participants:</string>
+    
+    <!-- Action bar titles -->
+    
+    <!-- Toasts -->
+    
+    <!-- Activity titles -->
+    <string name="app_name">InstaVote VoterApp</string>    
+    <string name="title_activity_network_config">Join Group</string>
+    <string name="title_activity_check_electorate">CheckElectorateActivity</string>
+    <string name="title_activity_review_poll">ReviewPollActivity</string>
+    
+    <!-- Activity subtitles -->
+    <string name="choose_network">Choose the network you want to use</string>
+    <string name="check_electorate">Check electorate and wait</string>
+    <string name="review_poll">Review the poll!</string>
+    <string name="welcome">Welcome to the InstaVote\nVoter App</string>
+    
+        
+	<!-- Hints in EditText fields -->
+
+    
+    <!-- Image descriptions -->
     <string name="participant_included">Participants included</string>
+    
 </resources>
