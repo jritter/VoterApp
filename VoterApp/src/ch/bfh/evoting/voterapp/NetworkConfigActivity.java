@@ -1,10 +1,7 @@
 package ch.bfh.evoting.voterapp;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
@@ -21,8 +18,6 @@ public class NetworkConfigActivity extends Activity  {
 		setContentView(R.layout.activity_network_config);
 		// Show the Up button in the action bar.
 		setupActionBar();	
-
-		simulate();
 	}
 
 	/**
@@ -50,21 +45,4 @@ public class NetworkConfigActivity extends Activity  {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
-	//TODO remove, only for simulation
-	private void simulate(){
-		new AsyncTask<Object, Object, Object>(){
-			@Override
-			protected Object doInBackground(Object... arg0) {
-				
-					SystemClock.sleep(8000);
-					Intent i = new Intent(NetworkConfigActivity.this, CheckElectorateActivity.class);
-					startActivity(i);
-				return null;
-			}
-		}.execute();
-	}
-
-
-
 }
