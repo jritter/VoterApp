@@ -8,6 +8,7 @@
     <string name="participants">Participants:</string>
     
     <!-- Action bar titles -->
+    <string name="action_rescan_wifi">Rescan Wifi Networks</string>
     
     <!-- Toasts -->
     
