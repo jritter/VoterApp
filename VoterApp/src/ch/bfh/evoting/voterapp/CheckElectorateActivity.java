@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import ch.bfh.evoting.voterapp.adapters.NetworkParticipantListAdapter;
+import ch.bfh.evoting.votinglib.AndroidApplication;
 import ch.bfh.evoting.votinglib.entities.Participant;
 import ch.bfh.evoting.votinglib.entities.Poll;
 import ch.bfh.evoting.votinglib.util.BroadcastIntentTypes;
@@ -36,6 +37,21 @@ public class CheckElectorateActivity extends ListActivity {
 		final NetworkParticipantListAdapter npa = new NetworkParticipantListAdapter(CheckElectorateActivity.this, R.layout.list_item_participant_network, participants);
 		setListAdapter(npa);
 
+		//Until the electorate is received from the administrator, the list is filled 
+		//with the participant in the network
+		final BroadcastReceiver networkParticipantUpdater = new BroadcastReceiver() {
+
+			@Override
+			public void onReceive(Context context, Intent intent) {
+
+				Map<String,Participant> participants = AndroidApplication.getInstance().getNetworkInterface().getConversationParticipants();
+				npa.clear();
+				npa.addAll(participants.values());
+				npa.notifyDataSetChanged();
+			}
+		};
+		LocalBroadcastManager.getInstance(this).registerReceiver(networkParticipantUpdater, new IntentFilter(BroadcastIntentTypes.participantStateUpdate));
+
 		//broadcast receiving the participants
 		final BroadcastReceiver electorateReceiver = new BroadcastReceiver() {
 
@@ -47,7 +63,7 @@ public class CheckElectorateActivity extends ListActivity {
 				npa.clear();
 				npa.addAll(participants.values());
 				npa.notifyDataSetChanged();
-
+				LocalBroadcastManager.getInstance(CheckElectorateActivity.this).unregisterReceiver(networkParticipantUpdater);
 
 			}
 		};
@@ -60,13 +76,16 @@ public class CheckElectorateActivity extends ListActivity {
 			public void onReceive(Context context, Intent intent) {
 
 				Poll poll = (Poll)intent.getSerializableExtra("poll");
+				//Poll is not in the DB, so reset the id
+				poll.setId(-1);
 				Intent i = new Intent(CheckElectorateActivity.this, ReviewPollActivity.class);
 				i.putExtra("poll", (Serializable) poll);
 				startActivity(i);
 				LocalBroadcastManager.getInstance(CheckElectorateActivity.this).unregisterReceiver(this);
 				LocalBroadcastManager.getInstance(CheckElectorateActivity.this).unregisterReceiver(electorateReceiver);
-
+				LocalBroadcastManager.getInstance(CheckElectorateActivity.this).unregisterReceiver(networkParticipantUpdater);
 			}
 		}, new IntentFilter(BroadcastIntentTypes.pollToReview));
+
 	}
 }

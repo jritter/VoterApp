@@ -39,7 +39,6 @@ public class VoterAppMainActivity extends Activity implements OnClickListener {
 			Intent intent = new Intent(this, ListTerminatedPollsActivity.class);
 	        startActivity(intent);
 		}
-		
 	}
 
 }

@@ -14,7 +14,7 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:text="@string/welcome"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:background="@drawable/gradient" />
+        android:background="@drawable/gradient_green" />
 
     <LinearLayout
         android:id="@+id/layout_buttons"
