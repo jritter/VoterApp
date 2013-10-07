@@ -8,29 +8,42 @@
     <string name="participants">Participants:</string>
     <string name="networks">Networks</string>
     <string name="identification">Your identification</string>
-    
+
     <!-- Action bar titles -->
     <string name="action_rescan_wifi">Rescan Wifi Networks</string>
-    
+
     <!-- Toasts -->
-    
+
+
     <!-- Activity titles -->
-    <string name="app_name">InstaVote VoterApp</string>    
+    <string name="app_name">InstaVote VoterApp</string>
     <string name="title_activity_network_config">Join Group</string>
     <string name="title_activity_check_electorate">CheckElectorateActivity</string>
     <string name="title_activity_review_poll">ReviewPollActivity</string>
-    
+    <string name="title_activity_network_informations">Network informations</string>
+
     <!-- Activity subtitles -->
     <string name="choose_network">Choose the network you want to use</string>
     <string name="check_electorate">Check electorate and wait</string>
     <string name="review_poll">Review the poll!</string>
     <string name="welcome">Welcome to the InstaVote\nVoter App</string>
-    
-        
-	<!-- Hints in EditText fields -->
 
-    
+    <!-- Hints in EditText fields -->
+
+
     <!-- Image descriptions -->
     <string name="participant_included">Participants included</string>
-    
+
+    <!-- Help dialog titles -->
+    <string name="help_title_main">Help for home screen</string>
+    <string name="help_title_network_config">Help for network configuration</string>
+    <string name="help_title_electorate">Help for electorate selection</string>
+    <string name="help_title_review">Help for poll review</string>
+
+    <!-- Help dialog texts -->
+    <string name="help_text_main">The home screen allows you to... and so on. The home screen allows you to... and so on. The home screen allows you to... and so on. The home screen allows you to... and so on. The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.</string>
+    <string name="help_text_network_config">network configuration</string>
+    <string name="help_text_electorate">electorate selection</string>
+    <string name="help_text_review">poll review</string>
+
 </resources>

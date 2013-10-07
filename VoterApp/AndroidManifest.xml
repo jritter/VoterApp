@@ -73,6 +73,14 @@
 
         <!-- VotingLib activities -->
         <activity
+            android:name="ch.bfh.evoting.votinglib.NetworkInformationsActivity"
+            android:label="@string/title_activity_network_informations" 
+            android:parentActivityName="ch.bfh.evoting.voterapp.VoterAppMainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.bfh.evoting.voterapp.VoterAppMainActivity" />
+        </activity>
+        <activity
             android:name="ch.bfh.evoting.votinglib.ListTerminatedPollsActivity"
             android:label="@string/title_activity_list_terminated_polls" >
         </activity>

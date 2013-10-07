@@ -10,8 +10,11 @@ import ch.bfh.evoting.votinglib.AndroidApplication;
 import ch.bfh.evoting.votinglib.entities.Participant;
 import ch.bfh.evoting.votinglib.entities.Poll;
 import ch.bfh.evoting.votinglib.util.BroadcastIntentTypes;
+import ch.bfh.evoting.votinglib.util.HelpDialogFragment;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -87,5 +90,27 @@ public class CheckElectorateActivity extends ListActivity {
 			}
 		}, new IntentFilter(BroadcastIntentTypes.pollToReview));
 
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.check_electorate, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.network_info:
+			Intent i = new Intent(this, ch.bfh.evoting.votinglib.NetworkInformationsActivity.class);
+			startActivity(i);
+			return true;
+		case R.id.help:
+			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_electorate), getString(R.string.help_text_electorate) );
+	        hdf.show( getFragmentManager( ), "help" );
+	        return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 }

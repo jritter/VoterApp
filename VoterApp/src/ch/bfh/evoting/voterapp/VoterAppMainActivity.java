@@ -1,9 +1,12 @@
 package ch.bfh.evoting.voterapp;
 
 import ch.bfh.evoting.votinglib.ListTerminatedPollsActivity;
+import ch.bfh.evoting.votinglib.util.HelpDialogFragment;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -39,6 +42,28 @@ public class VoterAppMainActivity extends Activity implements OnClickListener {
 			Intent intent = new Intent(this, ListTerminatedPollsActivity.class);
 	        startActivity(intent);
 		}
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.network_info:
+			Intent i = new Intent(this, ch.bfh.evoting.votinglib.NetworkInformationsActivity.class);
+			startActivity(i);
+			return true;
+		case R.id.help:
+			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_main), getString(R.string.help_text_main) );
+	        hdf.show( getFragmentManager( ), "help" );
+	        return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 }

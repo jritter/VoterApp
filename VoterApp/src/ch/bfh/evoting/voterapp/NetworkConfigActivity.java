@@ -1,5 +1,6 @@
 package ch.bfh.evoting.voterapp;
 
+import ch.bfh.evoting.votinglib.util.HelpDialogFragment;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -74,12 +75,12 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 
 	}
 	
-//	@Override
-//	public boolean onCreateOptionsMenu(Menu menu) {
-//		// Inflate the menu; this adds items to the action bar if it is present.
-//		getMenuInflater().inflate(R.menu.network_config, menu);
-//		return true;
-//	}
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.network_config, menu);
+		return true;
+	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -99,6 +100,14 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 			wifi.startScan();
 			Toast.makeText(this, "Rescan initiated", Toast.LENGTH_SHORT).show();
 			return true;
+		case R.id.network_info:
+			Intent i = new Intent(this, ch.bfh.evoting.votinglib.NetworkInformationsActivity.class);
+			startActivity(i);
+			return true;
+		case R.id.help:
+			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_network_config), getString(R.string.help_text_network_config) );
+	        hdf.show( getFragmentManager( ), "help" );
+	        return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
