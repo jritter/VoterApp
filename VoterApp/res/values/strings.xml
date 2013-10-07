@@ -18,8 +18,8 @@
     <!-- Activity titles -->
     <string name="app_name">InstaVote VoterApp</string>
     <string name="title_activity_network_config">Join Group</string>
-    <string name="title_activity_check_electorate">CheckElectorateActivity</string>
-    <string name="title_activity_review_poll">ReviewPollActivity</string>
+    <string name="title_activity_check_electorate">Check electorate</string>
+    <string name="title_activity_review_poll">Review poll</string>
     <string name="title_activity_network_informations">Network informations</string>
 
     <!-- Activity subtitles -->
