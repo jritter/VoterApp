@@ -1,5 +1,6 @@
 package ch.bfh.evoting.voterapp;
 
+import ch.bfh.evoting.votinglib.AndroidApplication;
 import ch.bfh.evoting.votinglib.util.HelpDialogFragment;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -8,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -64,6 +64,9 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 
 		
 		wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		
+//		AndroidApplication.getInstance().getNetworkInterface().joinNetwork("tutu");
+//		startActivity(new Intent("ch.bfh.evoting.voterapp.CheckElectorateActivity"));
 	}
 
 	/**
