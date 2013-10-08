@@ -11,8 +11,6 @@
         android:layout_alignParentTop="true"
         android:gravity="center_vertical|center_horizontal"
         android:minHeight="70dp"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
         android:text="@string/check_electorate"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
