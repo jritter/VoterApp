@@ -1,11 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     
     <item
-        android:id="@+id/rescan_wifi"
-        android:icon="@drawable/ic_action_refresh"
-        android:title="@string/action_rescan_wifi"
-        android:showAsAction="ifRoom" />
-    <item
         android:id="@+id/network_info"
         android:icon="@drawable/ic_action_about"
         android:showAsAction="always"

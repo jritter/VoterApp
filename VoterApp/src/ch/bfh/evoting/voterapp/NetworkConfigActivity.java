@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.content.Context;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -18,6 +17,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -26,7 +28,7 @@ import android.widget.Toast;
  * @author Philémon von Bergen
  *
  */
-public class NetworkConfigActivity extends Activity implements TextWatcher {
+public class NetworkConfigActivity extends Activity implements TextWatcher, OnClickListener {
 
 	
 	private WifiManager wifi;
@@ -34,6 +36,8 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 	private static final String PREFS_NAME = "network_preferences";
 	private SharedPreferences preferences;
 	private EditText etIdentification;
+	
+	private Button btnRescanWifi;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +58,9 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 			editor.putString("identification", identification);
 			editor.commit();
 		}
+		
+		btnRescanWifi = (Button) findViewById(R.id.button_rescan_wifi);
+		btnRescanWifi.setOnClickListener(this);
 
 		etIdentification = (EditText) findViewById(R.id.edittext_identification);
 		etIdentification.setText(identification);
@@ -94,11 +101,6 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
 			//
 			NavUtils.navigateUpFromSameTask(this);
-			return true;
-		case R.id.rescan_wifi:
-			// rescanning the WLAN networks
-			wifi.startScan();
-			Toast.makeText(this, "Rescan initiated", Toast.LENGTH_SHORT).show();
 			return true;
 		case R.id.network_info:
 			Intent i = new Intent(this, ch.bfh.evoting.votinglib.NetworkInformationsActivity.class);
@@ -157,5 +159,13 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 			startActivity(new Intent(NetworkConfigActivity.this, CheckElectorateActivity.class));
 		}
 	};
+
+	@Override
+	public void onClick(View view) {
+		if (view == btnRescanWifi){
+			wifi.startScan();
+			Toast.makeText(this, "Rescan initiated", Toast.LENGTH_SHORT).show();
+		}
+	}
 
 }
