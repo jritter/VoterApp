@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import ch.bfh.evoting.voterapp.adapters.NetworkParticipantListAdapter;
 import ch.bfh.evoting.votinglib.AndroidApplication;
@@ -34,10 +35,12 @@ public class CheckElectorateActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_check_electorate);
 
-		List<Participant> participants = new ArrayList<Participant>();
-		participants.add(new Participant("Please wait...", "", false, false));
+		Map<String, Participant> participants = new TreeMap<String, Participant>();
+		participants = AndroidApplication.getInstance().getNetworkInterface().getConversationParticipants();
+		if(participants.size()==0)
+			participants.put("",new Participant("Please wait...", "", false, false));
 
-		final NetworkParticipantListAdapter npa = new NetworkParticipantListAdapter(CheckElectorateActivity.this, R.layout.list_item_participant_network, participants);
+		final NetworkParticipantListAdapter npa = new NetworkParticipantListAdapter(CheckElectorateActivity.this, R.layout.list_item_participant_network, new ArrayList<Participant>(participants.values()));
 		setListAdapter(npa);
 
 		//Until the electorate is received from the administrator, the list is filled 

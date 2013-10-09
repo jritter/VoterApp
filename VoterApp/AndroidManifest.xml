@@ -24,12 +24,15 @@
         android:name="ch.bfh.evoting.votinglib.AndroidApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name" android:theme="@style/Theme.Votebartheme">
+        android:label="@string/app_name"
+        android:theme="@style/Theme.Votebartheme" >
         <service
             android:name="ch.bfh.evoting.instacirclelib.service.NetworkService"
             android:enabled="true"
             android:exported="true" >
         </service>
+        <!-- TODO remove when no more needed -->
+        <service android:name="ch.bfh.evoting.votinglib.VoteActivity$VoteService" />
         <service android:name="ch.bfh.evoting.instacirclelib.service.ProcessUnicastMessageIntentService" />
         <service android:name="ch.bfh.evoting.instacirclelib.service.ProcessBroadcastMessageIntentService" />
         <service android:name="ch.bfh.evoting.instacirclelib.service.SendBroadcastIntentService" />
@@ -75,7 +78,7 @@
         <!-- VotingLib activities -->
         <activity
             android:name="ch.bfh.evoting.votinglib.NetworkInformationsActivity"
-            android:label="@string/title_activity_network_informations" 
+            android:label="@string/title_activity_network_informations"
             android:parentActivityName="ch.bfh.evoting.voterapp.VoterAppMainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -97,17 +100,16 @@
             android:name="ch.bfh.evoting.votinglib.WaitForVotesActivity"
             android:label="@string/title_activity_wait_for_votes" >
         </activity>
-
-        <!-- InstaCircle Lib activities -->
         <activity
-            android:name="ch.bfh.evoting.instacirclelib.CreateNetworkActivity"
-            android:label="@string/app_name" >
+            android:name="ch.bfh.evoting.votinglib.network.wifi.CreateNetworkActivity"
+            android:label="@string/title_activity_create_network" >
             <intent-filter>
                 <action android:name="ch.bfh.evoting.voterapp.CreateNetworkActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        
     </application>
 
 </manifest>

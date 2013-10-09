@@ -73,8 +73,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, OnCl
 		
 		wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		
-//		AndroidApplication.getInstance().getNetworkInterface().joinNetwork("tutu");
-//		startActivity(new Intent("ch.bfh.evoting.voterapp.CheckElectorateActivity"));
+
 	}
 
 	/**
