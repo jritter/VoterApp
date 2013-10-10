@@ -102,14 +102,18 @@
         </activity>
         <activity
             android:name="ch.bfh.evoting.votinglib.network.wifi.CreateNetworkActivity"
-            android:label="@string/title_activity_create_network" >
+            android:label="@string/title_activity_create_network"
+            android:parentActivityName="ch.bfh.evoting.voterapp.VoterAppMainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.bfh.evoting.voterapp.VoterAppMainActivity" />
+
             <intent-filter>
                 <action android:name="ch.bfh.evoting.voterapp.CreateNetworkActivity" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        
     </application>
 
 </manifest>
