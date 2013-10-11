@@ -37,6 +37,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, OnCl
 	private static final String PREFS_NAME = "network_preferences";
 	private SharedPreferences preferences;
 	private EditText etIdentification;
+	private BroadcastReceiver serviceStartedListener;
 	
 	private Button btnRescanWifi;
 	
@@ -68,6 +69,12 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, OnCl
 
 		etIdentification.addTextChangedListener(this);
 		
+		serviceStartedListener = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				startActivity(new Intent(NetworkConfigActivity.this, CheckElectorateActivity.class));
+			}
+		};
 		LocalBroadcastManager.getInstance(this).registerReceiver(serviceStartedListener, new IntentFilter("NetworkServiceStarted"));
 
 		
@@ -108,6 +115,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, OnCl
 		case R.id.network_info:
 			Intent i = new Intent(this, ch.bfh.evoting.votinglib.NetworkInformationsActivity.class);
 			startActivity(i);
+			LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceStartedListener);
 			return true;
 		case R.id.help:
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_network_config), getString(R.string.help_text_network_config) );
@@ -153,15 +161,15 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, OnCl
 
 	}
 	
-	/**
-	 * this broadcast receiver listens for incoming instacircle broadcast notifying that network service was started
-	 */
-	private BroadcastReceiver serviceStartedListener = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			startActivity(new Intent(NetworkConfigActivity.this, CheckElectorateActivity.class));
-		}
-	};
+//	/**
+//	 * this broadcast receiver listens for incoming instacircle broadcast notifying that network service was started
+//	 */
+//	private BroadcastReceiver serviceStartedListener = new BroadcastReceiver() {
+//		@Override
+//		public void onReceive(Context context, Intent intent) {
+//			startActivity(new Intent(NetworkConfigActivity.this, CheckElectorateActivity.class));
+//		}
+//	};
 
 	@Override
 	public void onClick(View view) {

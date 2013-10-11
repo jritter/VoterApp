@@ -30,6 +30,8 @@ import android.widget.Toast;
  */
 public class ReviewPollActivity extends Activity {
 
+	private BroadcastReceiver pollReceiver;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -45,15 +47,19 @@ public class ReviewPollActivity extends Activity {
 			}
 		});
 
-
-		LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver() {
-
+		pollReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				((LinearLayout)btn_validate_review.getParent()).setVisibility(View.VISIBLE);
-
 			}
-		}, new IntentFilter(BroadcastIntentTypes.pollToReview));
+		};
+		LocalBroadcastManager.getInstance(this).registerReceiver(pollReceiver, new IntentFilter(BroadcastIntentTypes.pollToReview));
+	}
+	
+	@Override
+	protected void onDestroy() {
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(pollReceiver);
+		super.onDestroy();
 	}
 
 	@Override

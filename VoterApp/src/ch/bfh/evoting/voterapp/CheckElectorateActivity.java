@@ -33,6 +33,9 @@ import android.content.IntentFilter;
  */
 public class CheckElectorateActivity extends ListActivity {
 
+	private BroadcastReceiver networkParticipantUpdater;
+	private BroadcastReceiver electorateReceiver;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -55,7 +58,7 @@ public class CheckElectorateActivity extends ListActivity {
 
 		//Until the electorate is received from the administrator, the list is filled 
 		//with the participant in the network
-		final BroadcastReceiver networkParticipantUpdater = new BroadcastReceiver() {
+		networkParticipantUpdater = new BroadcastReceiver() {
 
 			@Override
 			public void onReceive(Context context, Intent intent) {
@@ -69,7 +72,7 @@ public class CheckElectorateActivity extends ListActivity {
 		LocalBroadcastManager.getInstance(this).registerReceiver(networkParticipantUpdater, new IntentFilter(BroadcastIntentTypes.participantStateUpdate));
 
 		//broadcast receiving the participants
-		final BroadcastReceiver electorateReceiver = new BroadcastReceiver() {
+		electorateReceiver = new BroadcastReceiver() {
 
 			@Override
 			public void onReceive(Context context, Intent intent) {
