@@ -8,12 +8,15 @@ import java.util.TreeMap;
 
 import ch.bfh.evoting.voterapp.adapters.NetworkParticipantListAdapter;
 import ch.bfh.evoting.votinglib.AndroidApplication;
+import ch.bfh.evoting.votinglib.NetworkInformationsActivity;
 import ch.bfh.evoting.votinglib.entities.Participant;
 import ch.bfh.evoting.votinglib.entities.Poll;
 import ch.bfh.evoting.votinglib.util.BroadcastIntentTypes;
 import ch.bfh.evoting.votinglib.util.HelpDialogFragment;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.app.ListActivity;
@@ -35,10 +38,17 @@ public class CheckElectorateActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_check_electorate);
 
+		setupActionBar();
+		
 		Map<String, Participant> participants = new TreeMap<String, Participant>();
+		
+		if(this.getIntent().getSerializableExtra("participants") == null){
 		participants = AndroidApplication.getInstance().getNetworkInterface().getConversationParticipants();
 		if(participants.size()==0)
 			participants.put("",new Participant("Please wait...", "", false, false));
+		} else {
+			participants = (Map<String,Participant>)this.getIntent().getSerializableExtra("participants");
+		}
 
 		final NetworkParticipantListAdapter npa = new NetworkParticipantListAdapter(CheckElectorateActivity.this, R.layout.list_item_participant_network, new ArrayList<Participant>(participants.values()));
 		setListAdapter(npa);
@@ -69,7 +79,6 @@ public class CheckElectorateActivity extends ListActivity {
 				npa.clear();
 				npa.addAll(participants.values());
 				npa.notifyDataSetChanged();
-				LocalBroadcastManager.getInstance(CheckElectorateActivity.this).unregisterReceiver(networkParticipantUpdater);
 
 			}
 		};
@@ -95,6 +104,15 @@ public class CheckElectorateActivity extends ListActivity {
 
 	}
 	
+	/**
+	 * Set up the {@link android.app.ActionBar}.
+	 */
+	private void setupActionBar() {
+
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -105,6 +123,16 @@ public class CheckElectorateActivity extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case android.R.id.home:
+			// This ID represents the Home or Up button. In the case of this
+			// activity, the Up button is shown. Use NavUtils to allow users
+			// to navigate up one level in the application structure. For
+			// more details, see the Navigation pattern on Android Design:
+			//
+			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
+			//
+			NavUtils.navigateUpFromSameTask(this);
+			return true;
 		case R.id.network_info:
 			Intent i = new Intent(this, ch.bfh.evoting.votinglib.NetworkInformationsActivity.class);
 			startActivity(i);
