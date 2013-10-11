@@ -145,4 +145,9 @@ public class CheckElectorateActivity extends ListActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
+	@Override
+	public void onBackPressed() {
+		//do nothing because we don't want that people access to an anterior activity
+	}
 }

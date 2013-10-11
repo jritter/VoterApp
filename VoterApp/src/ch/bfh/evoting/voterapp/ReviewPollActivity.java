@@ -36,29 +36,22 @@ public class ReviewPollActivity extends Activity {
 		setContentView(R.layout.activity_review_poll);
 
 		final Button btn_validate_review = (Button) findViewById(R.id.button_validate_review);
-//		btn_validate_review.setDrawingCacheEnabled(true);
 
 		btn_validate_review.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
 				AndroidApplication.getInstance().getNetworkInterface().sendMessage(new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_ACCEPT_REVIEW, ""));
 				((LinearLayout)btn_validate_review.getParent()).setVisibility(View.GONE);
-//				btn_validate_review.setBackgroundColor(Color.GRAY);
 			}
 		});
 
-//		btn_validate_review.setEnabled(true);
 
-		//broadcast receiving the poll if it was modified
 		LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver() {
 
 			@Override
 			public void onReceive(Context context, Intent intent) {
-					//recreate();
-//				btn_validate_review.setEnabled(true);
 				((LinearLayout)btn_validate_review.getParent()).setVisibility(View.VISIBLE);
 
-//				btn_validate_review.setBackgroundColor(Color.GREEN);
 			}
 		}, new IntentFilter(BroadcastIntentTypes.pollToReview));
 	}
