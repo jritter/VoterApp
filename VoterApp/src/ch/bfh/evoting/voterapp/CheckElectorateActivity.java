@@ -95,6 +95,7 @@ public class CheckElectorateActivity extends ListActivity {
 				poll.setId(-1);
 				Intent i = new Intent(CheckElectorateActivity.this, ReviewPollActivity.class);
 				i.putExtra("poll", (Serializable) poll);
+				i.putExtra("sender", intent.getStringExtra("sender"));
 				startActivity(i);
 				LocalBroadcastManager.getInstance(CheckElectorateActivity.this).unregisterReceiver(this);
 				LocalBroadcastManager.getInstance(CheckElectorateActivity.this).unregisterReceiver(electorateReceiver);
