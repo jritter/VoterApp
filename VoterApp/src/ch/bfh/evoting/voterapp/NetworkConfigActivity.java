@@ -1,6 +1,5 @@
 package ch.bfh.evoting.voterapp;
 
-import ch.bfh.evoting.votinglib.AndroidApplication;
 import ch.bfh.evoting.votinglib.util.HelpDialogFragment;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -10,7 +9,9 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.wifi.WifiManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.provider.ContactsContract;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
@@ -29,7 +30,7 @@ import android.widget.Toast;
  * @author Philémon von Bergen
  *
  */
-public class NetworkConfigActivity extends Activity implements TextWatcher, OnClickListener {
+public class NetworkConfigActivity extends Activity implements TextWatcher/*, OnClickListener*/ {
 
 	
 	private WifiManager wifi;
@@ -40,6 +41,10 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, OnCl
 	private BroadcastReceiver serviceStartedListener;
 	
 	private Button btnRescanWifi;
+
+	private boolean active;
+
+	private AsyncTask<Object, Object, Object> rescanWifiTask;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,8 +66,8 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, OnCl
 			editor.commit();
 		}
 		
-		btnRescanWifi = (Button) findViewById(R.id.button_rescan_wifi);
-		btnRescanWifi.setOnClickListener(this);
+//		btnRescanWifi = (Button) findViewById(R.id.button_rescan_wifi);
+//		btnRescanWifi.setOnClickListener(this);
 
 		etIdentification = (EditText) findViewById(R.id.edittext_identification);
 		etIdentification.setText(identification);
@@ -72,15 +77,59 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, OnCl
 		serviceStartedListener = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
+				active=false;
+				rescanWifiTask.cancel(true);
+				LocalBroadcastManager.getInstance(NetworkConfigActivity.this).unregisterReceiver(this);
 				startActivity(new Intent(NetworkConfigActivity.this, CheckElectorateActivity.class));
 			}
 		};
 		LocalBroadcastManager.getInstance(this).registerReceiver(serviceStartedListener, new IntentFilter("NetworkServiceStarted"));
 
-		
 		wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-		
 
+		active = true;
+		rescanWifiTask = new AsyncTask<Object, Object, Object>(){
+
+			@Override
+			protected Object doInBackground(Object... arg0) {
+				
+				while(active){
+					SystemClock.sleep(5000);
+					wifi.startScan();
+				}
+				return null;
+			}
+			
+		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+	}
+	
+	@Override
+	protected void onPause() {
+		active=false;
+		rescanWifiTask.cancel(true);
+		super.onPause();
+	}
+
+
+
+	@Override
+	protected void onResume() {
+		active = true;
+		rescanWifiTask = new AsyncTask<Object, Object, Object>(){
+
+			@Override
+			protected Object doInBackground(Object... arg0) {
+				
+				while(active){
+					SystemClock.sleep(5000);
+					wifi.startScan();
+				}
+				return null;
+			}
+			
+		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+		super.onResume();
 	}
 
 	/**
@@ -171,13 +220,13 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, OnCl
 //		}
 //	};
 
-	@Override
-	public void onClick(View view) {
-		if (view == btnRescanWifi){
-			wifi.startScan();
-			Toast.makeText(this, "Rescan initiated", Toast.LENGTH_SHORT).show();
-		}
-	}
+//	@Override
+//	public void onClick(View view) {
+//		if (view == btnRescanWifi){
+//			wifi.startScan();
+//			Toast.makeText(this, "Rescan initiated", Toast.LENGTH_SHORT).show();
+//		}
+//	}
 	
 	@Override
 	public void onBackPressed() {
