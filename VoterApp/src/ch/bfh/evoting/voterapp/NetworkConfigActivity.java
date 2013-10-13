@@ -1,13 +1,18 @@
 package ch.bfh.evoting.voterapp;
 
 import ch.bfh.evoting.votinglib.util.HelpDialogFragment;
+import ch.bfh.evoting.votinglib.network.wifi.AdhocWifiManager;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -30,10 +35,11 @@ import android.widget.Toast;
  * @author Philémon von Bergen
  *
  */
-public class NetworkConfigActivity extends Activity implements TextWatcher/*, OnClickListener*/ {
+public class NetworkConfigActivity extends Activity implements TextWatcher, OnClickListener {
 
 	
 	private WifiManager wifi;
+	private AdhocWifiManager adhoc;
 
 	private static final String PREFS_NAME = "network_preferences";
 	private SharedPreferences preferences;
@@ -41,6 +47,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher/*, On
 	private BroadcastReceiver serviceStartedListener;
 	
 	private Button btnRescanWifi;
+	private Button btnScanQRCode;
 
 	private boolean active;
 
@@ -68,6 +75,10 @@ public class NetworkConfigActivity extends Activity implements TextWatcher/*, On
 		
 //		btnRescanWifi = (Button) findViewById(R.id.button_rescan_wifi);
 //		btnRescanWifi.setOnClickListener(this);
+		
+		btnScanQRCode = (Button) findViewById(R.id.button_scan_qrcode);
+		btnScanQRCode.setOnClickListener(this);
+		
 
 		etIdentification = (EditText) findViewById(R.id.edittext_identification);
 		etIdentification.setText(identification);
@@ -86,6 +97,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher/*, On
 		LocalBroadcastManager.getInstance(this).registerReceiver(serviceStartedListener, new IntentFilter("NetworkServiceStarted"));
 
 		wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		adhoc = new AdhocWifiManager(wifi);
 
 		active = true;
 		rescanWifiTask = new AsyncTask<Object, Object, Object>(){
@@ -220,17 +232,95 @@ public class NetworkConfigActivity extends Activity implements TextWatcher/*, On
 //		}
 //	};
 
-//	@Override
-//	public void onClick(View view) {
+	@Override
+	public void onClick(View view) {
 //		if (view == btnRescanWifi){
 //			wifi.startScan();
 //			Toast.makeText(this, "Rescan initiated", Toast.LENGTH_SHORT).show();
 //		}
-//	}
+		
+		if (view == btnScanQRCode){
+			Toast.makeText(this, "Clicked...", Toast.LENGTH_SHORT).show();
+			Intent intent = new Intent(
+					"com.google.zxing.client.android.SCAN");
+			intent.setPackage(getApplication().getPackageName());
+			intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
+			startActivityForResult(intent, 0);
+		}
+	}
+	
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		   if (requestCode == 0) {
+		      if (resultCode == RESULT_OK) {
+		        String contents = intent.getStringExtra("SCAN_RESULT");
+				String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
+				Toast.makeText(this, contents, Toast.LENGTH_SHORT).show();
+
+				String[] config = intent.getStringExtra("SCAN_RESULT").split(
+						"\\|\\|");
+
+				// saving the values that we got
+				SharedPreferences.Editor editor = preferences.edit();
+				editor.putString("SSID", config[0]);
+				editor.putString("password", config[1]);
+				editor.commit();
+
+				// connect to the network
+				connect(config);
+
+			} else if (resultCode == RESULT_CANCELED) {
+				// Handle cancel
+			}
+		}
+		}
 	
 	@Override
 	public void onBackPressed() {
 		//do nothing because we don't want that people access to an anterior activity
+	}
+	
+	/**
+	 * This method initiates the connect process
+	 * 
+	 * @param config
+	 *            an array containing the SSID and the password of the network
+	 */
+	private void connect(String[] config) {
+		boolean connectedSuccessful = false;
+		// check whether the network is already known, i.e. the password is
+		// already stored in the device
+		for (WifiConfiguration configuredNetwork : wifi.getConfiguredNetworks()) {
+			if (configuredNetwork.SSID.equals("\"".concat(config[0]).concat(
+					"\""))) {
+				connectedSuccessful = true;
+				adhoc.connectToNetwork(configuredNetwork.networkId, this);
+				break;
+			}
+		}
+		if (!connectedSuccessful) {
+			for (ScanResult result : wifi.getScanResults()) {
+				if (result.SSID.equals(config[0])) {
+					connectedSuccessful = true;
+					adhoc.connectToNetwork(config[0], config[1], this);
+					break;
+				}
+			}
+		}
+
+		// display a message if the connection was not successful
+		if (!connectedSuccessful) {
+			AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+			alertDialog.setTitle("InstaCircle - Network not found");
+			alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+						}
+					});
+			alertDialog.setMessage("The network \"" + config[0]
+					+ "\" is not available, cannot connect.");
+			alertDialog.show();
+		}
 	}
 
 }

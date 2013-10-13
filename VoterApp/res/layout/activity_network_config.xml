@@ -87,7 +87,7 @@
             android:layout_centerHorizontal="true" />
     </RelativeLayout>
     
-    <!-- <LinearLayout
+    <LinearLayout
 	     style="@style/ActionBar.Solid.Votebartheme"
 	     android:layout_width="fill_parent"
 	     android:layout_height="wrap_content"
@@ -97,7 +97,7 @@
 	     android:divider="?android:dividerVertical"
 	     android:dividerPadding="8dp" >
 	
-	   <Button
+	   <!-- <Button
 	       android:id="@+id/button_rescan_wifi"
 	       style="@style/BottomBar"
 	       android:layout_width="0dp"
@@ -106,8 +106,19 @@
 	       android:paddingLeft="16dp"
 	       android:paddingRight="16dp"
 	       android:drawableLeft="@drawable/ic_action_refresh"
-	       android:text="@string/rescan_wifi" />
+	       android:text="@string/rescan_wifi" />  -->
+	       
+	    <Button
+	       android:id="@+id/button_scan_qrcode"
+	       style="@style/BottomBar"
+	       android:layout_width="0dp"
+	       android:layout_height="wrap_content"
+	       android:layout_weight="0.18"
+	       android:paddingLeft="16dp"
+	       android:paddingRight="16dp"
+	       android:drawableLeft="@drawable/ic_action_camera"
+	       android:text="@string/scan_qrcode" />
 	
-	</LinearLayout> -->
+	</LinearLayout>
 
 </LinearLayout>
