@@ -28,16 +28,16 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 /**
  * Activity displaying the available networks
+ * 
  * @author Philémon von Bergen
- *
+ * 
  */
-public class NetworkConfigActivity extends Activity implements TextWatcher, OnClickListener {
+public class NetworkConfigActivity extends Activity implements TextWatcher,
+		OnClickListener {
 
-	
 	private WifiManager wifi;
 	private AdhocWifiManager adhoc;
 
@@ -45,14 +45,14 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, OnCl
 	private SharedPreferences preferences;
 	private EditText etIdentification;
 	private BroadcastReceiver serviceStartedListener;
-	
+
 	private Button btnRescanWifi;
 	private Button btnScanQRCode;
 
 	private boolean active;
 
 	private AsyncTask<Object, Object, Object> rescanWifiTask;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -63,83 +63,84 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, OnCl
 		// reading the identification from the preferences, if it is not there
 		// it will try to read the name of the device owner
 		preferences = getSharedPreferences(PREFS_NAME, 0);
-		String identification = preferences.getString("identification",	"");
+		String identification = preferences.getString("identification", "");
 
-		if(identification.equals("")){
+		if (identification.equals("")) {
 			identification = readOwnerName();
 			// saving the identification field
 			SharedPreferences.Editor editor = preferences.edit();
 			editor.putString("identification", identification);
 			editor.commit();
 		}
-		
-//		btnRescanWifi = (Button) findViewById(R.id.button_rescan_wifi);
-//		btnRescanWifi.setOnClickListener(this);
-		
+
+		// btnRescanWifi = (Button) findViewById(R.id.button_rescan_wifi);
+		// btnRescanWifi.setOnClickListener(this);
+
 		btnScanQRCode = (Button) findViewById(R.id.button_scan_qrcode);
 		btnScanQRCode.setOnClickListener(this);
-		
 
 		etIdentification = (EditText) findViewById(R.id.edittext_identification);
 		etIdentification.setText(identification);
 
 		etIdentification.addTextChangedListener(this);
-		
+
 		serviceStartedListener = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
-				active=false;
+				active = false;
 				rescanWifiTask.cancel(true);
-				LocalBroadcastManager.getInstance(NetworkConfigActivity.this).unregisterReceiver(this);
-				startActivity(new Intent(NetworkConfigActivity.this, CheckElectorateActivity.class));
+				LocalBroadcastManager.getInstance(NetworkConfigActivity.this)
+						.unregisterReceiver(this);
+				startActivity(new Intent(NetworkConfigActivity.this,
+						CheckElectorateActivity.class));
 			}
 		};
-		LocalBroadcastManager.getInstance(this).registerReceiver(serviceStartedListener, new IntentFilter("NetworkServiceStarted"));
+		LocalBroadcastManager.getInstance(this).registerReceiver(
+				serviceStartedListener,
+				new IntentFilter("NetworkServiceStarted"));
 
 		wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		adhoc = new AdhocWifiManager(wifi);
 
 		active = true;
-		rescanWifiTask = new AsyncTask<Object, Object, Object>(){
+		rescanWifiTask = new AsyncTask<Object, Object, Object>() {
 
 			@Override
 			protected Object doInBackground(Object... arg0) {
-				
-				while(active){
+
+				while (active) {
 					SystemClock.sleep(5000);
 					wifi.startScan();
 				}
 				return null;
 			}
-			
+
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
 	}
-	
+
 	@Override
 	protected void onPause() {
-		active=false;
+		active = false;
 		rescanWifiTask.cancel(true);
 		super.onPause();
 	}
 
-
-
 	@Override
 	protected void onResume() {
 		active = true;
-		rescanWifiTask = new AsyncTask<Object, Object, Object>(){
+		rescanWifiTask = new AsyncTask<Object, Object, Object>() {
 
 			@Override
 			protected Object doInBackground(Object... arg0) {
-				
-				while(active){
+
+				while (active) {
 					SystemClock.sleep(5000);
 					wifi.startScan();
 				}
 				return null;
 			}
-			
+
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 		super.onResume();
 	}
@@ -152,7 +153,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, OnCl
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -174,14 +175,18 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, OnCl
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		case R.id.network_info:
-			Intent i = new Intent(this, ch.bfh.evoting.votinglib.NetworkInformationsActivity.class);
+			Intent i = new Intent(this,
+					ch.bfh.evoting.votinglib.NetworkInformationsActivity.class);
 			startActivity(i);
-			LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceStartedListener);
+			LocalBroadcastManager.getInstance(this).unregisterReceiver(
+					serviceStartedListener);
 			return true;
 		case R.id.help:
-			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_network_config), getString(R.string.help_text_network_config) );
-	        hdf.show( getFragmentManager( ), "help" );
-	        return true;
+			HelpDialogFragment hdf = HelpDialogFragment.newInstance(
+					getString(R.string.help_title_network_config),
+					getString(R.string.help_text_network_config));
+			hdf.show(getFragmentManager(), "help");
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
@@ -189,19 +194,21 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, OnCl
 	@Override
 	public void afterTextChanged(Editable s) {
 		// saving the identification field
-				SharedPreferences.Editor editor = preferences.edit();
-				editor.putString("identification", etIdentification.getText()
-						.toString());
-				editor.commit();
+		SharedPreferences.Editor editor = preferences.edit();
+		editor.putString("identification", etIdentification.getText()
+				.toString());
+		editor.commit();
 	}
 
 	@Override
 	public void beforeTextChanged(CharSequence s, int start, int count,
-			int after) {}
+			int after) {
+	}
 
 	@Override
-	public void onTextChanged(CharSequence s, int start, int before, int count) {}
-	
+	public void onTextChanged(CharSequence s, int start, int before, int count) {
+	}
+
 	/**
 	 * This method is used to extract the name of the device owner
 	 * 
@@ -221,41 +228,38 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, OnCl
 		return displayName;
 
 	}
-	
-//	/**
-//	 * this broadcast receiver listens for incoming instacircle broadcast notifying that network service was started
-//	 */
-//	private BroadcastReceiver serviceStartedListener = new BroadcastReceiver() {
-//		@Override
-//		public void onReceive(Context context, Intent intent) {
-//			startActivity(new Intent(NetworkConfigActivity.this, CheckElectorateActivity.class));
-//		}
-//	};
+
+	// /**
+	// * this broadcast receiver listens for incoming instacircle broadcast
+	// notifying that network service was started
+	// */
+	// private BroadcastReceiver serviceStartedListener = new
+	// BroadcastReceiver() {
+	// @Override
+	// public void onReceive(Context context, Intent intent) {
+	// startActivity(new Intent(NetworkConfigActivity.this,
+	// CheckElectorateActivity.class));
+	// }
+	// };
 
 	@Override
 	public void onClick(View view) {
-//		if (view == btnRescanWifi){
-//			wifi.startScan();
-//			Toast.makeText(this, "Rescan initiated", Toast.LENGTH_SHORT).show();
-//		}
-		
-		if (view == btnScanQRCode){
-			Toast.makeText(this, "Clicked...", Toast.LENGTH_SHORT).show();
-			Intent intent = new Intent(
-					"com.google.zxing.client.android.SCAN");
+		// if (view == btnRescanWifi){
+		// wifi.startScan();
+		// Toast.makeText(this, "Rescan initiated", Toast.LENGTH_SHORT).show();
+		// }
+
+		if (view == btnScanQRCode) {
+			Intent intent = new Intent("com.google.zxing.client.android.SCAN");
 			intent.setPackage(getApplication().getPackageName());
 			intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
 			startActivityForResult(intent, 0);
 		}
 	}
-	
-	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-		   if (requestCode == 0) {
-		      if (resultCode == RESULT_OK) {
-		        String contents = intent.getStringExtra("SCAN_RESULT");
-				String format = intent.getStringExtra("SCAN_RESULT_FORMAT");
-				Toast.makeText(this, contents, Toast.LENGTH_SHORT).show();
 
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		if (requestCode == 0) {
+			if (resultCode == RESULT_OK) {
 				String[] config = intent.getStringExtra("SCAN_RESULT").split(
 						"\\|\\|");
 
@@ -272,13 +276,14 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, OnCl
 				// Handle cancel
 			}
 		}
-		}
-	
+	}
+
 	@Override
 	public void onBackPressed() {
-		//do nothing because we don't want that people access to an anterior activity
+		// do nothing because we don't want that people access to an anterior
+		// activity
 	}
-	
+
 	/**
 	 * This method initiates the connect process
 	 * 
