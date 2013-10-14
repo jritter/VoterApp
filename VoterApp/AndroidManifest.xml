@@ -25,7 +25,7 @@
         android:name="ch.bfh.evoting.votinglib.AndroidApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
+        android:label="@string/voter_app_app_name"
         android:theme="@style/Theme.Votebartheme" >
         <service
             android:name="ch.bfh.evoting.instacirclelib.service.NetworkService"
@@ -41,7 +41,7 @@
 
         <activity
             android:name="ch.bfh.evoting.voterapp.VoterAppMainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/voter_app_app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

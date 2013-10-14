@@ -35,22 +35,23 @@ public class ReviewPollActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		AndroidApplication.getInstance().setCurrentActivity(this);
 		setContentView(R.layout.activity_review_poll);
 
-		final Button btn_validate_review = (Button) findViewById(R.id.button_validate_review);
-
-		btn_validate_review.setOnClickListener(new OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				AndroidApplication.getInstance().getNetworkInterface().sendMessage(new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_ACCEPT_REVIEW, ""));
-				((LinearLayout)btn_validate_review.getParent()).setVisibility(View.GONE);
-			}
-		});
+//		final Button btn_validate_review = (Button) findViewById(R.id.button_validate_review);
+//
+//		btn_validate_review.setOnClickListener(new OnClickListener(){
+//			@Override
+//			public void onClick(View v) {
+//				AndroidApplication.getInstance().getNetworkInterface().sendMessage(new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_ACCEPT_REVIEW, ""));
+//				((LinearLayout)btn_validate_review.getParent()).setVisibility(View.GONE);
+//			}
+//		});
 
 		pollReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
-				((LinearLayout)btn_validate_review.getParent()).setVisibility(View.VISIBLE);
+//				((LinearLayout)btn_validate_review.getParent()).setVisibility(View.VISIBLE);
 			}
 		};
 		LocalBroadcastManager.getInstance(this).registerReceiver(pollReceiver, new IntentFilter(BroadcastIntentTypes.pollToReview));
@@ -58,6 +59,7 @@ public class ReviewPollActivity extends Activity {
 	
 	@Override
 	protected void onDestroy() {
+		AndroidApplication.getInstance().setCurrentActivity(null);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(pollReceiver);
 		super.onDestroy();
 	}
@@ -84,4 +86,14 @@ public class ReviewPollActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
+	protected void onResume() {
+		super.onResume();
+		AndroidApplication.getInstance().setCurrentActivity(this);
+	}
+	protected void onPause() {
+		AndroidApplication.getInstance().setCurrentActivity(null);
+		super.onPause();
+	}
+	
 }

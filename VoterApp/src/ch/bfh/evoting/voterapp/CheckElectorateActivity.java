@@ -39,6 +39,7 @@ public class CheckElectorateActivity extends ListActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		AndroidApplication.getInstance().setCurrentActivity(this);
 		setContentView(R.layout.activity_check_electorate);
 
 		setupActionBar();
@@ -152,5 +153,18 @@ public class CheckElectorateActivity extends ListActivity {
 	@Override
 	public void onBackPressed() {
 		//do nothing because we don't want that people access to an anterior activity
+	}
+	
+	protected void onResume() {
+		super.onResume();
+		AndroidApplication.getInstance().setCurrentActivity(this);
+	}
+	protected void onPause() {
+		AndroidApplication.getInstance().setCurrentActivity(null);
+		super.onPause();
+	}
+	protected void onDestroy() {        
+		AndroidApplication.getInstance().setCurrentActivity(null);
+		super.onDestroy();
 	}
 }

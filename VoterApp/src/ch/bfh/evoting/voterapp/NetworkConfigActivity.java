@@ -1,5 +1,6 @@
 package ch.bfh.evoting.voterapp;
 
+import ch.bfh.evoting.votinglib.AndroidApplication;
 import ch.bfh.evoting.votinglib.util.HelpDialogFragment;
 import ch.bfh.evoting.votinglib.network.wifi.AdhocWifiManager;
 import android.app.Activity;
@@ -327,5 +328,6 @@ public class NetworkConfigActivity extends Activity implements TextWatcher,
 			alertDialog.show();
 		}
 	}
-
+	
+	
 }
