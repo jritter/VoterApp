@@ -53,15 +53,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="ch.bfh.evoting.voterapp.NetworkConfigActivity"
-            android:label="@string/title_activity_network_config"
-            android:parentActivityName="ch.bfh.evoting.voterapp.VoterAppMainActivity"
-            android:windowSoftInputMode="stateHidden" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.bfh.evoting.voterapp.VoterAppMainActivity" />
-        </activity>
+        
         <activity
             android:name="ch.bfh.evoting.voterapp.CheckElectorateActivity"
             android:label="@string/title_activity_check_electorate"
@@ -82,6 +74,15 @@
         </activity>
 
         <!-- VotingLib activities -->
+        <activity
+            android:name="ch.bfh.evoting.votinglib.NetworkConfigActivity"
+            android:label="@string/title_activity_network_config"
+            android:parentActivityName="ch.bfh.evoting.voterapp.VoterAppMainActivity"
+            android:windowSoftInputMode="stateHidden" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="ch.bfh.evoting.voterapp.VoterAppMainActivity" />
+        </activity>
         <activity
             android:name="ch.bfh.evoting.votinglib.NetworkInformationsActivity"
             android:label="@string/title_activity_network_informations"

@@ -1,6 +1,7 @@
 package ch.bfh.evoting.voterapp;
 
 import ch.bfh.evoting.votinglib.ListTerminatedPollsActivity;
+import ch.bfh.evoting.votinglib.NetworkConfigActivity;
 import ch.bfh.evoting.votinglib.util.HelpDialogFragment;
 import android.os.Bundle;
 import android.app.Activity;

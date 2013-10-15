@@ -6,8 +6,6 @@
     <string name="poll_archive">Poll Archives</string>
     <string name="options">Options:</string>
     <string name="participants">Participants:</string>
-    <string name="networks">Networks</string>
-    <string name="identification">Your identification</string>
 
     <!-- Action bar titles -->
     <string name="action_rescan_wifi">Rescan Wifi Networks</string>
@@ -38,13 +36,11 @@
 
     <!-- Help dialog titles -->
     <string name="help_title_main">Help for home screen</string>
-    <string name="help_title_network_config">Help for network configuration</string>
     <string name="help_title_electorate">Help for electorate selection</string>
     <string name="help_title_review">Help for poll review</string>
 
     <!-- Help dialog texts -->
     <string name="help_text_main">The home screen allows you to... and so on. The home screen allows you to... and so on. The home screen allows you to... and so on. The home screen allows you to... and so on. The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.</string>
-    <string name="help_text_network_config">network configuration</string>
     <string name="help_text_electorate">electorate selection</string>
     <string name="help_text_review">poll review</string>
 
