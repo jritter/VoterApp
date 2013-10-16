@@ -38,6 +38,7 @@ public class VoterAppMainActivity extends Activity implements OnClickListener {
 	public void onClick(View view) {
 		if (view == btnSetupNetwork) {
 			Intent intent = new Intent(this, NetworkConfigActivity.class);
+			intent.putExtra("hideCreateNetwork", true);
 	        startActivity(intent);
 		} else if (view == btnPollArchive){
 			Intent intent = new Intent(this, ListTerminatedPollsActivity.class);
