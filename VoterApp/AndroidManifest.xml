@@ -57,10 +57,10 @@
         <activity
             android:name="ch.bfh.evoting.voterapp.CheckElectorateActivity"
             android:label="@string/title_activity_check_electorate"
-            android:parentActivityName="ch.bfh.evoting.voterapp.NetworkConfigActivity" >
+            android:parentActivityName="ch.bfh.evoting.voterapp.VoterAppMainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.bfh.evoting.voterapp.NetworkConfigActivity" />
+                android:value="ch.bfh.evoting.voterapp.VoterAppMainActivity" />
 
             <intent-filter>
                 <action android:name="ch.bfh.evoting.voterapp.CheckElectorateActivity" />
