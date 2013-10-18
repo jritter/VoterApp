@@ -67,6 +67,8 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 		// Show the Up button in the action bar.
 		setupActionBar();
 
+		AndroidApplication.getInstance().setIsAdmin(true);
+		
 		pollDbHelper = PollDbHelper.getInstance(this);
 
 

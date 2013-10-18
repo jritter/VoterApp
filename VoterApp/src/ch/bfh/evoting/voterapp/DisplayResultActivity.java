@@ -23,6 +23,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.bfh.evoting.voterapp.adapters.OptionListAdapter;
@@ -71,12 +72,12 @@ public class DisplayResultActivity extends ListActivity {
 			pollId = -1;
 		}
 
-		Log.e("save to db needed",""+ saveToDbNeeded);
-		Log.e("is admin", ""+AndroidApplication.getInstance().isAdmin());
+		RelativeLayout rootLayout = (RelativeLayout)lv.getParent();
+		
 		if(!AndroidApplication.getInstance().isAdmin() && saveToDbNeeded){
-			LinearLayout linearLayout = (LinearLayout)findViewById(R.id.layout_action_bar);
-			linearLayout.removeView(linearLayout);
-
+			LinearLayout ll = (LinearLayout)findViewById(R.id.layout_action_bar);
+			((LinearLayout)ll.getParent()).removeView(ll);
+			
 			//register a listener of messages of the admin sending the electorate
 			//TODO is that a good idea? when to unregister it
 //			redoPollReceiver = new BroadcastReceiver(){
@@ -92,6 +93,7 @@ public class DisplayResultActivity extends ListActivity {
 //			LocalBroadcastManager.getInstance(this).registerReceiver(redoPollReceiver, new IntentFilter(BroadcastIntentTypes.electorate));
 		} else {
 
+			
 			//Set a listener on the redo button
 			Button btnRedo = (Button)findViewById(R.id.button_redo_poll);
 			btnRedo.setOnClickListener(new OnClickListener(){
@@ -119,6 +121,13 @@ public class DisplayResultActivity extends ListActivity {
 					}
 				}
 			});
+			
+			//Poll is just finished
+			if(saveToDbNeeded){
+				btnRedo.setText(R.string.redo_poll);
+			} else {
+				btnRedo.setText(R.string.clone_poll);				
+			}
 		}
 
 		lv.addHeaderView(header);
@@ -178,11 +187,6 @@ public class DisplayResultActivity extends ListActivity {
 				Log.e(this.getClass().getSimpleName(), "DB error: "+e.getMessage());
 				e.printStackTrace();
 			}
-		}
-
-		if(!AndroidApplication.getInstance().isAdmin() || !saveToDbNeeded){
-			LinearLayout ll = (LinearLayout)findViewById(R.id.layout_action_bar);
-			((LinearLayout)ll.getParent()).removeView(ll);
 		}
 
 	}
