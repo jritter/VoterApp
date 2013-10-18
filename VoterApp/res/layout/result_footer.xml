@@ -1,0 +1,43 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <View
+            android:id="@+id/separator_1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="3dp"
+            android:background="@color/theme_color"
+            android:gravity="center_vertical" />
+    
+    <TextView
+        android:id="@+id/textview_number_voters"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="lkasjdflkasjdflk"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:textSize="20sp"
+        android:textStyle="" />
+    
+    
+    <TextView
+        android:id="@+id/textview_number_cast_votes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="lkasjdflkasjdflk"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:textSize="20sp"
+        android:textStyle="" />
+    
+    <TextView
+        android:id="@+id/textview_vote_participation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+		android:text="lkasjdflkasjdflk"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:textSize="20sp"
+        android:textStyle="" />
+
+</LinearLayout>

@@ -38,6 +38,16 @@
             android:minWidth="160dip"
             android:text="@string/join_network"
             style="@style/MainButtons" />
+        
+        <Button
+            android:id="@+id/button_polls"
+            android:layout_width="0dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:minWidth="160dip"
+            android:text="@string/polls"
+            style="@style/MainButtons" />
 
         <Button
             android:id="@+id/button_archive"

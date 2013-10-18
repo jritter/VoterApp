@@ -36,6 +36,14 @@
             android:minHeight="80dip"
             android:text="@string/join_network"
             style="@style/MainButtons" />
+        
+        <Button
+            android:id="@+id/button_polls"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="80dip"
+            android:text="@string/polls"
+            style="@style/MainButtons" />
 
         <Button
             android:id="@+id/button_archive"

@@ -10,7 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import ch.bfh.evoting.voterapp.R;
-import ch.bfh.evoting.votinglib.entities.Participant;
+import ch.bfh.evoting.voterapp.entities.Participant;
 
 /**
  * Adapter listing the participants that are present in the network and if they are included or not in the electorate
@@ -50,9 +50,9 @@ public class NetworkParticipantListAdapter extends ArrayAdapter<Participant> {
 		//Set the corresponding if the administrator has selected the participant a part of the electorate
 		ImageView ivSelected = (ImageView)view.findViewById(R.id.imageview_participant_selected);
 		if(this.values.get(position).isSelected()){
-			ivSelected.setImageResource(R.drawable.ic_action_good);
+			ivSelected.setImageResource(R.drawable.included);
 		} else {
-			ivSelected.setImageResource(R.drawable.ic_action_bad);
+			ivSelected.setImageResource(R.drawable.not_included);
 		}
 		
 

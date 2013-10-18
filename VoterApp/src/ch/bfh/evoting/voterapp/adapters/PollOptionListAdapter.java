@@ -4,7 +4,7 @@ package ch.bfh.evoting.voterapp.adapters;
 import java.util.List;
 
 import ch.bfh.evoting.voterapp.R;
-import ch.bfh.evoting.votinglib.entities.Option;
+import ch.bfh.evoting.voterapp.entities.Option;
 
 import android.content.Context;
 import android.view.LayoutInflater;

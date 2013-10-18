@@ -7,12 +7,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import ch.bfh.evoting.voterapp.adapters.NetworkParticipantListAdapter;
-import ch.bfh.evoting.votinglib.AndroidApplication;
-import ch.bfh.evoting.votinglib.NetworkInformationsActivity;
-import ch.bfh.evoting.votinglib.entities.Participant;
-import ch.bfh.evoting.votinglib.entities.Poll;
-import ch.bfh.evoting.votinglib.util.BroadcastIntentTypes;
-import ch.bfh.evoting.votinglib.util.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.entities.Participant;
+import ch.bfh.evoting.voterapp.entities.Poll;
+import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
+import ch.bfh.evoting.voterapp.util.HelpDialogFragment;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
@@ -97,7 +95,7 @@ public class CheckElectorateActivity extends ListActivity {
 				Poll poll = (Poll)intent.getSerializableExtra("poll");
 				//Poll is not in the DB, so reset the id
 				poll.setId(-1);
-				Intent i = new Intent(CheckElectorateActivity.this, ReviewPollActivity.class);
+				Intent i = new Intent(CheckElectorateActivity.this, ReviewPollVoterActivity.class);
 				i.putExtra("poll", (Serializable) poll);
 				i.putExtra("sender", intent.getStringExtra("sender"));
 				startActivity(i);
@@ -139,7 +137,7 @@ public class CheckElectorateActivity extends ListActivity {
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		case R.id.network_info:
-			Intent i = new Intent(this, ch.bfh.evoting.votinglib.NetworkInformationsActivity.class);
+			Intent i = new Intent(this, ch.bfh.evoting.voterapp.NetworkInformationsActivity.class);
 			startActivity(i);
 			return true;
 		case R.id.help:
@@ -150,10 +148,10 @@ public class CheckElectorateActivity extends ListActivity {
 		return super.onOptionsItemSelected(item);
 	}
 	
-	@Override
-	public void onBackPressed() {
-		//do nothing because we don't want that people access to an anterior activity
-	}
+//	@Override
+//	public void onBackPressed() {
+//		//do nothing because we don't want that people access to an anterior activity
+//	}
 	
 	protected void onResume() {
 		super.onResume();

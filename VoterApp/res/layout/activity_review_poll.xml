@@ -2,8 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".ReviewPollActivity" >
+    android:orientation="vertical" >
 
     <TextView
         android:id="@+id/textview_review_poll"
@@ -11,7 +10,9 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical|center_horizontal"
         android:minHeight="70dp"
-        android:text="@string/review_poll"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:text="@string/title_activity_reviewpoll"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <fragment
@@ -19,28 +20,30 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        class="ch.bfh.evoting.votinglib.fragment.PollReviewFragment" >
+        class="ch.bfh.evoting.voterapp.fragment.PollReviewFragment" >
     </fragment>
-
-    <!-- <LinearLayout
-        style="@style/ActionBar.Solid.Votebartheme"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:divider="?android:dividerVertical"
-        android:dividerPadding="8dp"
-        android:orientation="horizontal"
-        android:showDividers="middle" >
-
-        <Button
-            android:id="@+id/button_validate_review"
-            style="@style/BottomBar"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.18"
-            android:drawableLeft="@drawable/ic_action_accept"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:text="@string/validate_review" />
-    </LinearLayout> -->
+    
+    <LinearLayout
+	     style="@style/ActionBar.Solid.Votebartheme"
+	     android:layout_width="fill_parent"
+	     android:layout_height="wrap_content"
+	     android:orientation="horizontal"
+	     
+	     android:showDividers="middle"
+	     android:divider="?android:dividerVertical"
+	     android:dividerPadding="8dp" >
+	
+	   <Button
+	       android:id="@+id/button_start_poll_period"
+	       style="@style/BottomBar"
+	       android:layout_width="0dp"
+	       android:layout_height="wrap_content"
+	       android:layout_weight="0.18"
+	       android:paddingLeft="16dp"
+	       android:paddingRight="16dp"
+	       android:drawableLeft="@drawable/ic_action_play"
+	       android:text="@string/action_start_poll_period" />
+	
+	</LinearLayout>
 
 </LinearLayout>

@@ -20,5 +20,48 @@
       <item name="android:windowBackground">@drawable/gradient_green</item>
 
     </style>
+    
+    <style name="tallerBarStyle" parent="@android:style/Widget.SeekBar">
+        <item name="android:indeterminateOnly">false</item>
+        <item name="android:progressDrawable">@android:drawable/progress_horizontal</item>
+        <item name="android:indeterminateDrawable">@android:drawable/progress_horizontal</item>
+        <item name="android:minHeight">8dip</item>
+        <item name="android:maxHeight">20dip</item>
+    </style>
+    
+    <style name="BottomBar">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:background">@drawable/selectable_background_bottombar</item>
+    </style>
+    
+    <style name="MainButtons">
+        <item name="android:layout_margin">4dp</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:background">@drawable/selectable_background_mainbuttons</item>
+    </style>
+    
+    <style name="BorderLessButton">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:background">@drawable/selectable_background_votebartheme</item>
+    </style>
+    
+    <style name="Dialog" parent="android:Theme.Holo.Dialog">
+	    <item name="android:windowBackground">@android:color/transparent</item>
+	    <item name="android:windowTitleStyle">@style/DialogTitleStyle</item>
+	    <item name="android:tint">@android:color/holo_orange_light</item>
+	</style>
+
+	<style name="DialogTitleStyle">
+	    <item name="android:maxLines">1</item>
+	    <item name="android:scrollHorizontally">true</item>
+	    <item name="android:textAppearance">@style/DialogTitleStyleTextAppearance</item>
+	</style>
+	
+	<style name="DialogTitleStyleTextAppearance">
+	    <item name="android:textColor">@android:color/holo_orange_light</item>
+	</style>
 
 </resources>
