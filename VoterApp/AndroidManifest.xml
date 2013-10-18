@@ -90,7 +90,6 @@
             android:name="ch.bfh.evoting.voterapp.ElectorateActivity"
             android:label="@string/title_activity_electorate"
             android:launchMode="singleTop"
-            android:noHistory="true"
             android:parentActivityName="ch.bfh.evoting.voterapp.PollDetailActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
