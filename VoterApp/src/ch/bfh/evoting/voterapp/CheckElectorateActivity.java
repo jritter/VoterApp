@@ -9,8 +9,9 @@ import java.util.TreeMap;
 import ch.bfh.evoting.voterapp.adapters.NetworkParticipantListAdapter;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
+import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
-import ch.bfh.evoting.voterapp.util.HelpDialogFragment;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
@@ -137,8 +138,10 @@ public class CheckElectorateActivity extends ListActivity {
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		case R.id.network_info:
-			Intent i = new Intent(this, ch.bfh.evoting.voterapp.NetworkInformationsActivity.class);
-			startActivity(i);
+			//Intent i = new Intent(this, ch.bfh.evoting.voterapp.NetworkInformationActivity.class);
+			//startActivity(i);
+			NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();
+			ndf.show( getFragmentManager( ), "networkInfo" );
 			return true;
 		case R.id.help:
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_electorate), getString(R.string.help_text_electorate) );

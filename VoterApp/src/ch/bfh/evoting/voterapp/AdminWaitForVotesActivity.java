@@ -1,8 +1,8 @@
 package ch.bfh.evoting.voterapp;
 
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
+import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
-import ch.bfh.evoting.voterapp.util.HelpDialogFragment;
 import android.os.Bundle;
 import android.app.AlertDialog;
 import android.app.ListActivity;

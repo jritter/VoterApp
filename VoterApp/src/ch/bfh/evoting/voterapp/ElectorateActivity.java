@@ -11,10 +11,10 @@ import ch.bfh.evoting.voterapp.adapters.NetworkParticipantListAdapter;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
+import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
-import ch.bfh.evoting.voterapp.util.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.util.IPAddressComparator;
-
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -29,6 +29,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ListView;
@@ -110,8 +111,11 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		case R.id.network_info:
-			Intent i = new Intent(this, NetworkInformationsActivity.class);
-			startActivity(i);
+			//Intent i = new Intent(this, NetworkInformationActivity.class);
+			//startActivity(i);
+			
+			NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();			
+			ndf.show( getFragmentManager( ), "networkInfo" );
 			return true;
 		case R.id.help:
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_electorate), getString(R.string.help_text_electorate) );

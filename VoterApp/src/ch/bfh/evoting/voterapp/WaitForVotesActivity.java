@@ -1,7 +1,7 @@
 package ch.bfh.evoting.voterapp;
 
 
-import ch.bfh.evoting.voterapp.util.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.Menu;

@@ -8,8 +8,8 @@ import ch.bfh.evoting.voterapp.db.PollDbHelper;
 import ch.bfh.evoting.voterapp.entities.DatabaseException;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Poll;
-import ch.bfh.evoting.voterapp.util.HelpDialogFragment;
-
+import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -174,8 +174,10 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 			askToSave();
 			return true;
 		case R.id.action_network_info:
-			Intent i = new Intent(this, NetworkInformationsActivity.class);
-			startActivity(i);
+			//Intent i = new Intent(this, NetworkInformationActivity.class);
+			//startActivity(i);
+			NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();
+			ndf.show( getFragmentManager( ), "networkInfo" );
 			return true;
 		case R.id.help:
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_poll_details), getString(R.string.help_text_poll_details) );
@@ -323,7 +325,7 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 				i.putExtra("poll", (Serializable)this.poll);
 				startActivity(i);
 			} else {
-				Intent i = new Intent(this, NetworkInformationsActivity.class);
+				Intent i = new Intent(this, NetworkInformationActivity.class);
 				i.putExtra("poll", (Serializable)this.poll);
 				startActivity(i);
 			}

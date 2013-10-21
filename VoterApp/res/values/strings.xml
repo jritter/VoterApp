@@ -138,7 +138,7 @@
     <string name="display_result_title">Poll results</string>
     <string name="vote_title">Please vote</string>
     <string name="wait_votes">Thanks for voting!\nWaiting for votes...</string>
-    <string name="title_activity_network_ready">Network connection informations</string>
+    <string name="title_activity_network_ready">Network connection information</string>
     <string name="title_activity_choosenetwork">Please Choose the Network you want to use</string>
     <string name="title_activity_welcome">Welcome to the InstaVote Administrator!</string>
     <string name="title_activity_choosenetwork">Please Choose the Network you want to use</string>

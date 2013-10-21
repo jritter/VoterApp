@@ -1,4 +1,4 @@
-package ch.bfh.evoting.voterapp.util;
+package ch.bfh.evoting.voterapp.fragment;
 
 import ch.bfh.evoting.voterapp.R;
 import android.app.AlertDialog;
