@@ -17,9 +17,7 @@
         android:id="@+id/listview_electorate"
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:layout_weight="1"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin">
+        android:layout_weight="1">
     </ListView>
 
     <LinearLayout

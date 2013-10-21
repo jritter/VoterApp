@@ -10,8 +10,6 @@
         android:layout_height="wrap_content"
         android:gravity="center_vertical|center_horizontal"
         android:minHeight="70dp"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
         android:text="@string/title_activity_network_ready"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
@@ -39,7 +37,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.18"
-            android:drawableLeft="@drawable/ic_action_labels"
+            android:drawableLeft="@drawable/ic_action_edit"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:text="@string/recreate_network" />
@@ -61,7 +59,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.18"
-            android:drawableLeft="@drawable/ic_action_next_item"
+            android:drawableRight="@drawable/ic_action_next_item"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:text="@string/next" />

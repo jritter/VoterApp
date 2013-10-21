@@ -6,6 +6,7 @@ import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.VoteActivity.VoteService;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkOptionsFragment;
 import ch.bfh.evoting.voterapp.network.wifi.AdhocWifiManager;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
@@ -209,11 +210,15 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 			return true;
 		}else if(item.getItemId()==R.id.network_info){
 
-			Intent i = new Intent(this,
-					ch.bfh.evoting.voterapp.NetworkInformationActivity.class);
-			startActivity(i);
-			LocalBroadcastManager.getInstance(this).unregisterReceiver(
-					serviceStartedListener);
+			//Intent i = new Intent(this,
+			//		ch.bfh.evoting.voterapp.NetworkInformationActivity.class);
+			//startActivity(i);
+			//LocalBroadcastManager.getInstance(this).unregisterReceiver(
+			//		serviceStartedListener);
+			
+			NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();			
+			ndf.show( getFragmentManager( ), "networkInfo" );
+			
 			return true;
 		} else if (item.getItemId()==R.id.help){
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance(
