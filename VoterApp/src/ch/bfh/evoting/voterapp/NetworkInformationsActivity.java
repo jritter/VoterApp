@@ -126,7 +126,7 @@ public class NetworkInformationsActivity extends Activity implements OnClickList
 		
 		WifiAPManager wifiapman = new WifiAPManager();
 		WifiManager wifiman = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-		if (wifiapman.isWifiAPEnabled(wifiman)) {
+		if (!wifiapman.isWifiAPEnabled(wifiman)) {
 			LinearLayout v = (LinearLayout)findViewById(R.id.view_wlan_key);
 			((LinearLayout)v.getParent()).removeView(v);
 		} else {

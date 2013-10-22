@@ -11,7 +11,7 @@
         android:orientation="vertical"
         android:layout_weight="1" >
 
-        <TextView
+        <!-- <TextView
             android:id="@+id/textview_network_name_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -58,6 +58,115 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="left"
+            android:textSize="20sp"
+            android:textStyle="" >
+        </TextView>-->
+        
+        <TextView
+            android:id="@+id/textview_network_name_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/network_name"
+            android:textAllCaps="true" >
+        </TextView>
+
+        <View
+            android:id="@+id/separator_1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="5dp"
+            android:background="@color/theme_color"
+            android:gravity="center_vertical" />
+
+        <TextView
+            android:id="@+id/textview_network_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textStyle="" >
+        </TextView>
+
+        <LinearLayout
+            android:id="@+id/view_wlan_key"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/textview_network_key_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/network_key"
+                android:textAllCaps="true" >
+            </TextView>
+
+            <View
+                android:id="@+id/separator_4"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="5dp"
+                android:background="@color/theme_color"
+                android:gravity="center_vertical" />
+
+            <TextView
+                android:id="@+id/textview_network_key"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20sp"
+                android:textStyle="" >
+            </TextView>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textview_group_name_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/group_name_desc"
+            android:textAllCaps="true" >
+        </TextView>
+
+        <View
+            android:id="@+id/separator_2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="5dp"
+            android:background="@color/theme_color"
+            android:gravity="center_vertical" />
+
+        <TextView
+            android:id="@+id/textview_group_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textStyle="" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/textview_group_password_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/group_password_desc"
+            android:textAllCaps="true" >
+        </TextView>
+
+        <View
+            android:id="@+id/separator_3"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="5dp"
+            android:background="@color/theme_color"
+            android:gravity="center_vertical" />
+
+        <TextView
+            android:id="@+id/textview_group_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
             android:textSize="20sp"
             android:textStyle="" >
         </TextView>

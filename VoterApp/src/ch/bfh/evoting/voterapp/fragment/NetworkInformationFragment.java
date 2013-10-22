@@ -7,11 +7,14 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.wifi.WifiManager;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -25,9 +28,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.R;
+import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -42,7 +47,8 @@ public class NetworkInformationFragment extends Fragment {
 
 	private boolean paramsAvailable = false;
 	private String ssid;
-	private String password;
+	private String groupPassword;
+	private String groupName;
 	private boolean nfcAvailable;
 
 
@@ -74,14 +80,17 @@ public class NetworkInformationFragment extends Fragment {
 
 		ssid = AndroidApplication.getInstance().getNetworkInterface()
 				.getNetworkName();
-		password = AndroidApplication.getInstance().getNetworkInterface()
+		groupName = AndroidApplication.getInstance().getNetworkInterface()
 				.getGroupName();
-		if (password == null) {
+		if (groupName == null) {
 			ssid = getString(R.string.not_connected);
-			password = getString(R.string.not_connected);
+			groupName = getString(R.string.not_connected);
+			groupPassword = getString(R.string.not_connected);
 			paramsAvailable = false;
 		} else {
 			paramsAvailable = true;
+			SharedPreferences preferences = this.getActivity().getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
+			groupPassword = preferences.getString("group_password", null);
 		}
 
 		
@@ -111,7 +120,7 @@ public class NetworkInformationFragment extends Fragment {
 							try {
 								QRCodeWriter writer = new QRCodeWriter();
 								BitMatrix qrcode = writer.encode(ssid + "||"
-										+ password, BarcodeFormat.QR_CODE,
+										+ groupName +"||" + groupPassword, BarcodeFormat.QR_CODE,
 										size, size);
 								ivQrCode.setImageBitmap(qrCode2Bitmap(qrcode));
 
@@ -160,11 +169,31 @@ public class NetworkInformationFragment extends Fragment {
 
 
 
+//		TextView tv_network_name = (TextView) v.findViewById(R.id.textview_network_name);
+//		tv_network_name.setText(ssid);
+//
+//		TextView tv_network_password = (TextView) v.findViewById(R.id.textview_network_password);
+//		tv_network_password.setText(groupPassword);
+		
 		TextView tv_network_name = (TextView) v.findViewById(R.id.textview_network_name);
 		tv_network_name.setText(ssid);
 
-		TextView tv_network_password = (TextView) v.findViewById(R.id.textview_network_password);
-		tv_network_password.setText(password);
+		TextView tv_group_name = (TextView) v.findViewById(R.id.textview_group_name);
+		tv_group_name.setText(groupName.replace("group", ""));
+		
+		TextView tv_group_password = (TextView) v.findViewById(R.id.textview_group_password);
+		tv_group_password.setText(groupPassword);
+		
+		WifiAPManager wifiapman = new WifiAPManager();
+		WifiManager wifiman = (WifiManager) this.getActivity().getSystemService(Context.WIFI_SERVICE);
+		if (!wifiapman.isWifiAPEnabled(wifiman)) {
+			LinearLayout view = (LinearLayout)v.findViewById(R.id.view_wlan_key);
+			((LinearLayout)view.getParent()).removeView(v);
+		} else {
+			TextView tv_network_key = (TextView) v.findViewById(R.id.textview_network_key);
+			SharedPreferences preferences = this.getActivity().getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
+			tv_network_key.setText(preferences.getString("wlan_key", ""));
+		}
 
 		return v;
 	}
