@@ -5,11 +5,11 @@ import java.io.Serializable;
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.VoteActivity.VoteService;
 import ch.bfh.evoting.voterapp.entities.Poll;
+import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkOptionsFragment;
 import ch.bfh.evoting.voterapp.network.wifi.AdhocWifiManager;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
-import ch.bfh.evoting.voterapp.util.HelpDialogFragment;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
@@ -103,7 +103,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 				LocalBroadcastManager.getInstance(NetworkConfigActivity.this)
 				.unregisterReceiver(this);
 				if(AndroidApplication.getInstance().isAdmin()){
-					Intent i = new Intent(NetworkConfigActivity.this, NetworkInformationsActivity.class);
+					Intent i = new Intent(NetworkConfigActivity.this, NetworkInformationActivity.class);
 					i.putExtra("poll", poll);
 					startActivity(i);
 				} else {
@@ -214,11 +214,15 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 			return true;
 		}else if(item.getItemId()==R.id.network_info){
 
-			Intent i = new Intent(this,
-					ch.bfh.evoting.voterapp.NetworkInformationsActivity.class);
-			startActivity(i);
-			LocalBroadcastManager.getInstance(this).unregisterReceiver(
-					serviceStartedListener);
+			//Intent i = new Intent(this,
+			//		ch.bfh.evoting.voterapp.NetworkInformationActivity.class);
+			//startActivity(i);
+			//LocalBroadcastManager.getInstance(this).unregisterReceiver(
+			//		serviceStartedListener);
+			
+			NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();			
+			ndf.show( getFragmentManager( ), "networkInfo" );
+			
 			return true;
 		} else if (item.getItemId()==R.id.help){
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance(

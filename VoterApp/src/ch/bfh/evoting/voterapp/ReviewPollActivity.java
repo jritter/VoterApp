@@ -5,8 +5,7 @@ import java.io.Serializable;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
-import ch.bfh.evoting.voterapp.util.HelpDialogFragment;
-
+import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;

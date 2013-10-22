@@ -79,7 +79,7 @@
                 android:value="ch.bfh.evoting.voterapp.PollDetailActivity" />
         </activity>
         <activity
-            android:name="ch.bfh.evoting.voterapp.NetworkInformationsActivity"
+            android:name="ch.bfh.evoting.voterapp.NetworkInformationActivity"
             android:label="@string/title_activity_network_informations"
             android:parentActivityName="ch.bfh.evoting.voterapp.NetworkConfigActivity" >
             <meta-data

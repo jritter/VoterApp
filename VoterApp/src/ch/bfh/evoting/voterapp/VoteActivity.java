@@ -7,9 +7,8 @@ import ch.bfh.evoting.voterapp.adapters.VoteOptionListAdapter;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
+import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
-import ch.bfh.evoting.voterapp.util.HelpDialogFragment;
-
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;

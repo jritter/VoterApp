@@ -17,7 +17,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="lkasjdflkasjdflk"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:textSize="20sp"
         android:textStyle="" />
     
@@ -27,7 +26,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="lkasjdflkasjdflk"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:textSize="20sp"
         android:textStyle="" />
     
@@ -36,7 +34,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
 		android:text="lkasjdflkasjdflk"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:textSize="20sp"
         android:textStyle="" />
 

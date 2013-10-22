@@ -3,7 +3,8 @@ package ch.bfh.evoting.voterapp;
 import java.io.Serializable;
 
 import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
-import ch.bfh.evoting.voterapp.util.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
@@ -59,7 +60,7 @@ public class MainActivity extends Activity implements OnClickListener {
 				intent.putExtra("hideCreateNetwork", true);
 		        startActivity(intent);
 			} else {
-				Intent i = new Intent(this, NetworkInformationsActivity.class);
+				Intent i = new Intent(this, NetworkInformationActivity.class);
 				startActivity(i);
 			}
 		} else if (view == btnPolls){
@@ -82,8 +83,12 @@ public class MainActivity extends Activity implements OnClickListener {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.network_info:
-			Intent i = new Intent(this, ch.bfh.evoting.voterapp.NetworkInformationsActivity.class);
-			startActivity(i);
+			//Intent i = new Intent(this, ch.bfh.evoting.voterapp.NetworkInformationActivity.class);
+			//startActivity(i);
+			
+			NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();			
+			ndf.show( getFragmentManager( ), "networkInfo" );
+			
 			return true;
 		case R.id.help:
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_main), getString(R.string.help_text_main) );

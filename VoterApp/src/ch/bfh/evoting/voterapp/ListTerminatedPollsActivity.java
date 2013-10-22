@@ -7,8 +7,7 @@ import ch.bfh.evoting.voterapp.adapters.PollArchiveAdapter;
 import ch.bfh.evoting.voterapp.db.PollDbHelper;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
-import ch.bfh.evoting.voterapp.util.HelpDialogFragment;
-
+import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;

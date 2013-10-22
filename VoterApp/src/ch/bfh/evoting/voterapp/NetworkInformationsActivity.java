@@ -35,9 +35,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import ch.bfh.evoting.voterapp.entities.Poll;
+import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.network.wifi.AdhocWifiManager;
 import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
-import ch.bfh.evoting.voterapp.util.HelpDialogFragment;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;

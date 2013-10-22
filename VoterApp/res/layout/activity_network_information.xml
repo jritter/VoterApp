@@ -3,24 +3,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-
+    
     <TextView
-        android:id="@+id/textview_electorate"
+        android:id="@+id/textview_network_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical|center_horizontal"
         android:minHeight="70dp"
-        android:text="@string/title_activity_chooseelectorate"
+        android:text="@string/title_activity_network_ready"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <ListView
-        android:id="@+id/listview_electorate"
+    <fragment
+        android:id="@+id/fragment_network_information"
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:layout_weight="1">
-    </ListView>
-
+        android:layout_weight="1"
+        class="ch.bfh.evoting.voterapp.fragment.NetworkInformationFragment" >
+    </fragment>
+    
     <LinearLayout
+        android:id="@+id/layout_bottom_action_bar"
         style="@style/ActionBar.Solid.Votebartheme"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -30,6 +32,28 @@
         android:showDividers="middle" >
 
         <Button
+            android:id="@+id/button_recreate_network"
+            style="@style/BottomBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.18"
+            android:drawableLeft="@drawable/ic_action_edit"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="@string/recreate_network" />
+        
+        <!-- <Button
+            android:id="@+id/button_write_nfc_tag"
+            style="@style/BottomBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.18"
+            android:drawableLeft="@drawable/ic_action_labels"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="@string/write_nfc_tag" /> -->
+        
+        <Button
             android:id="@+id/button_next"
             style="@style/BottomBar"
             android:layout_width="0dp"
@@ -38,7 +62,7 @@
             android:drawableRight="@drawable/ic_action_next_item"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:text="@string/action_next" />
+            android:text="@string/next" />
     </LinearLayout>
-
+    
 </LinearLayout>

@@ -32,8 +32,8 @@ import ch.bfh.evoting.voterapp.entities.DatabaseException;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
+import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
-import ch.bfh.evoting.voterapp.util.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.util.OptionsComparator;
 
 /**

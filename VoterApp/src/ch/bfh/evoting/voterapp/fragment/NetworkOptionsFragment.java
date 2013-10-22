@@ -5,7 +5,7 @@ import java.util.HashMap;
 
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.NetworkConfigActivity;
-import ch.bfh.evoting.voterapp.NetworkInformationsActivity;
+import ch.bfh.evoting.voterapp.NetworkInformationActivity;
 import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.VoteActivity;
 import ch.bfh.evoting.voterapp.network.wifi.AdhocWifiManager;

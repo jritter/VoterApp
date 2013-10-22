@@ -5,8 +5,8 @@ import java.util.List;
 import ch.bfh.evoting.voterapp.adapters.PollAdapter;
 import ch.bfh.evoting.voterapp.db.PollDbHelper;
 import ch.bfh.evoting.voterapp.entities.Poll;
-import ch.bfh.evoting.voterapp.util.HelpDialogFragment;
-
+import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -80,8 +80,10 @@ public class PollActivity extends Activity implements OnItemClickListener {
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		case R.id.action_network_info:
-			Intent i = new Intent(this, NetworkInformationsActivity.class);
-			startActivity(i);
+			//Intent i = new Intent(this, NetworkInformationActivity.class);
+			//startActivity(i);
+			NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();
+			ndf.show( getFragmentManager( ), "networkInfo" );
 			return true;
 		case R.id.help:
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_poll), getString(R.string.help_text_poll) );
