@@ -19,6 +19,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
@@ -45,7 +46,7 @@ import ch.bfh.evoting.voterapp.R;
  */
 public class CreateNetworkActivity extends Activity implements OnClickListener,
 TextWatcher {
-
+	
 	private WifiAPManager wifiapman;
 	private WifiManager wifiman;
 	private Button btnCreateNetwork;
@@ -95,9 +96,7 @@ TextWatcher {
 					new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 
-
-					AndroidApplication.getInstance().getNetworkInterface().joinNetwork(txtNetworkPIN.getText().toString());
-
+					AndroidApplication.getInstance().getNetworkInterface().joinGroup(null);
 
 					CreateNetworkActivity.this.finish();
 				}
@@ -161,10 +160,7 @@ TextWatcher {
 			WifiConfiguration wificonfig = new WifiConfiguration();
 			wificonfig.SSID = txtNetworkName.getText().toString();
 			wificonfig.preSharedKey = txtNetworkPIN.getText().toString();
-			if(!Character.isLetter(wificonfig.preSharedKey.charAt(0))){
-				Toast.makeText(this, R.string.taost_password_letter, Toast.LENGTH_LONG).show();
-				return;
-			}
+
 			wificonfig.hiddenSSID = false;
 			wificonfig.status = WifiConfiguration.Status.ENABLED;
 
@@ -180,8 +176,15 @@ TextWatcher {
 			.set(WifiConfiguration.PairwiseCipher.CCMP);
 			wificonfig.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
 
+			SharedPreferences preferences = this.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
+			SharedPreferences.Editor editor = preferences.edit();
+			editor.putString("wlan_key", txtNetworkPIN.getText().toString());
+			editor.commit();
+			
 			// enabling the configuration
 			wifiapman.enableHotspot(wifiman, wificonfig, this);
+			
+			
 		}
 	}
 

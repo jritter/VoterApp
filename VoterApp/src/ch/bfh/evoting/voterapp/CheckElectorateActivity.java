@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import ch.bfh.evoting.voterapp.adapters.NetworkParticipantListAdapter;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
+import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.HelpDialogFragment;
 import android.os.Bundle;

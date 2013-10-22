@@ -318,7 +318,7 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 			}
 
 			//then start next activity
-			if(AndroidApplication.getInstance().getNetworkInterface().getConversationPassword()==null){
+			if(AndroidApplication.getInstance().getNetworkInterface().getGroupName()==null){
 				Intent i = new Intent(this, NetworkConfigActivity.class);
 				i.putExtra("poll", (Serializable)this.poll);
 				startActivity(i);

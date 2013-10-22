@@ -5,6 +5,7 @@ import org.apache.log4j.Level;
 
 import ch.bfh.evoting.voterapp.network.AllJoynNetworkInterface;
 import ch.bfh.evoting.voterapp.network.NetworkInterface;
+import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.JavaSerialization;
 import ch.bfh.evoting.voterapp.util.SerializationUtil;
@@ -27,7 +28,8 @@ import android.support.v4.content.LocalBroadcastManager;
  */
 public class AndroidApplication extends Application {
 
-	public static final Level LEVEL = Level.DEBUG;;
+	public static final String PREFS_NAME = "network_preferences";
+	public static final Level LEVEL = Level.DEBUG;
 
 	private static AndroidApplication instance;
 	private SerializationUtil su;

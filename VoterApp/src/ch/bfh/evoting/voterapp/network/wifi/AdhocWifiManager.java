@@ -39,7 +39,6 @@ import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 public class AdhocWifiManager {
 
 	private static final String TAG = AdhocWifiManager.class.getSimpleName();
-	private static final String PREFS_NAME = "network_preferences";
 
 	private WifiManager wifi;
 	private SharedPreferences preferences;
@@ -245,7 +244,7 @@ public class AdhocWifiManager {
 
 			// extract the current networkId and store it in the preferences
 			// file
-			preferences = context.getSharedPreferences(PREFS_NAME, 0);
+			preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
 			editor = preferences.edit();
 			editor.putInt("originalNetId", wifi.getConnectionInfo()
 					.getNetworkId());
@@ -394,12 +393,12 @@ public class AdhocWifiManager {
 			if (startActivity) {
 				if (success) {
 					// start the service if we were successful
-					preferences = context.getSharedPreferences(PREFS_NAME, 0);
+					preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
 					editor = preferences.edit();
 					editor.putString("SSID", SSID);
 					editor.commit();
 
-					AndroidApplication.getInstance().getNetworkInterface().joinNetwork(preferences.getString("password", null));
+					AndroidApplication.getInstance().getNetworkInterface().joinGroup(preferences.getString("group_name", null));
 
 					LocalBroadcastManager.getInstance(context).registerReceiver(new BroadcastReceiver() {
 
@@ -484,7 +483,7 @@ public class AdhocWifiManager {
 		 */
 		@Override
 		protected Void doInBackground(Void... params) {
-			preferences = context.getSharedPreferences(PREFS_NAME, 0);
+			preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
 			wifi.enableNetwork(preferences.getInt("originalNetId", 0), true);
 
 			return null;

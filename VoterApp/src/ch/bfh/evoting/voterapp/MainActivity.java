@@ -2,6 +2,7 @@ package ch.bfh.evoting.voterapp;
 
 import java.io.Serializable;
 
+import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
 import ch.bfh.evoting.voterapp.util.HelpDialogFragment;
 import android.os.Bundle;
 import android.app.Activity;
@@ -19,6 +20,8 @@ import android.widget.Button;
  */
 public class MainActivity extends Activity implements OnClickListener {
 	
+	private static final String TAG = WifiAPManager.class.getName();
+
 	private Button btnSetupNetwork;
 	private Button btnPollArchive;
 	private Button btnPolls;
@@ -42,10 +45,16 @@ public class MainActivity extends Activity implements OnClickListener {
 	}
 
 	@Override
+	protected void onResume(){
+		AndroidApplication.getInstance().setIsAdmin(false);
+		super.onResume();
+	}
+	
+	@Override
 	public void onClick(View view) {
 		if (view == btnSetupNetwork) {
 			//then start next activity
-			if(AndroidApplication.getInstance().getNetworkInterface().getConversationPassword()==null){
+			if(AndroidApplication.getInstance().getNetworkInterface().getGroupName()==null){
 				Intent intent = new Intent(this, NetworkConfigActivity.class);
 				intent.putExtra("hideCreateNetwork", true);
 		        startActivity(intent);

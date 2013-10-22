@@ -2,6 +2,7 @@ package ch.bfh.evoting.voterapp.network;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 
 import org.alljoyn.bus.Status;
@@ -21,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.HandlerThread;
@@ -31,10 +33,8 @@ import android.util.Log;
 
 public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 
-	private static final String PREFS_NAME = "network_preferences";
-
 	private BusHandler mBusHandler;
-	private String networkName;
+	private String groupName;
 
 	public AllJoynNetworkInterface(Context context) {
 		super(context);
@@ -46,18 +46,26 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 		LocalBroadcastManager.getInstance(context).registerReceiver(mMessageReceiver, new IntentFilter("messageArrived"));
 		// Listening for group destroy signal
 		LocalBroadcastManager.getInstance(context).registerReceiver(mGroupEventReceiver, new IntentFilter("groupDestroyed"));
+		// Listening for group destroy signal
+		LocalBroadcastManager.getInstance(context).registerReceiver(mNetworkConectionFailedReceiver, new IntentFilter("networkConnectionFailed"));
+		
 	}
 
 	@Override
 	public String getNetworkName() {
-		SharedPreferences preferences = context.getSharedPreferences(PREFS_NAME, 0);
-		preferences = context.getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
 		return preferences.getString("SSID", "");
 	}
 
 	@Override
-	public String getConversationPassword() {
-		return networkName;
+	public String getGroupName() {
+		return groupName;
+	}
+	
+	@Override
+	public String getGroupPassword() {
+		SharedPreferences preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
+		return preferences.getString("group_password", "");
 	}
 
 	@Override
@@ -68,7 +76,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 	@Override
 	public Map<String, Participant> getConversationParticipants() {
 		TreeMap<String,Participant> parts = new TreeMap<String,Participant>();
-		for(String s : mBusHandler.getParticipants(this.networkName)){
+		for(String s : mBusHandler.getParticipants(this.groupName)){
 			String wellKnownName = s;
 			if(mBusHandler.getPeerWellKnownName(s)!=null){
 				wellKnownName = mBusHandler.getPeerWellKnownName(s);
@@ -89,7 +97,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 
 		Message msg = mBusHandler.obtainMessage(BusHandler.PING);
 		Bundle data = new Bundle();
-		data.putString("groupName", this.networkName);
+		data.putString("groupName", this.groupName);
 		data.putString("pingString", string);
 		msg.setData(data);
 		mBusHandler.sendMessage(msg);
@@ -105,21 +113,37 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 	public void disconnect() {
 		
 		//leave actual group
-		Message msg1 = mBusHandler.obtainMessage(BusHandler.LEAVE_GROUP, this.networkName);
+		Message msg1 = mBusHandler.obtainMessage(BusHandler.LEAVE_GROUP, this.groupName);
 		mBusHandler.sendMessage(msg1);
 		
 		if(AndroidApplication.getInstance().isAdmin()){
-			Message msg2 = mBusHandler.obtainMessage(BusHandler.DESTROY_GROUP, this.networkName);
+			Message msg2 = mBusHandler.obtainMessage(BusHandler.DESTROY_GROUP, this.groupName);
 			mBusHandler.sendMessage(msg2);
 		}
-		this.networkName = null;
+		this.groupName = null;
 		
 	}
 
 	@Override
-	public void joinNetwork(String networkName) {
-		String oldNetworkName = this.networkName;
-		this.networkName = networkName;
+	public void joinGroup(String groupName) {
+		if(groupName==null){
+			//Generate group name
+			int groupNumber = 1;
+			groupName = "group"+groupNumber;
+			while(mBusHandler.listGroups().contains(groupName)){
+				groupNumber++;
+				groupName = "group"+groupNumber;
+			}
+			//generate group password
+			String groupPassword = generatePassword();
+			SharedPreferences preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
+			Editor editor = preferences.edit();
+			editor.putString("group_password", groupPassword);
+			editor.commit();
+			
+		}
+		String oldNetworkName = this.groupName;
+		this.groupName = groupName;
 
 		boolean apOn = new WifiAPManager().isWifiAPEnabled((WifiManager) context.getSystemService(Context.WIFI_SERVICE));
 
@@ -128,10 +152,10 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 				Message msg1 = mBusHandler.obtainMessage(BusHandler.DESTROY_GROUP, oldNetworkName);
 				mBusHandler.sendMessage(msg1);
 			}
-			Message msg2 = mBusHandler.obtainMessage(BusHandler.CREATE_GROUP, this.networkName);
+			Message msg2 = mBusHandler.obtainMessage(BusHandler.CREATE_GROUP, this.groupName);
 			mBusHandler.sendMessage(msg2);
 		} else {
-			Message msg3 = mBusHandler.obtainMessage(BusHandler.JOIN_GROUP, this.networkName);
+			Message msg3 = mBusHandler.obtainMessage(BusHandler.JOIN_GROUP, this.groupName);
 			mBusHandler.sendMessage(msg3);
 		}		
 
@@ -155,12 +179,38 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String groupName = intent.getStringExtra("groupName");
-			if(groupName.equals(networkName)){
-				networkName = null;
+			if(groupName.equals(groupName)){
+				groupName = null;
 				Intent i  = new Intent(BroadcastIntentTypes.networkGroupDestroyedEvent);
 				LocalBroadcastManager.getInstance(context).sendBroadcast(i);
 			}
 		}
 	};
+	
+	/**
+	 * this broadcast receiver listens for incoming messages
+	 */
+	private BroadcastReceiver mNetworkConectionFailedReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			groupName = null;
+		}
+	};
+	
+	/**
+	 * Helper method that generates the network password
+	 * @return
+	 * Source: http://stackoverflow.com/questions/5683327/how-to-generate-a-random-string-of-20-characters
+	 */
+	private String generatePassword(){
+		char[] chars = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+		StringBuilder sb = new StringBuilder();
+		Random random = new Random();
+		for (int i = 0; i < 10; i++) {
+		    char c = chars[random.nextInt(chars.length)];
+		    sb.append(c);
+		}
+		return sb.toString();
+	}
 
 }

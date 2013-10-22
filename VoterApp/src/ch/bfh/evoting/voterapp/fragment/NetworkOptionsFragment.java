@@ -82,7 +82,7 @@ public class NetworkOptionsFragment extends Fragment {
 		Button btnAdvancedConfig = (Button)v.findViewById(R.id.button_advanced_network_config);
 
 		LinearLayout layout = (LinearLayout)v.findViewById(R.id.layout_network_options);
-		
+
 		if(AndroidApplication.getInstance().isAdmin()){
 			layout.removeView(btnScanQrCode);
 			layout.removeView(btnScanNFC);
@@ -91,18 +91,17 @@ public class NetworkOptionsFragment extends Fragment {
 		if(!activity.getPackageManager().hasSystemFeature(PackageManager.FEATURE_NFC) && btnScanNFC!=null){
 			layout.removeView(btnScanNFC);
 		}
-		
+
 		btnUseActualNetwork.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 
-				dialogFragment = new ConnectNetworkDialogFragment(false);
+					dialogFragment = new ConnectNetworkDialogFragment(false);
 
-				dialogFragment.setTargetFragment(NetworkOptionsFragment.this, DIALOG_FRAGMENT);
-				dialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog);
-				dialogFragment.show(getFragmentManager(), TAG);
-
+					dialogFragment.setTargetFragment(NetworkOptionsFragment.this, DIALOG_FRAGMENT);
+					dialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog);
+					dialogFragment.show(getFragmentManager(), TAG);
 			}
 		});
 

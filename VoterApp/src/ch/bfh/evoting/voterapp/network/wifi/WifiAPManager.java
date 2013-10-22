@@ -30,7 +30,6 @@ import ch.bfh.evoting.voterapp.AndroidApplication;
 public class WifiAPManager {
 
 	private static final String TAG = WifiAPManager.class.getName();
-	private static final String PREFS_NAME = "network_preferences";
 
 	private SharedPreferences preferences;
 	private SharedPreferences.Editor editor;
@@ -112,10 +111,10 @@ public class WifiAPManager {
 		String serializedAPConfig = Base64.encodeToString(baos.toByteArray(),
 				Base64.DEFAULT);
 
-		preferences = context.getSharedPreferences(PREFS_NAME, 0);
+		preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
 		editor = preferences.edit();
 		editor.putString("originalApConfig", serializedAPConfig);
-		editor.putString("password", config.preSharedKey);
+		editor.putString("group_password", config.preSharedKey);
 		editor.putString("SSID", config.SSID);
 		editor.commit();
 
@@ -141,7 +140,7 @@ public class WifiAPManager {
         //HTC One crashes when deactiving AP
         if (!strModel.contains("HTC One V")) {
             // restoring the original configuration
-            preferences = context.getSharedPreferences(PREFS_NAME, 0);
+            preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
             String serializedAPConfig = preferences.getString(
                     "originalApConfig", "");
 
@@ -402,7 +401,7 @@ public class WifiAPManager {
 			if (mode) {
 				d.dismiss();
 					
-				AndroidApplication.getInstance().getNetworkInterface().joinNetwork(preferences.getString("password", null));
+				AndroidApplication.getInstance().getNetworkInterface().joinGroup(preferences.getString("group_name", null));
 				
 			}
 		}

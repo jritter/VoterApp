@@ -11,6 +11,7 @@ import ch.bfh.evoting.voterapp.adapters.NetworkParticipantListAdapter;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
+import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.util.IPAddressComparator;
@@ -88,13 +89,25 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		LocalBroadcastManager.getInstance(this).registerReceiver(participantsDiscoverer, new IntentFilter(BroadcastIntentTypes.participantStateUpdate));
 
 		startPeriodicSend();
-		
+
 
 		//Send the list of participants in the network over the network
 		VoteMessage vm = new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_ELECTORATE, (Serializable)participants);
 		AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);
 
 	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+
+		//if extra is present, it has priority on the saved poll
+		Poll serializedPoll = (Poll)intent.getSerializableExtra("poll");
+		if(serializedPoll!=null){
+			poll = serializedPoll;
+		}
+		super.onNewIntent(intent);
+	}
+
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -122,20 +135,23 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		return super.onOptionsItemSelected(item); 
 	}
 
+
+
 	@Override
 	protected void onResume() {
+
 		AndroidApplication.getInstance().setCurrentActivity(this);
 
 		LocalBroadcastManager.getInstance(this).registerReceiver(participantsDiscoverer, new IntentFilter(BroadcastIntentTypes.participantStateUpdate));
-		
+
 		updateFromNetwork();
-		
+
 		//Send the updated list of participants in the network over the network
 		VoteMessage vm = new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_ELECTORATE, (Serializable)participants);
 		AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);
-		
+
 		startPeriodicSend();
-		
+
 		super.onResume();
 	}
 
@@ -200,13 +216,13 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 			LocalBroadcastManager.getInstance(this).unregisterReceiver(participantsDiscoverer);
 		}	
 	}
-	
-//	@Override
-//	public void onBackPressed() {
-//		//do nothing because we don't want that people access to an anterior activity
-//	}
-	
-	
+
+	//	@Override
+	//	public void onBackPressed() {
+	//		//do nothing because we don't want that people access to an anterior activity
+	//	}
+
+
 	private void updateFromNetwork(){
 		Map<String,Participant> newReceivedMapOfParticipants = AndroidApplication.getInstance().getNetworkInterface().getConversationParticipants();
 		for(String ip : newReceivedMapOfParticipants.keySet()){
@@ -234,15 +250,15 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		for(String ip : toRemove){
 			participants.remove(ip);
 		}
-		
+
 		npa.clear();
 		npa.addAll(participants.values());
 		npa.notifyDataSetChanged();
 	}
-	
+
 	private void startPeriodicSend(){
 		active = true;
-		
+
 		resendElectorate = new AsyncTask<Object, Object, Object>(){
 
 			@Override
@@ -260,6 +276,6 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
-	
+
 }
 

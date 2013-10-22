@@ -2,6 +2,7 @@
 
 package ch.bfh.evoting.voterapp.fragment;
 
+import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.R;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -45,16 +46,17 @@ OnClickListener, TextWatcher {
 	}
 
 	private EditText txtPassword;
+	private EditText txtGroupName;
 	private EditText txtNetworkKey;
 
 	private String password;
 	private String networkKey;
+	private String groupName;
+
 
 	private boolean showNetworkKeyField;
 
 	private AlertDialog dialog;
-
-	private static final String PREFS_NAME = "network_preferences";
 
 
 	/**
@@ -82,6 +84,9 @@ OnClickListener, TextWatcher {
 		View view = inflater.inflate(R.layout.dialog_join_network, null);
 
 		// extract the controls of the layout
+		txtGroupName = (EditText) view.findViewById(R.id.edittext_group_name);
+		txtGroupName.addTextChangedListener(this);
+
 		txtPassword = (EditText) view.findViewById(R.id.edittext_password);
 		txtPassword.addTextChangedListener(this);
 
@@ -92,26 +97,27 @@ OnClickListener, TextWatcher {
 			txtNetworkKey.setVisibility(View.INVISIBLE);
 		}
 
+		if(AndroidApplication.getInstance().isAdmin()){
+			txtPassword.setVisibility(View.INVISIBLE);
+			txtGroupName.setVisibility(View.INVISIBLE);
+		}
+		
+		if(txtPassword.getVisibility() == View.INVISIBLE &&
+				txtGroupName.getVisibility() == View.INVISIBLE &&
+				txtNetworkKey.getVisibility() == View.INVISIBLE){
+			saveData();
+		}
+
 		// Inflate and set the layout for the dialog
 		// Pass null as the parent view because its going in the dialog layout
 		builder.setView(view);
 		// Add action buttons
 		builder.setPositiveButton(R.string.join,
 				new DialogInterface.OnClickListener() {
+
 			public void onClick(DialogInterface dialog, int which) {
-				password = txtPassword.getText().toString();
-				networkKey = txtNetworkKey.getText().toString();
-				if(Character.isLetter(password.charAt(0))){
-					SharedPreferences preferences = getActivity().getSharedPreferences(PREFS_NAME, 0);
-					SharedPreferences.Editor editor = preferences.edit();
-//											editor.putString("SSID", selectedResult.SSID);
-					editor.putString("password",password);
-					//								((ConnectNetworkDialogFragment) dialog).getPassword());
-					editor.commit();
-					getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, getActivity().getIntent());
-				} else {
-					Toast.makeText(ConnectNetworkDialogFragment.this.getActivity(), R.string.taost_password_letter, Toast.LENGTH_LONG).show();
-				}
+				saveData();
+
 			}
 		});
 
@@ -119,6 +125,7 @@ OnClickListener, TextWatcher {
 				new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				password = txtPassword.getText().toString();
+				groupName = txtGroupName.getText().toString();
 				networkKey = txtNetworkKey.getText().toString();
 				getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, getActivity().getIntent());
 			}
@@ -137,12 +144,34 @@ OnClickListener, TextWatcher {
 		dialog.setOnShowListener(new OnShowListener() {
 
 			public void onShow(DialogInterface dialog) {
-				((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE)
-				.setEnabled(false);
+				
+					((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE)
+					.setEnabled(false);
+				
 			}
 		});
 
 		return dialog;
+	}
+	
+	private void saveData(){
+		password = txtPassword.getText().toString();
+		groupName = "group"+txtGroupName.getText().toString();
+		networkKey = txtNetworkKey.getText().toString();
+		SharedPreferences preferences = getActivity().getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
+		SharedPreferences.Editor editor = preferences.edit();
+		editor.putString("group_name",null);
+		editor.putString("group_password",null);
+		if(!AndroidApplication.getInstance().isAdmin()){
+			
+			//											editor.putString("SSID", selectedResult.SSID);
+			editor.putString("group_password",password);
+			editor.putString("group_name",groupName);
+			//								((ConnectNetworkDialogFragment) dialog).getPassword());
+		}
+		editor.commit();
+		
+		getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, getActivity().getIntent());
 	}
 
 	/*
@@ -170,9 +199,9 @@ OnClickListener, TextWatcher {
 	 * 
 	 * @return the password
 	 */
-	public String getPassword() {
-		return password;
-	}
+	//	public String getPassword() {
+	//		return password;
+	//	}
 
 	/**
 	 * Returns the network key which is defined in the textfield
@@ -204,12 +233,16 @@ OnClickListener, TextWatcher {
 				joinButton.setEnabled(true);
 			}
 		} else {
-			// activate only if there is at least one character in the password
-			// field
-			if (txtPassword.getText().toString().length() < 1) {
-				joinButton.setEnabled(false);
-			} else {
+			if(AndroidApplication.getInstance().isAdmin()){
 				joinButton.setEnabled(true);
+			} else {
+				// activate only if there is at least one character in the password
+				// field
+				if (txtPassword.getText().toString().length() < 1) {
+					joinButton.setEnabled(false);
+				} else {
+					joinButton.setEnabled(true);
+				}
 			}
 		}
 	}

@@ -26,13 +26,16 @@ public abstract class AbstractNetworkInterface implements NetworkInterface {
 	
 
 	@Override
-	public abstract void joinNetwork(String networkName);
+	public abstract void joinGroup(String groupName);
 	
 	@Override
 	public abstract String getNetworkName();
 
 	@Override
-	public abstract String getConversationPassword();
+	public abstract String getGroupName();
+	
+	@Override
+	public abstract String getGroupPassword();
 
 	@Override
 	public abstract String getMyIpAddress();

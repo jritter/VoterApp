@@ -50,12 +50,9 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 	private WifiManager wifi;
 	private AdhocWifiManager adhoc;
 
-	private static final String PREFS_NAME = "network_preferences";
 	private SharedPreferences preferences;
 	private EditText etIdentification;
 	private BroadcastReceiver serviceStartedListener;
-
-	private Button btnScanQRCode;
 
 	private boolean active;
 	private Poll poll;
@@ -82,7 +79,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 
 		// reading the identification from the preferences, if it is not there
 		// it will try to read the name of the device owner
-		preferences = getSharedPreferences(PREFS_NAME, 0);
+		preferences = getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
 		String identification = preferences.getString("identification", "");
 
 		if (identification.equals("")) {
@@ -92,9 +89,6 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 			editor.putString("identification", identification);
 			editor.commit();
 		}
-
-		//		btnScanQRCode = (Button) findViewById(R.id.button_scan_qrcode);
-		//		btnScanQRCode.setOnClickListener(this);
 
 		etIdentification = (EditText) findViewById(R.id.edittext_identification);
 		etIdentification.setText(identification);
@@ -139,6 +133,16 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
+	}
+	
+	@Override
+	protected void onNewIntent(Intent intent) {
+		//if extra is present, it has priority on the saved poll
+		Poll serializedPoll = (Poll)intent.getSerializableExtra("poll");
+		if(serializedPoll!=null){
+			poll = serializedPoll;
+		}
+		super.onNewIntent(intent);
 	}
 	
 	@Override
@@ -273,7 +277,8 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 				// saving the values that we got
 				SharedPreferences.Editor editor = preferences.edit();
 				editor.putString("SSID", config[0]);
-				editor.putString("password", config[1]);
+				editor.putString("group_name", config[1]);
+				editor.putString("group_password", config[2]);
 				editor.commit();
 
 				// connect to the network

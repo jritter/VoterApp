@@ -12,11 +12,13 @@ import ch.bfh.evoting.voterapp.entities.VoteMessage;
  */
 public interface NetworkInterface {
 		
-	public void joinNetwork(String networkName);
+	public void joinGroup(String groupName);
 		
 	public String getNetworkName();
 
-	public String getConversationPassword();
+	public String getGroupName();
+
+	public String getGroupPassword();
 	
 	public String getMyIpAddress();
 	

@@ -7,11 +7,14 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.wifi.WifiManager;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -25,12 +28,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import ch.bfh.evoting.voterapp.entities.Poll;
+import ch.bfh.evoting.voterapp.network.wifi.AdhocWifiManager;
+import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
 import ch.bfh.evoting.voterapp.util.HelpDialogFragment;
 
 import com.google.zxing.BarcodeFormat;
@@ -42,7 +48,8 @@ public class NetworkInformationsActivity extends Activity implements OnClickList
 
 	private boolean paramsAvailable = false;
 	private String ssid;
-	private String password;
+	private String groupName;
+	private String groupPassword;
 	private boolean nfcAvailable;
 	private Button btnWriteNfcTag;
 	private Button btnNext;
@@ -77,14 +84,17 @@ public class NetworkInformationsActivity extends Activity implements OnClickList
 
 		ssid = AndroidApplication.getInstance().getNetworkInterface()
 				.getNetworkName();
-		password = AndroidApplication.getInstance().getNetworkInterface()
-				.getConversationPassword();
-		if (password == null) {
+		groupName = AndroidApplication.getInstance().getNetworkInterface()
+				.getGroupName();
+		if (groupName == null) {
 			ssid = getString(R.string.not_connected);
-			password = getString(R.string.not_connected);
+			groupName = getString(R.string.not_connected);
+			groupPassword = getString(R.string.not_connected);
 			paramsAvailable = false;
 		} else {
 			paramsAvailable = true;
+			SharedPreferences preferences = this.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
+			groupPassword = preferences.getString("group_password", null);
 		}
 
 		findViewById(R.id.layout_bottom_action_bar).setVisibility(View.VISIBLE);
@@ -108,8 +118,22 @@ public class NetworkInformationsActivity extends Activity implements OnClickList
 		TextView tv_network_name = (TextView) findViewById(R.id.textview_network_name);
 		tv_network_name.setText(ssid);
 
-		TextView tv_network_password = (TextView) findViewById(R.id.textview_network_password);
-		tv_network_password.setText(password);
+		TextView tv_group_name = (TextView) findViewById(R.id.textview_group_name);
+		tv_group_name.setText(groupName.replace("group", ""));
+		
+		TextView tv_group_password = (TextView) findViewById(R.id.textview_group_password);
+		tv_group_password.setText(groupPassword);
+		
+		WifiAPManager wifiapman = new WifiAPManager();
+		WifiManager wifiman = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		if (wifiapman.isWifiAPEnabled(wifiman)) {
+			LinearLayout v = (LinearLayout)findViewById(R.id.view_wlan_key);
+			((LinearLayout)v.getParent()).removeView(v);
+		} else {
+			TextView tv_network_key = (TextView) findViewById(R.id.textview_network_key);
+			SharedPreferences preferences = this.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
+			tv_network_key.setText(preferences.getString("wlan_key", ""));
+		}
 
 		if (paramsAvailable) {
 
@@ -136,7 +160,7 @@ public class NetworkInformationsActivity extends Activity implements OnClickList
 							try {
 								QRCodeWriter writer = new QRCodeWriter();
 								BitMatrix qrcode = writer.encode(ssid + "||"
-										+ password, BarcodeFormat.QR_CODE,
+										+ groupName + "||" + groupPassword, BarcodeFormat.QR_CODE,
 										size, size);
 								ivQrCode.setImageBitmap(qrCode2Bitmap(qrcode));
 
@@ -170,6 +194,7 @@ public class NetworkInformationsActivity extends Activity implements OnClickList
 			}
 		}
 	}
+
 
 	//	@Override
 	//	public void onBackPressed() {
@@ -324,10 +349,16 @@ public class NetworkInformationsActivity extends Activity implements OnClickList
 	 */
 	@Override
 	public void onNewIntent(Intent intent) {
+		//if extra is present, it has priority on the saved poll
+		Poll serializedPoll = (Poll)intent.getSerializableExtra("poll");
+		if(serializedPoll!=null){
+			poll = serializedPoll;
+		}
+
 		if (writeNfcEnabled) {
 			// Handle the NFC part...
 
-			String text = ssid + "||" + password;
+			String text = ssid + "||" + groupName + "||" + groupPassword;
 
 			// create a new NdefRecord
 			NdefRecord record = createMimeRecord(

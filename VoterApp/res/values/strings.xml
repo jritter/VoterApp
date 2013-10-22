@@ -14,8 +14,9 @@
     <string name="options">Options</string>
     <string name="participants">Participants</string>
     <string name="network_name">Network name</string>
+    <string name="network_key">Network key</string>
+    
     <string name="network_info">Network information</string>
-    <string name="network_password_desc">Network password</string>
     <string name="not_connected">No network set up</string>
     <string name="help">Help</string>
     <string name="networks">Network connection</string>
@@ -49,6 +50,8 @@
     <string name="setup_network">Setup Network</string>
     <string name="polls">Polls</string>
     <string name="poll_archive">Poll Archive</string>
+    <string name="group_password_desc">Group password</string>
+    <string name="group_name_desc">Group number</string>
     <string name="network_password">Password</string>
     <string name="cancel">Cancel</string>
     <string name="network_wlan_key">WLAN Key</string>
@@ -147,7 +150,8 @@
     <string name="wait_votes_admin">Thanks for voting!\nWaiting for votes...</string>
 
     <!-- Hints in EditText fields -->
-    <string name="hint_network_password">Network Password</string>
+    <string name="hint_group_name">Group number</string>
+    <string name="hint_group_password">Group Password</string>
     <string name="hint_network_wlan_key">WLAN Key</string>
     <string name="hint_enter_question">Enter the question of the poll here</string>
     <string name="hint_enter_option">Enter the Option here</string>

@@ -18,12 +18,12 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin"
-        android:orientation="vertical"
-        android:layout_weight="1" >
+        android:paddingTop="@dimen/activity_vertical_margin" >
 
         <TextView
             android:id="@+id/textview_network_name_desc"
@@ -50,12 +50,44 @@
             android:textStyle="" >
         </TextView>
 
+        <LinearLayout
+            android:id="@+id/view_wlan_key"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/textview_network_key_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/network_key"
+                android:textAllCaps="true" >
+            </TextView>
+
+            <View
+                android:id="@+id/separator_4"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="5dp"
+                android:background="@color/theme_color"
+                android:gravity="center_vertical" />
+
+            <TextView
+                android:id="@+id/textview_network_key"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textSize="20sp"
+                android:textStyle="" >
+            </TextView>
+        </LinearLayout>
+
         <TextView
-            android:id="@+id/textview_network_password_desc"
+            android:id="@+id/textview_group_name_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="@string/network_password_desc"
+            android:text="@string/group_name_desc"
             android:textAllCaps="true" >
         </TextView>
 
@@ -68,7 +100,33 @@
             android:gravity="center_vertical" />
 
         <TextView
-            android:id="@+id/textview_network_password"
+            android:id="@+id/textview_group_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textStyle="" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/textview_group_password_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/group_password_desc"
+            android:textAllCaps="true" >
+        </TextView>
+
+        <View
+            android:id="@+id/separator_3"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginBottom="5dp"
+            android:background="@color/theme_color"
+            android:gravity="center_vertical" />
+
+        <TextView
+            android:id="@+id/textview_group_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -104,7 +162,7 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:text="@string/recreate_network" />
-        
+
         <Button
             android:id="@+id/button_write_nfc_tag"
             style="@style/BottomBar"
@@ -115,7 +173,7 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:text="@string/write_nfc_tag" />
-        
+
         <Button
             android:id="@+id/button_next"
             style="@style/BottomBar"

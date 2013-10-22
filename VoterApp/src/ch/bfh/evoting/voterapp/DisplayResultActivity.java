@@ -31,6 +31,7 @@ import ch.bfh.evoting.voterapp.db.PollDbHelper;
 import ch.bfh.evoting.voterapp.entities.DatabaseException;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Poll;
+import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.util.OptionsComparator;
@@ -217,7 +218,7 @@ public class DisplayResultActivity extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		if (item.getItemId() == android.R.id.home){
-			LocalBroadcastManager.getInstance(this).registerReceiver(redoPollReceiver, new IntentFilter(BroadcastIntentTypes.electorate));
+//			LocalBroadcastManager.getInstance(this).registerReceiver(redoPollReceiver, new IntentFilter(BroadcastIntentTypes.electorate));
 			//if ending a poll
 			if(saveToDbNeeded){
 				Intent i = new Intent(DisplayResultActivity.this, MainActivity.class);
