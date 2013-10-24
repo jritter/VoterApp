@@ -8,10 +8,19 @@
         android:id="@+id/textview_electorate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin"
         android:gravity="center_vertical|center_horizontal"
         android:minHeight="70dp"
         android:text="@string/title_activity_chooseelectorate"
         android:textAppearance="?android:attr/textAppearanceLarge" />
+    
+    <TextView
+            android:id="@+id/textview_participants"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:text="@string/participants"
+            style="?android:attr/listSeparatorTextViewStyle" />
 
     <ListView
         android:id="@+id/listview_electorate"

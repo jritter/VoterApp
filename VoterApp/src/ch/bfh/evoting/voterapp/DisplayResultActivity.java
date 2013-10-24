@@ -1,21 +1,12 @@
 package ch.bfh.evoting.voterapp;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
-import android.annotation.SuppressLint;
 import android.app.ListActivity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,18 +14,13 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
-import ch.bfh.evoting.voterapp.adapters.OptionListAdapter;
+import ch.bfh.evoting.voterapp.adapters.ResultAdapter;
 import ch.bfh.evoting.voterapp.db.PollDbHelper;
 import ch.bfh.evoting.voterapp.entities.DatabaseException;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Poll;
-import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
-import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
-import ch.bfh.evoting.voterapp.util.OptionsComparator;
 
 /**
  * Activity displaying the results of a poll
@@ -46,9 +32,6 @@ public class DisplayResultActivity extends ListActivity {
 	private int pollId;
 	private boolean saveToDbNeeded;
 
-	private BroadcastReceiver redoPollReceiver;
-
-	@SuppressLint("SimpleDateFormat")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -56,13 +39,14 @@ public class DisplayResultActivity extends ListActivity {
 		setupActionBar();
 
 		ListView lv = (ListView)findViewById(android.R.id.list);
-		LayoutInflater inflater = this.getLayoutInflater();
-
-		View header = inflater.inflate(R.layout.result_header, null, false);
-		View footer = inflater.inflate(R.layout.result_footer, null, false);
-
-		lv.addHeaderView(header);
-		lv.addFooterView(footer);
+		
+//		LayoutInflater inflater = this.getLayoutInflater();
+//
+//		View header = inflater.inflate(R.layout.result_header, null, false);
+//		View footer = inflater.inflate(R.layout.result_footer, null, false);
+//
+//		lv.addHeaderView(header);
+//		lv.addFooterView(footer);
 
 		//Get the data in the intent
 		final Poll poll = (Poll)this.getIntent().getSerializableExtra("poll");
@@ -72,8 +56,6 @@ public class DisplayResultActivity extends ListActivity {
 		} else {
 			pollId = -1;
 		}
-
-		RelativeLayout rootLayout = (RelativeLayout)lv.getParent();
 		
 		if(!AndroidApplication.getInstance().isAdmin() && saveToDbNeeded){
 			LinearLayout ll = (LinearLayout)findViewById(R.id.layout_action_bar);
@@ -130,49 +112,8 @@ public class DisplayResultActivity extends ListActivity {
 				btnRedo.setText(R.string.clone_poll);				
 			}
 		}
-
-		lv.addHeaderView(header);
-
-
-
-		//Set GUI informations
-		TextView tvQuestion = (TextView)header.findViewById(R.id.textview_poll_question);
-		tvQuestion.setText(poll.getQuestion());
-
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		Date resultdate = new Date(poll.getStartTime());
-
-
-		// Do some statistics
-
-		int numberParticipants = poll.getNumberOfParticipants();
-		Log.d(this.getClass().getSimpleName(), "Number Voters: " + numberParticipants);
-
-		int numberCastVotes = 0;
-
-		for (Option option : poll.getOptions()){
-			numberCastVotes += option.getVotes();
-		}
-
-		double participation = (double)numberCastVotes / (double)numberParticipants * 100;
-
-		TextView tvPollTime = (TextView)header.findViewById(R.id.textview_poll_start_time);
-		tvPollTime.setText(getString(R.string.poll_start_time) + ": " + sdf.format(resultdate));
-
-		TextView tvNumberVoters = (TextView)footer.findViewById(R.id.textview_number_voters);
-		tvNumberVoters.setText(getString(R.string.number_voters) + ": " + numberParticipants);
-
-		TextView tvNumberCastVotes = (TextView)footer.findViewById(R.id.textview_number_cast_votes);
-		tvNumberCastVotes.setText(getString(R.string.number_cast_votes) + ": " + numberCastVotes);
-
-		TextView tvParticipation = (TextView)footer.findViewById(R.id.textview_vote_participation);
-		tvParticipation.setText(getString(R.string.participation) + ": " + participation + "%");
-
-
-		//Order the options in descending order
-		Collections.sort(poll.getOptions(), new OptionsComparator());
-		//Create the list
-		setListAdapter(new OptionListAdapter(this, R.layout.list_item_result, poll.getOptions()));
+		
+		lv.setAdapter(new ResultAdapter(this, poll));
 
 		//Save the poll to the DB if needed
 		if(saveToDbNeeded){

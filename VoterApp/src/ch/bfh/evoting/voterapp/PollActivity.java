@@ -2,11 +2,6 @@ package ch.bfh.evoting.voterapp;
 
 import java.util.List;
 
-import ch.bfh.evoting.voterapp.adapters.PollAdapter;
-import ch.bfh.evoting.voterapp.db.PollDbHelper;
-import ch.bfh.evoting.voterapp.entities.Poll;
-import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
-import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,11 +9,14 @@ import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.ListView;
+import ch.bfh.evoting.voterapp.adapters.PollAdapter;
+import ch.bfh.evoting.voterapp.db.PollDbHelper;
+import ch.bfh.evoting.voterapp.entities.Poll;
+import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
 
 /**
  * Class displaying all the available polls

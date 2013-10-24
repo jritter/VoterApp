@@ -3,43 +3,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    
+
     <TextView
         android:id="@+id/textview_display_result_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin"
         android:gravity="center_vertical|center_horizontal"
         android:minHeight="70dp"
         android:text="@string/display_result_title"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-    
+
     <fragment
         android:id="@+id/fragment_result_chart"
         android:name="ch.bfh.evoting.voterapp.fragment.ResultChartFragment"
         android:layout_width="match_parent"
-        android:layout_height="100dp" />
+        android:layout_height="100dp"
+        android:layout_margin="@dimen/margin" />
 
-    <RelativeLayout
+    <ListView
+        android:id="@android:id/list"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-     	android:id="@+id/rel_layout"
-        android:layout_weight="1">
-        <ListView
-            android:id="@android:id/list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_marginBottom="5dp"
-            android:gravity="center_vertical" >
-        </ListView>
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:clickable="false"
+        android:divider="@android:color/transparent"
+        android:gravity="center_vertical" >
+    </ListView>
 
-        
-
-    </RelativeLayout>
-    
     <LinearLayout
-        style="@style/ActionBar.Solid.Votebartheme"
         android:id="@+id/layout_action_bar"
+        style="@style/ActionBar.Solid.Votebartheme"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:divider="?android:dividerVertical"

@@ -14,7 +14,7 @@
         android:text="@string/title_activity_choosenetwork"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <RelativeLayout
+  <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" >
@@ -25,24 +25,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="@dimen/margin"
-            android:layout_marginRight="@dimen/margin"
-            android:layout_marginTop="@dimen/margin"
             android:gravity="center_vertical"
             android:text="@string/identification"
-            android:textAllCaps="true" />
-
-        <View
-            android:id="@+id/separator_identification"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/textview_identification"
-            android:layout_marginBottom="5dp"
-            android:layout_marginLeft="@dimen/margin"
-            android:layout_marginRight="@dimen/margin"
-            android:background="@color/theme_color"
-            android:gravity="center_vertical" />
+            style="?android:attr/listSeparatorTextViewStyle" />
 
         <EditText
             android:id="@+id/edittext_identification"
@@ -50,8 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
-            android:layout_below="@id/separator_identification"
-            android:layout_margin="@dimen/margin"
+            android:layout_below="@id/textview_identification"
             android:ems="10"
             android:hint="@string/your_identification"
             android:inputType="textPersonName" >
@@ -64,30 +48,16 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@id/edittext_identification"
-            android:layout_marginLeft="@dimen/margin"
-            android:layout_marginRight="@dimen/margin"
-            android:layout_marginTop="@dimen/margin"
             android:gravity="center_vertical"
             android:text="@string/networks"
-            android:textAllCaps="true" />
+            style="?android:attr/listSeparatorTextViewStyle" />
 
-        <View
-            android:id="@+id/separator_identification_2"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@id/textview_networks"
-            android:layout_marginBottom="5dp"
-            android:layout_marginLeft="@dimen/margin"
-            android:layout_marginRight="@dimen/margin"
-            android:background="@color/theme_color"
-            android:gravity="center_vertical" />
 
         <RelativeLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/separator_identification_2" >
+            android:layout_below="@id/textview_networks" >
 
         </RelativeLayout>
         <!--
