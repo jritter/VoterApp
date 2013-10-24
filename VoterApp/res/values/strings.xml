@@ -86,8 +86,10 @@
     <string name="delete_poll_confirm_text">Do you really want to delete this poll? It won\'t be accessible anymore.</string>
     <string name="scroll">Please first have a look at all options</string>
     <string name="choose_one_option">Please choose one of the given options</string>
-    <string name="join_error_admin">It seems that a group with the same name already exists! Please choose another name!</string>
+    <string name="join_error_admin">A group with the same name already exists! Please choose another name!</string>
     <string name="join_error_voter">No group with the given name exists. Please wait for the administrator to create the group.</string>
+    <string name="join_error">Error creating/joining the group!</string>
+    <string name="join_error_invalid_name">Invalid group name! Please choose another name!</string>
     <string name="redo_impossible">An error occurred while trying to restart the poll.</string>
     <string name="not_included_title">Your are not in the electorate</string>
     <string name="not_included">You were not included in the electorate. So, you cannot participate to the poll. You will be redirected to the main screen.</string>
@@ -110,7 +112,10 @@
     <string name="dialog_stop_poll">Some participants have not voted yet. Do you really want to finish the voting phase?</string>
     <string name="dialog_title_add_option">Add option in edition?</string>
     <string name="dialog_add_option">You still have an option in edition. Do you want to add it to the poll?</string>
-
+    <string name="dialog_title_attack_detected">Attack detected !!</string>
+    <string name="dialog_attack_impersonalization">An attack has been detected! Someone is trying to impersonate a group member in order to be able to vote in his name. We strongly recommand to interrupt the vote session and start a new session.</string>
+    
+    
     <!-- Activity titles -->
     <string name="voter_app_app_name">MobiVote</string>
     <string name="title_activity_network_config">Join Group</string>

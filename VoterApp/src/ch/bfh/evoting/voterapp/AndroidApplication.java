@@ -53,6 +53,7 @@ public class AndroidApplication extends Application {
 		instance.initializeInstance();
 		Utility.initialiseLogging();
 		LocalBroadcastManager.getInstance(this).registerReceiver(mGroupEventReceiver, new IntentFilter(BroadcastIntentTypes.networkGroupDestroyedEvent));
+		LocalBroadcastManager.getInstance(this).registerReceiver(mAttackDetecter, new IntentFilter(BroadcastIntentTypes.attackDetected));
 	}
 
 	/**
@@ -110,6 +111,33 @@ public class AndroidApplication extends Application {
 
 				builder.setTitle(R.string.dialog_title_network_lost);
 				builder.setMessage(R.string.dialog_network_lost);
+
+				// Create the AlertDialog
+				builder.create().show();
+			}
+		}
+	};
+	
+	/**
+	 * this broadcast receiver listens for information about an attack
+	 */
+	private BroadcastReceiver mAttackDetecter = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if(currentActivity!=null){
+				AlertDialog.Builder builder = new AlertDialog.Builder(currentActivity);
+				// Add the buttons
+				builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						Intent i = new Intent(AndroidApplication.this, MainActivity.class);
+						currentActivity.startActivity(i);
+					}
+				});
+
+				builder.setTitle(R.string.dialog_title_attack_detected);
+				if(intent.getIntExtra("type", 0)==1){
+					builder.setMessage(R.string.dialog_attack_impersonalization);
+				}
 
 				// Create the AlertDialog
 				builder.create().show();

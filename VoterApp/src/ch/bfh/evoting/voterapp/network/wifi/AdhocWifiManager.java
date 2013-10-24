@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.WindowManager.BadTokenException;
 import android.widget.Toast;
 import ch.bfh.evoting.voterapp.AndroidApplication;
+import ch.bfh.evoting.voterapp.NetworkConfigActivity;
 import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 
@@ -228,7 +229,9 @@ public class AdhocWifiManager {
 			super.onPreExecute();
 			d.setTitle("Connecting to Network " + ssid + "...");
 			d.setMessage("...please wait a moment.");
-			d.show();
+			if(AndroidApplication.getInstance().getCurrentActivity() instanceof NetworkConfigActivity){
+				d.show();
+			}
 		}
 
 		/*
@@ -403,12 +406,21 @@ public class AdhocWifiManager {
 					LocalBroadcastManager.getInstance(context).registerReceiver(new BroadcastReceiver() {
 
 						@Override
-						public void onReceive(Context arg0, Intent arg1) {
-							d.dismiss();
-							if(AndroidApplication.getInstance().isAdmin()){
+						public void onReceive(Context arg0, Intent intent) {
+							try{
+								d.dismiss();
+							} catch(Throwable t){
+								//do nothing;
+							}
+							int status = intent.getIntExtra("error", 0);
+							if(status==1){
+								Toast.makeText(context, context.getString(R.string.join_error_invalid_name), Toast.LENGTH_LONG).show();
+							} else if (status == 2){
 								Toast.makeText(context, context.getString(R.string.join_error_admin), Toast.LENGTH_LONG).show();
-							} else {
+							} else if (status == 3){
 								Toast.makeText(context, context.getString(R.string.join_error_voter), Toast.LENGTH_LONG).show();
+							} else {
+								Toast.makeText(context, context.getString(R.string.join_error), Toast.LENGTH_LONG).show();
 							}
 						}
 					}, new IntentFilter(BroadcastIntentTypes.networkConnectionFailed));
@@ -416,12 +428,20 @@ public class AdhocWifiManager {
 
 						@Override
 						public void onReceive(Context arg0, Intent arg1) {
-							d.dismiss();
+							try{
+								d.dismiss();
+							} catch(Throwable t){
+								//do nothing;
+							}
 						}
 					}, new IntentFilter(BroadcastIntentTypes.networkConnectionSuccessful));
 
 				} else {
-					d.dismiss();
+					try{
+						d.dismiss();
+					} catch(Throwable t){
+						//do nothing;
+					}
 					// display a dialog if the connection was not successful
 					AlertDialog.Builder builder = new AlertDialog.Builder(
 							context);

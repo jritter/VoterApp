@@ -70,6 +70,7 @@ public class BroadcastIntentTypes {
 	/**
 	 * Intent type sent when connection to network failed
 	 * Extras:
+	 * - "error": integer, 1 = Invalid group name, 2 = Group name already exists (creation), 3 = Group not found (join)
 	 */
 	public static final String networkConnectionFailed = "networkConnectionFailed";
 	
@@ -81,4 +82,13 @@ public class BroadcastIntentTypes {
 	 * -"participants" list of participants of the poll
 	 */
 	public static final String newIncomingVote = "UpdateNewVotes";
+	
+	/**
+	 * Intent type sent when an attack has been detected
+	 * Extras:
+	 * -"type" type of the attack
+	 * 		1: impersonalization on the network: someone has send another public key for a peer that had already authenticated itself by sending its key
+	 */
+	public static final String attackDetected = "attackDetected";
+	
 }
