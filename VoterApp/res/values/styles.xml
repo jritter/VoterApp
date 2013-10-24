@@ -36,7 +36,7 @@
     </style>
     
     <style name="MainButtons">
-        <item name="android:layout_margin">4dp</item>
+        <item name="android:layout_margin">@dimen/margin</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textAllCaps">true</item>
         <item name="android:background">@drawable/selectable_background_mainbuttons</item>
@@ -46,6 +46,12 @@
         <item name="android:textColor">@android:color/black</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:background">@drawable/selectable_background_votebartheme</item>
+    </style>
+    
+    <style name="AcceptReviewButton">
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:background">@drawable/selectable_background_mainbuttons</item>
     </style>
     
     <style name="Dialog" parent="android:Theme.Holo.Dialog">

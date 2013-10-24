@@ -5,31 +5,42 @@
     android:orientation="vertical" >
 
     <TextView
-        android:id="@+id/textview_header"
+        android:id="@+id/textview_display_result_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin"
         android:gravity="center_vertical|center_horizontal"
         android:minHeight="70dp"
-        android:text="@string/available_polls"
+        android:text="@string/display_result_title"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-    
-    <TextView
-            android:id="@+id/textview_polls"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:text="@string/polls"
-            style="?android:attr/listSeparatorTextViewStyle" />
 
-    <ListView
-        android:id="@+id/listview_polls"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dip"
-        android:layout_weight="1" >
-    </ListView>
+        android:layout_weight="1"
+        android:orientation="horizontal" >
 
-    <!-- <LinearLayout
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:clickable="false"
+            android:divider="@android:color/transparent"
+            android:gravity="center_vertical" >
+        </ListView>
+
+        <fragment
+            android:id="@+id/fragment_result_chart"
+            android:name="ch.bfh.evoting.voterapp.fragment.ResultChartFragment"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/margin"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_action_bar"
         style="@style/ActionBar.Solid.Votebartheme"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -39,15 +50,15 @@
         android:showDividers="middle" >
 
         <Button
-            android:id="@+id/button_createpoll"
+            android:id="@+id/button_redo_poll"
             style="@style/BottomBar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.18"
-            android:drawableLeft="@drawable/ic_action_new"
+            android:drawableLeft="@drawable/ic_action_undo"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:text="@string/create" />
-    </LinearLayout>  -->
+            android:text="@string/redo_poll" />
+    </LinearLayout>
 
 </LinearLayout>

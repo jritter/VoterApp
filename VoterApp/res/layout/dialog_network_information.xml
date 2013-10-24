@@ -6,6 +6,7 @@
             android:id="@+id/fragment_network_information"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_margin="@dimen/margin"
             class="ch.bfh.evoting.voterapp.fragment.NetworkInformationFragment"
             android:tag="networkInformation" />
 

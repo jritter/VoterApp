@@ -15,6 +15,8 @@
     <string name="participants">Participants</string>
     <string name="network_name">Network name</string>
     <string name="network_key">Network key</string>
+    <string name="vote_singular">vote</string>
+    <string name="vote_plural">votes</string>
     
     <string name="network_info">Network information</string>
     <string name="not_connected">No network set up</string>
@@ -53,7 +55,6 @@
     <string name="group_name_desc">Group number</string>
     <string name="network_password">Password</string>
     <string name="cancel">Cancel</string>
-    <string name="network_wlan_key">WLAN Key</string>
     <string name="poll_setup">Poll Setup</string>
     <string name="add">Add</string>
     <string name="available_polls">Available Polls</string>
@@ -65,6 +66,7 @@
     <string name="identification">Your identification</string>
     <string name="next">Next</string>
     <string name="recreate_network">Modify</string>
+    <string name="question">Question</string>
 
     <!-- Action bar titles -->
     <string name="action_rescan_wifi">Rescan Wifi Networks</string>

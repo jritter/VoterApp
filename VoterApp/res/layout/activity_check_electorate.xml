@@ -9,6 +9,7 @@
         android:id="@+id/textview_check_electorate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin"
         android:gravity="center_vertical|center_horizontal"
         android:minHeight="70dp"
         android:text="@string/check_electorate"

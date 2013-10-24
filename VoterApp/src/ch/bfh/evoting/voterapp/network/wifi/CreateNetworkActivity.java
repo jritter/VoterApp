@@ -12,19 +12,14 @@ package ch.bfh.evoting.voterapp.network.wifi;
 
 import java.util.UUID;
 
-import org.alljoyn.bus.Status;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v4.app.NavUtils;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -34,7 +29,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.R;
 
@@ -68,8 +62,8 @@ TextWatcher {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 		// extract the control elements from the layout
-		txtNetworkName = (EditText) findViewById(R.id.network_name);
-		txtNetworkPIN = (EditText) findViewById(R.id.network_pin);
+		txtNetworkName = (EditText) findViewById(R.id.edittext_network_name);
+		txtNetworkPIN = (EditText) findViewById(R.id.edittext_network_pin);
 
 		btnCreateNetwork = (Button) findViewById(R.id.create_network_button);
 		btnCreateNetwork.setOnClickListener(this);

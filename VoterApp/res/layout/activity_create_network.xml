@@ -1,75 +1,64 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
 
     <TextView
-        android:id="@+id/create_network_textview"
-        android:layout_width="fill_parent"
+        android:id="@+id/textview_check_electorate"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
+        android:layout_margin="@dimen/margin"
+        android:gravity="center_vertical|center_horizontal"
+        android:minHeight="70dp"
+        android:text="@string/create_new_network"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <TextView
+        android:id="@+id/textview_create_network"
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:text="@string/create_new_network" />
-
-    <View
-        android:id="@+id/create_network_separator"
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/create_network_textview"
-        android:background="@android:color/holo_blue_light"
-        android:gravity="center_vertical" />
-
-    <TextView
-        android:id="@+id/network_name_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/create_network_separator"
-        android:layout_marginTop="20dp"
-        android:text="@string/network_name_label" />
+        android:text="@string/network_name" />
 
     <EditText
-        android:id="@+id/network_name"
-        android:layout_width="wrap_content"
+        android:id="@+id/edittext_network_name"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/network_name_label"
         android:ems="10"
-        android:inputType="text" >
+        android:hint="@string/network_name"
+        android:inputType="" >
 
         <requestFocus />
     </EditText>
 
     <TextView
-        android:id="@+id/network_pin_label"
-        android:layout_width="wrap_content"
+        android:id="@+id/textview_network_pin"
+        style="?android:attr/listSeparatorTextViewStyle"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/network_name"
-        android:layout_marginTop="20dp"
+        android:gravity="center_vertical"
         android:text="@string/network_wlan_key" />
-
+	
     <EditText
-        android:id="@+id/network_pin"
-        android:layout_width="wrap_content"
+        android:id="@+id/edittext_network_pin"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/network_pin_label"
         android:ems="10"
-        android:inputType="text" />
+        android:hint="@string/network_wlan_key"
+        android:inputType="" >
+
+    </EditText>
+
 
     <Button
         android:id="@+id/create_network_button"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/network_pin"
+
         android:layout_marginTop="20dp"
         android:text="@string/create_network" />
 
-</RelativeLayout>
+
+</LinearLayout>

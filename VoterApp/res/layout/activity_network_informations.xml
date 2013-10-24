@@ -8,6 +8,7 @@
         android:id="@+id/textview_network_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin"
         android:gravity="center_vertical|center_horizontal"
         android:minHeight="70dp"
         android:paddingLeft="@dimen/activity_horizontal_margin"

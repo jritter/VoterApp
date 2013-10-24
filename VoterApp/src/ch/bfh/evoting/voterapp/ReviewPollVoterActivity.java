@@ -1,24 +1,17 @@
 package ch.bfh.evoting.voterapp;
 
 
-import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
-import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.Toast;
+import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 
 /**
  * Class displaying the activity showing the entire poll, in order to allow the user to check if it is correct
