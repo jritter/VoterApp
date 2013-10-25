@@ -88,6 +88,7 @@ public class BroadcastIntentTypes {
 	 * Extras:
 	 * -"type" type of the attack
 	 * 		1: impersonalization on the network: someone has send another public key for a peer that had already authenticated itself by sending its key
+	 * 		2: message sent from someone on behalf of another peer
 	 */
 	public static final String attackDetected = "attackDetected";
 	

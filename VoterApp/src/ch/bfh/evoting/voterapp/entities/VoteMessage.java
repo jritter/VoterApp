@@ -15,6 +15,7 @@ public class VoteMessage implements Serializable {
 	private Serializable messageContent;
 	private long timestamp;
 	
+	public VoteMessage(){}
 	
 	public VoteMessage(Type messageType, Serializable messageContent){
 		this.messageType = messageType;

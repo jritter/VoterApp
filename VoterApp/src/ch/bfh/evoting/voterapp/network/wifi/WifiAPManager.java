@@ -114,10 +114,11 @@ public class WifiAPManager {
 		preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
 		editor = preferences.edit();
 		editor.putString("originalApConfig", serializedAPConfig);
-		editor.putString("group_password", config.preSharedKey);
+//		editor.putString("group_password", config.preSharedKey);
 		editor.putString("SSID", config.SSID);
 		editor.commit();
-
+		AndroidApplication.getInstance().getNetworkInterface().setGroupPassword(config.preSharedKey);
+		
 		new SetWifiAPTask(true, context).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
 
@@ -401,7 +402,8 @@ public class WifiAPManager {
 			if (mode) {
 				d.dismiss();
 					
-				AndroidApplication.getInstance().getNetworkInterface().joinGroup(preferences.getString("group_name", null));
+				String groupName = AndroidApplication.getInstance().getNetworkInterface().getGroupName();
+				AndroidApplication.getInstance().getNetworkInterface().joinGroup(groupName);
 				
 			}
 		}

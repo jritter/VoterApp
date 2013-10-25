@@ -89,8 +89,10 @@ public class NetworkInformationFragment extends Fragment {
 			paramsAvailable = false;
 		} else {
 			paramsAvailable = true;
-			SharedPreferences preferences = this.getActivity().getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
-			groupPassword = preferences.getString("group_password", null);
+//			SharedPreferences preferences = this.getActivity().getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
+//			groupPassword = preferences.getString("group_password", null);
+			groupPassword = AndroidApplication.getInstance().getNetworkInterface().getGroupPassword()
+					+ AndroidApplication.getInstance().getNetworkInterface().getSaltShortDigest();
 		}
 
 		
