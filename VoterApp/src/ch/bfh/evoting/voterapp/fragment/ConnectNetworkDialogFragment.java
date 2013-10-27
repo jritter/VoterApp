@@ -158,18 +158,21 @@ OnClickListener, TextWatcher {
 		password = txtPassword.getText().toString();
 		groupName = "group"+txtGroupName.getText().toString();
 		networkKey = txtNetworkKey.getText().toString();
-		SharedPreferences preferences = getActivity().getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
-		SharedPreferences.Editor editor = preferences.edit();
-		editor.putString("group_name",null);
-		editor.putString("group_password",null);
+//		SharedPreferences preferences = getActivity().getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
+//		SharedPreferences.Editor editor = preferences.edit();
+//		editor.putString("group_name",null);
+//		editor.putString("group_password",null);
+		
 		if(!AndroidApplication.getInstance().isAdmin()){
 			
+			AndroidApplication.getInstance().getNetworkInterface().setGroupName(groupName);
+			AndroidApplication.getInstance().getNetworkInterface().setGroupPassword(password);
 			//											editor.putString("SSID", selectedResult.SSID);
-			editor.putString("group_password",password);
-			editor.putString("group_name",groupName);
+//			editor.putString("group_password",password);
+//			editor.putString("group_name",groupName);
 			//								((ConnectNetworkDialogFragment) dialog).getPassword());
 		}
-		editor.commit();
+//		editor.commit();
 		
 		getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, getActivity().getIntent());
 	}

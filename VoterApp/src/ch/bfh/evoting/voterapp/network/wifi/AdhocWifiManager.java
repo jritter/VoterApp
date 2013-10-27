@@ -401,7 +401,8 @@ public class AdhocWifiManager {
 					editor.putString("SSID", SSID);
 					editor.commit();
 
-					AndroidApplication.getInstance().getNetworkInterface().joinGroup(preferences.getString("group_name", null));
+					String groupName = AndroidApplication.getInstance().getNetworkInterface().getGroupName();
+					AndroidApplication.getInstance().getNetworkInterface().joinGroup(groupName);
 
 					LocalBroadcastManager.getInstance(context).registerReceiver(new BroadcastReceiver() {
 

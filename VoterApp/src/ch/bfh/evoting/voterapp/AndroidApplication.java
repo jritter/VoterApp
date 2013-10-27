@@ -5,7 +5,6 @@ import org.apache.log4j.Level;
 
 import ch.bfh.evoting.voterapp.network.AllJoynNetworkInterface;
 import ch.bfh.evoting.voterapp.network.NetworkInterface;
-import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.JavaSerialization;
 import ch.bfh.evoting.voterapp.util.SerializationUtil;
@@ -137,6 +136,10 @@ public class AndroidApplication extends Application {
 				builder.setTitle(R.string.dialog_title_attack_detected);
 				if(intent.getIntExtra("type", 0)==1){
 					builder.setMessage(R.string.dialog_attack_impersonalization);
+				} else if(intent.getIntExtra("type", 0)==2){
+					builder.setMessage(R.string.dialog_attack_different_senders);
+				} else if(intent.getIntExtra("type", 0)==3){
+					builder.setMessage(R.string.dialog_attack_different_salts);
 				}
 
 				// Create the AlertDialog

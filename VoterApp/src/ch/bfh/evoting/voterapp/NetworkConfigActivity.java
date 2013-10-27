@@ -281,10 +281,13 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 				// saving the values that we got
 				SharedPreferences.Editor editor = preferences.edit();
 				editor.putString("SSID", config[0]);
-				editor.putString("group_name", config[1]);
-				editor.putString("group_password", config[2]);
+//				editor.putString("group_name", config[1]);
+//				editor.putString("group_password", config[2]);
 				editor.commit();
-
+				
+				AndroidApplication.getInstance().getNetworkInterface().setGroupName(config[1]);
+				AndroidApplication.getInstance().getNetworkInterface().setGroupPassword(config[2]);
+				
 				// connect to the network
 				connect(config);
 

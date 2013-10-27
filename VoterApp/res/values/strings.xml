@@ -116,8 +116,9 @@
     <string name="dialog_add_option">You still have an option in edition. Do you want to add it to the poll?</string>
     <string name="dialog_title_attack_detected">Attack detected !!</string>
     <string name="dialog_attack_impersonalization">An attack has been detected! Someone is trying to impersonate a group member in order to be able to vote in his name. We strongly recommand to interrupt the vote session and start a new session.</string>
-    
-    
+    <string name="dialog_attack_different_senders">An attack has been detected! Someone has sent a message on behalf of another member of the group. We strongly recommand to interrupt the vote session and start a new session.</string>
+    <string name="dialog_attack_different_salts">An attack has been detected! Someone is sending different cryptographic values. The vote must be interrupted. Create a new group and give the password only to people allowed to vote.</string>
+
     <!-- Activity titles -->
     <string name="voter_app_app_name">MobiVote</string>
     <string name="title_activity_network_config">Join Group</string>

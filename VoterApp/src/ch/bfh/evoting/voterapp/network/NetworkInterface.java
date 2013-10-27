@@ -24,6 +24,10 @@ public interface NetworkInterface {
 	
 	public Map<String,Participant> getConversationParticipants();
 	
+	public void setGroupName(String groupName);
+	
+	public void setGroupPassword(String password);
+	
 	/**
 	 * This method can be used to send a broadcast message
 	 * 
@@ -41,5 +45,10 @@ public interface NetworkInterface {
 	public void sendMessage(VoteMessage votemessage, String destinationIPAddress);	
 
 	public void disconnect();
+
+//	public void setSaltShortDigest(String saltShortDigest);
+
+	public String getSaltShortDigest();
+	
 }
 

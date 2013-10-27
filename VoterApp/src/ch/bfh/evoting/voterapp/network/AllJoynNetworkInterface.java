@@ -1,17 +1,11 @@
 package ch.bfh.evoting.voterapp.network;
 
-import java.io.Serializable;
+import java.security.SecureRandom;
 import java.util.Map;
-import java.util.Random;
 import java.util.TreeMap;
-
-import org.alljoyn.bus.Status;
-
-
 
 import ch.bfh.evoting.alljoyn.BusHandler;
 import ch.bfh.evoting.voterapp.AndroidApplication;
-import ch.bfh.evoting.voterapp.WaitForVotesActivity;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
@@ -22,19 +16,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
-import android.text.BoringLayout;
-import android.util.Log;
 
 public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 
 	private BusHandler mBusHandler;
 	private String groupName;
+	private String groupPassword;
+	private String saltShortDigest;
 
 	public AllJoynNetworkInterface(Context context) {
 		super(context);
@@ -64,8 +57,9 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 	
 	@Override
 	public String getGroupPassword() {
-		SharedPreferences preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
-		return preferences.getString("group_password", "");
+//		SharedPreferences preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
+//		return preferences.getString("group_password", "");
+		return this.groupPassword;
 	}
 
 	@Override
@@ -135,11 +129,11 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 				groupName = "group"+groupNumber;
 			}
 			//generate group password
-			String groupPassword = generatePassword();
-			SharedPreferences preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
-			Editor editor = preferences.edit();
-			editor.putString("group_password", groupPassword);
-			editor.commit();
+			this.groupPassword = generatePassword();
+//			SharedPreferences preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
+//			Editor editor = preferences.edit();
+//			editor.putString("group_password", groupPassword);
+//			editor.commit();
 			
 		}
 		String oldNetworkName = this.groupName;
@@ -152,13 +146,43 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 				Message msg1 = mBusHandler.obtainMessage(BusHandler.DESTROY_GROUP, oldNetworkName);
 				mBusHandler.sendMessage(msg1);
 			}
-			Message msg2 = mBusHandler.obtainMessage(BusHandler.CREATE_GROUP, this.groupName);
+			Message msg2 = mBusHandler.obtainMessage(BusHandler.CREATE_GROUP);
+			Bundle data = new Bundle();
+			data.putString("groupName", this.groupName);
+			data.putString("groupPassword", this.groupPassword);
+			msg2.setData(data);
 			mBusHandler.sendMessage(msg2);
 		} else {
-			Message msg3 = mBusHandler.obtainMessage(BusHandler.JOIN_GROUP, this.groupName);
+			Message msg3 = mBusHandler.obtainMessage(BusHandler.JOIN_GROUP);
+			Bundle data = new Bundle();
+			data.putString("groupName", this.groupName);
+			data.putString("groupPassword", this.groupPassword);
+			data.putString("saltShortDigest", this.saltShortDigest);
+			msg3.setData(data);
 			mBusHandler.sendMessage(msg3);
 		}		
 
+	}
+	
+	@Override
+	public void setGroupName(String groupName){
+		this.groupName = groupName;
+	}
+	
+	@Override
+	public void setGroupPassword(String password){
+		this.saltShortDigest = password.substring(password.length()-3, password.length());
+		this.groupPassword = password.substring(0,password.length()-3);
+	}
+	
+//	@Override
+//	public void setSaltShortDigest(String saltShortDigest){
+//		this.saltShortDigest = saltShortDigest;
+//	}
+	
+	@Override
+	public String getSaltShortDigest(){
+		return mBusHandler.getSaltShortDigest();
 	}
 
 	/**
@@ -205,10 +229,13 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 	private String generatePassword(){
 		char[] chars = "abcdefghijklmnopqrstuvwxyz".toCharArray();
 		StringBuilder sb = new StringBuilder();
-		Random random = new Random();
+		
+		SecureRandom random = new SecureRandom();
 		for (int i = 0; i < 10; i++) {
-		    char c = chars[random.nextInt(chars.length)];
-		    sb.append(c);
+			int pos = random.generateSeed(1)[0]%26;
+			if(pos<0)pos=pos+26;
+			
+		    sb.append(chars[pos]);
 		}
 		return sb.toString();
 	}

@@ -52,6 +52,17 @@ public abstract class AbstractNetworkInterface implements NetworkInterface {
 	@Override
 	public abstract void disconnect();
 	
+	@Override
+	public abstract void setGroupName(String groupName);
+	
+	@Override
+	public abstract void setGroupPassword(String password);
+	
+//	@Override
+//	public abstract void setSaltShortDigest(String saltShortDigest);
+	
+	@Override
+	public abstract String getSaltShortDigest();
 	
 	/**
 	 * This method checks the message type and inform the application of the new incoming message.
