@@ -8,7 +8,6 @@ import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
-import android.view.WindowManager;
 
 public class NetworkDialogFragment extends DialogFragment {
 	

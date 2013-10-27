@@ -123,6 +123,14 @@ public class NetworkInformationFragment extends Fragment {
 										+ groupName +"||" + groupPassword, BarcodeFormat.QR_CODE,
 										size, size);
 								ivQrCode.setImageBitmap(qrCode2Bitmap(qrcode));
+								android.view.ViewGroup.LayoutParams params = ivQrCode.getLayoutParams();
+								params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+								ivQrCode.setLayoutParams(params);
+								
+								
+								params = NetworkInformationFragment.this.getView().getRootView().getLayoutParams();
+								params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+								NetworkInformationFragment.this.getView().getRootView().setLayoutParams(params);
 
 							} catch (WriterException e) {
 								Log.d(this.getClass().getSimpleName(),
