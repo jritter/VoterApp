@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import ch.bfh.evoting.voterapp.adapters.NetworkParticipantListAdapter;
+import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
@@ -19,9 +20,12 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 
@@ -36,10 +40,14 @@ public class CheckElectorateActivity extends ListActivity {
 	private BroadcastReceiver networkParticipantUpdater;
 	private BroadcastReceiver electorateReceiver;
 	
+	private Dialog dialogBack = null;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		AndroidApplication.getInstance().setCurrentActivity(this);
+		AndroidApplication.getInstance().setVoteRunning(true);
+
 		setContentView(R.layout.activity_check_electorate);
 
 		setupActionBar();
@@ -152,21 +160,35 @@ public class CheckElectorateActivity extends ListActivity {
 		return super.onOptionsItemSelected(item);
 	}
 	
-//	@Override
-//	public void onBackPressed() {
-//		//do nothing because we don't want that people access to an anterior activity
-//	}
+	@Override
+	public void onBackPressed() {
+		//Show a dialog to ask confirmation to quit vote 
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		// Add the buttons
+		builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialogBack.dismiss();
+				CheckElectorateActivity.super.onBackPressed();
+			}
+		});
+		builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialogBack.dismiss();
+			}
+		});
+
+		builder.setTitle(R.string.dialog_title_back);
+		builder.setMessage(this.getString(R.string.dialog_back));
+
+		// Create the AlertDialog
+		dialogBack = builder.create();
+		dialogBack.show();
+	}
 	
 	protected void onResume() {
 		super.onResume();
+		AndroidApplication.getInstance().setVoteRunning(true);
 		AndroidApplication.getInstance().setCurrentActivity(this);
 	}
-	protected void onPause() {
-		AndroidApplication.getInstance().setCurrentActivity(null);
-		super.onPause();
-	}
-	protected void onDestroy() {        
-		AndroidApplication.getInstance().setCurrentActivity(null);
-		super.onDestroy();
-	}
+	
 }

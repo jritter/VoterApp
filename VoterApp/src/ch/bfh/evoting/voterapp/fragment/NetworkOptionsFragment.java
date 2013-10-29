@@ -76,7 +76,10 @@ public class NetworkOptionsFragment extends Fragment {
 		// Inflate the layout for this fragment
 		View v = inflater.inflate(R.layout.fragment_network_options, container, false);
 
+		WifiManager wm = (WifiManager) getActivity().getSystemService(NetworkConfigActivity.WIFI_SERVICE);
+		WifiInfo wifiInfo = wm.getConnectionInfo();
 		Button btnUseActualNetwork = (Button)v.findViewById(R.id.button_use_actual_ssid);
+		btnUseActualNetwork.setText(getString(R.string.button_use_actual_ssid, wifiInfo.getSSID()));
 		Button btnScanQrCode = (Button)v.findViewById(R.id.button_capture_qrcode);
 		Button btnScanNFC = (Button)v.findViewById(R.id.button_scan_nfc);
 		Button btnAdvancedConfig = (Button)v.findViewById(R.id.button_advanced_network_config);

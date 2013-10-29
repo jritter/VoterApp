@@ -46,16 +46,14 @@ public class VoteActivity extends Activity {
 
 	//TODO remove static when no more needed
 	static private Poll poll;
-	static private List<Option> options;
-	private String question;
 	private VoteOptionListAdapter volAdapter;
 	private boolean scrolled = false;
 	private boolean demoScrollDone = false;
 
 	private ListView lvChoices;
 	private BroadcastReceiver stopReceiver;
-	
-	private Dialog dialogConfirmVote = null;
+
+	private AlertDialog dialogBack;
 
 	static Context ctx;
 
@@ -73,19 +71,20 @@ public class VoteActivity extends Activity {
 
 		//Get the data in the intent
 		Intent intent = this.getIntent();
-		poll = (Poll) intent.getSerializableExtra("poll");
-		options = poll.getOptions();
-		question = poll.getQuestion();
+		Poll intentPoll = (Poll) intent.getSerializableExtra("poll");
+		if(intentPoll!=null){
+			poll = intentPoll;
+		}
 
 		//Set the question text
 		TextView tvQuestion = (TextView)findViewById(R.id.textview_vote_poll_question);
-		tvQuestion.setText(question);
+		tvQuestion.setText(poll.getQuestion());
 
 
 
 
 		//create the list of vote options
-		volAdapter = new VoteOptionListAdapter(this, R.layout.list_item_vote, options);
+		volAdapter = new VoteOptionListAdapter(this, R.layout.list_item_vote, poll.getOptions());
 		lvChoices.setAdapter(volAdapter);
 
 		lvChoices.setOnScrollListener(new OnScrollListener() {
@@ -94,7 +93,7 @@ public class VoteActivity extends Activity {
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 				//Check if the last view is visible
 				Log.e("VoteActivity", "Scroll: firstVisible item="+firstVisibleItem+" visibleItemCount="+visibleItemCount+" totalItemCount="+totalItemCount);
-				Log.e("VoteActivity", "DemoScrollDone: "+demoScrollDone);
+				Log.e("VoteActivity", "DemoScrollDone: "+demoScrollDone +" Scrolled: "+ scrolled);
 				if (++firstVisibleItem + visibleItemCount > totalItemCount && demoScrollDone) {
 					scrolled=true;
 				}
@@ -106,13 +105,16 @@ public class VoteActivity extends Activity {
 
 		});
 
-		//animate scroll
-		new AsyncTask<Object, Object, Object>(){
+		Log.e("VoteActivity", "Scroll: LastVisible item="+lvChoices.getLastVisiblePosition()+" lvChoices.getCount()-2="+(lvChoices.getCount()-2));
+		//TODO getLastVisiblePosition is -1
+		if(lvChoices.getLastVisiblePosition() < lvChoices.getCount()-2){
 
-			@Override
-			protected Object doInBackground(Object... params) {
-				SystemClock.sleep(300);
-				if(lvChoices.getLastVisiblePosition() < lvChoices.getCount()-2){
+			//animate scroll
+			new AsyncTask<Object, Object, Object>(){
+
+				@Override
+				protected Object doInBackground(Object... params) {
+					SystemClock.sleep(300);
 					Log.d("VoteActivity", "Doing demo scroll");
 					lvChoices.smoothScrollToPositionFromTop(lvChoices.getAdapter().getCount()-1, 0, 1000);
 					SystemClock.sleep(1050);
@@ -121,31 +123,29 @@ public class VoteActivity extends Activity {
 					scrolled = false;
 					demoScrollDone = true;
 					return null;
-				} else {
-					Log.d("VoteActivity", "Demo scroll not needed");
-					demoScrollDone = true;
-					scrolled = true;
-					return null;
 				}
-			}
 
-		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+			}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+		} else {
+			Log.d("VoteActivity", "Demo scroll not needed");
+			scrolled = true;
+		}
 
 
-//		//Set a listener on the cast button
-//		Button btnCast = (Button)findViewById(R.id.button_castvote);
-//		btnCast.setOnClickListener(new OnClickListener(){
-//			@Override
-//			public void onClick(View v) {
-//				if(!scrolled){
-//					Toast.makeText(VoteActivity.this, getString(R.string.scroll), Toast.LENGTH_SHORT).show();
-//				} else if (volAdapter.getSelectedPosition() == -1){
-//					Toast.makeText(VoteActivity.this, getString(R.string.choose_one_option), Toast.LENGTH_SHORT).show();
-//				} else {
-//					castBallot();
-//				}
-//			}
-//		});
+		//		//Set a listener on the cast button
+		//		Button btnCast = (Button)findViewById(R.id.button_castvote);
+		//		btnCast.setOnClickListener(new OnClickListener(){
+		//			@Override
+		//			public void onClick(View v) {
+		//				if(!scrolled){
+		//					Toast.makeText(VoteActivity.this, getString(R.string.scroll), Toast.LENGTH_SHORT).show();
+		//				} else if (volAdapter.getSelectedPosition() == -1){
+		//					Toast.makeText(VoteActivity.this, getString(R.string.choose_one_option), Toast.LENGTH_SHORT).show();
+		//				} else {
+		//					castBallot();
+		//				}
+		//			}
+		//		});
 
 		//Register a BroadcastReceiver on stop poll order events
 		stopReceiver = new BroadcastReceiver(){
@@ -184,10 +184,30 @@ public class VoteActivity extends Activity {
 	}
 
 
-//	@Override
-//	public void onBackPressed() {
-//		//do nothing because we don't want that people access to an anterior activity
-//	}
+	@Override
+	public void onBackPressed() {
+		//Show a dialog to ask confirmation to quit vote 
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		// Add the buttons
+		builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialogBack.dismiss();
+				VoteActivity.super.onBackPressed();
+			}
+		});
+		builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialogBack.dismiss();
+			}
+		});
+
+		builder.setTitle(R.string.dialog_title_back);
+		builder.setMessage(this.getString(R.string.dialog_back));
+
+		// Create the AlertDialog
+		dialogBack = builder.create();
+		dialogBack.show();
+	}
 
 	/**
 	 * Method called when cast button is clicked
@@ -222,7 +242,7 @@ public class VoteActivity extends Activity {
 	public boolean getScrolled(){
 		return scrolled;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -246,6 +266,20 @@ public class VoteActivity extends Activity {
 		return true;
 	}
 
+
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		super.onSaveInstanceState(savedInstanceState);
+		savedInstanceState.putSerializable("poll", poll);
+	}
+
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		poll = (Poll)savedInstanceState.getSerializable("poll");
+	}
+
+
 	//TODO remove: only for simulation
 	public static class VoteService extends Service{
 
@@ -264,10 +298,11 @@ public class VoteActivity extends Activity {
 
 		@Override
 		public void onDestroy() {
+			Log.e("VoteService", "Destroyed");
 			reset();
 			super.onDestroy();
 		}
-		
+
 		private void reset(){
 			LocalBroadcastManager.getInstance(ctx).unregisterReceiver(voteReceiver);
 			votesReceived = 0;
@@ -278,7 +313,7 @@ public class VoteActivity extends Activity {
 
 		@Override
 		public int onStartCommand(Intent intent, int flags, int startId) {
-			
+
 			voteReceiver = new BroadcastReceiver(){
 
 				@Override
@@ -300,7 +335,6 @@ public class VoteActivity extends Activity {
 						@Override
 						protected Object doInBackground(Object... arg0) {
 							while(doWork){
-								//TODO BC type
 								Intent i = new Intent(BroadcastIntentTypes.newIncomingVote);
 								i.putExtra("votes", votesReceived);
 								i.putExtra("options", (Serializable)poll.getOptions());
@@ -337,12 +371,5 @@ public class VoteActivity extends Activity {
 		super.onResume();
 		AndroidApplication.getInstance().setCurrentActivity(this);
 	}
-	protected void onPause() {
-		AndroidApplication.getInstance().setCurrentActivity(null);
-		super.onPause();
-	}
-	protected void onDestroy() {        
-		AndroidApplication.getInstance().setCurrentActivity(null);
-		super.onDestroy();
-	}
+
 }

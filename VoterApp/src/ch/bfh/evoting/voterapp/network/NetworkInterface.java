@@ -28,6 +28,10 @@ public interface NetworkInterface {
 	
 	public void setGroupPassword(String password);
 	
+	public void lockGroup();
+	
+	public void unlockGroup();
+	
 	/**
 	 * This method can be used to send a broadcast message
 	 * 

@@ -33,6 +33,9 @@ public class ListTerminatedPollsActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_list_terminated_polls);
 		setupActionBar();
+		
+		AndroidApplication.getInstance().setCurrentActivity(this);
+
 
 		//get the poll and generate the list
 		List<Poll> polls = PollDbHelper.getInstance(this).getAllTerminatedPolls();
@@ -113,6 +116,11 @@ public class ListTerminatedPollsActivity extends Activity {
 		intent.putExtra("poll", poll);
 		intent.putExtra("saveToDb", false);
 		startActivity(intent);
+	}
+	
+	protected void onResume() {
+		AndroidApplication.getInstance().setCurrentActivity(this);
+		super.onResume();
 	}
 
 }

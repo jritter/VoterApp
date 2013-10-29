@@ -34,11 +34,18 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 		setContentView(R.layout.activity_review_poll);
 		setupActionBar();
 		
+		AndroidApplication.getInstance().setCurrentActivity(this);
+		AndroidApplication.getInstance().getNetworkInterface().lockGroup();
+
+		
 		btnStartPollPeriod = (Button) findViewById(R.id.button_start_poll_period);
 		btnStartPollPeriod.setOnClickListener(this);
 		
 		Intent intent = getIntent();
-		poll = (Poll)intent.getSerializableExtra("poll");
+		Poll intentPoll = (Poll)intent.getSerializableExtra("poll");
+		if(intentPoll!=null){
+			poll = intentPoll;
+		}
 
 	}
 
@@ -60,14 +67,9 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			// This ID represents the Home or Up button. In the case of this
-			// activity, the Up button is shown. Use NavUtils to allow users
-			// to navigate up one level in the application structure. For
-			// more details, see the Navigation pattern on Android Design:
-			//
-			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
-			//
-			NavUtils.navigateUpFromSameTask(this);
+			Intent i = new Intent(this, ElectorateActivity.class);
+			i.putExtra("poll", (Serializable) poll);
+			NavUtils.navigateUpTo(this, i);
 			return true;
 		case R.id.help:
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_review), getString(R.string.help_text_review) );
@@ -115,6 +117,22 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 		}
 	}
 
+	protected void onResume() {
+		AndroidApplication.getInstance().setCurrentActivity(this);
+		super.onResume();
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		super.onSaveInstanceState(savedInstanceState);
+		savedInstanceState.putSerializable("poll", poll);
+	}
+
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		poll = (Poll)savedInstanceState.getSerializable("poll");
+	}
 	
 //	@Override
 //	public void onBackPressed() {

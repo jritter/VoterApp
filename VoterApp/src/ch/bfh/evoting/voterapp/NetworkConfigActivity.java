@@ -34,10 +34,12 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 
 /**
  * Activity displaying the available networks
@@ -62,7 +64,29 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_network_config);
+		final FrameLayout overlayFramelayout = new FrameLayout(this);
+		View view = getLayoutInflater().inflate(R.layout.activity_network_config, null,false);
+		overlayFramelayout.addView(view);
+		
+		final SharedPreferences settings = getSharedPreferences(AndroidApplication.PREFS_NAME, MODE_PRIVATE);
+		
+		if(settings.getBoolean("first_run_"+this.getClass().getSimpleName(), true)){
+			final View overlay_view = getLayoutInflater().inflate(R.layout.overlay_network_config, null,false);
+			overlayFramelayout.addView(overlay_view);
+			overlay_view.setOnTouchListener(new View.OnTouchListener() {
+
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					overlayFramelayout.removeView(overlay_view);
+					settings.edit().putBoolean("first_run_"+NetworkConfigActivity.this.getClass().getSimpleName(), false).commit();
+					return false;
+				}
+			});
+		}
+		setContentView(overlayFramelayout);
+
+
+		AndroidApplication.getInstance().setCurrentActivity(this);
 
 		Fragment fg = new NetworkOptionsFragment();
 		// adding fragment to relative layout by using layout id
@@ -134,7 +158,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
 	}
-	
+
 	@Override
 	protected void onNewIntent(Intent intent) {
 		//if extra is present, it has priority on the saved poll
@@ -144,7 +168,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 		}
 		super.onNewIntent(intent);
 	}
-	
+
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
@@ -166,6 +190,8 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 
 	@Override
 	protected void onResume() {
+		AndroidApplication.getInstance().setCurrentActivity(this);
+
 		active = true;
 		rescanWifiTask = new AsyncTask<Object, Object, Object>() {
 
@@ -219,10 +245,10 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 			//startActivity(i);
 			//LocalBroadcastManager.getInstance(this).unregisterReceiver(
 			//		serviceStartedListener);
-			
+
 			NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();			
 			ndf.show( getFragmentManager( ), "networkInfo" );
-			
+
 			return true;
 		} else if (item.getItemId()==R.id.help){
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance(
@@ -281,13 +307,13 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 				// saving the values that we got
 				SharedPreferences.Editor editor = preferences.edit();
 				editor.putString("SSID", config[0]);
-//				editor.putString("group_name", config[1]);
-//				editor.putString("group_password", config[2]);
+				//				editor.putString("group_name", config[1]);
+				//				editor.putString("group_password", config[2]);
 				editor.commit();
-				
+
 				AndroidApplication.getInstance().getNetworkInterface().setGroupName(config[1]);
 				AndroidApplication.getInstance().getNetworkInterface().setGroupPassword(config[2]);
-				
+
 				// connect to the network
 				connect(config);
 
@@ -346,6 +372,5 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 			alertDialog.show();
 		}
 	}
-
 
 }

@@ -49,7 +49,10 @@ public class NetworkInformationActivity extends Activity implements OnClickListe
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		
-		
+		AndroidApplication.getInstance().setCurrentActivity(this);
+		AndroidApplication.getInstance().getNetworkInterface().unlockGroup();
+
+
 		Poll serializedPoll = (Poll)getIntent().getSerializableExtra("poll");
 		if(serializedPoll!=null){
 			poll = serializedPoll;
@@ -108,13 +111,6 @@ public class NetworkInformationActivity extends Activity implements OnClickListe
 		return super.onOptionsItemSelected(item);
 	}
 
-	
-
-	protected void onDestroy() {        
-		AndroidApplication.getInstance().setCurrentActivity(null);
-		super.onDestroy();
-	}
-	
 	@Override
 	public void onClick(View view) {
 
@@ -181,4 +177,10 @@ public class NetworkInformationActivity extends Activity implements OnClickListe
 			}
 		}
 	}
+	
+	protected void onResume() {
+		AndroidApplication.getInstance().setCurrentActivity(this);
+		super.onResume();
+	}
+	
 }

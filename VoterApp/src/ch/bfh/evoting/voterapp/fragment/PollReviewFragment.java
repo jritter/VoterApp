@@ -38,9 +38,17 @@ public class PollReviewFragment extends ListFragment {
 	private BroadcastReceiver reviewAcceptsReceiver;
 	private ReviewPollAdapter adapter;
 
+	private BroadcastReceiver startVoteReceiver;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);	
+		super.onCreate(savedInstanceState);
+		if(savedInstanceState !=null){
+			Poll intentPoll = (Poll)savedInstanceState.getSerializable("poll");
+			if(intentPoll!=null){
+				this.poll = intentPoll;
+			}
+		}
 	}
 
 	@Override
@@ -51,18 +59,20 @@ public class PollReviewFragment extends ListFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		
-		poll = (Poll)getActivity().getIntent().getSerializableExtra("poll");
+
+		Poll intentPoll = (Poll)getActivity().getIntent().getSerializableExtra("poll");
+		if(intentPoll!=null){
+			this.poll = intentPoll;
+		}
 		String sender = getActivity().getIntent().getStringExtra("sender");
 		poll.getParticipants().get(sender).setHasAcceptedReview(true);
-		
 
 		// Inflate the layout for this fragment
 		View v = inflater.inflate(R.layout.fragment_poll_review, container,
 				false);
 
 		adapter = new ReviewPollAdapter(getActivity(), poll);
-		
+
 		ListView lv = (ListView) v.findViewById(android.R.id.list);
 		lv.setAdapter(adapter);
 
@@ -70,7 +80,7 @@ public class PollReviewFragment extends ListFragment {
 
 		if(!AndroidApplication.getInstance().isAdmin()){
 			//register the startvote signal receiver
-			LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(new BroadcastReceiver() {
+			startVoteReceiver = new BroadcastReceiver() {
 
 				@Override
 				public void onReceive(Context context, Intent intent) {
@@ -87,21 +97,22 @@ public class PollReviewFragment extends ListFragment {
 						AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 						// Add the buttons
 						builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
-						           public void onClick(DialogInterface dialog, int id) {
-						               AndroidApplication.getInstance().getNetworkInterface().disconnect();
-						        	   startActivity(new Intent(PollReviewFragment.this.getActivity(), MainActivity.class));
-						           }
-						       });
-						
+							public void onClick(DialogInterface dialog, int id) {
+								AndroidApplication.getInstance().getNetworkInterface().disconnect();
+								startActivity(new Intent(PollReviewFragment.this.getActivity(), MainActivity.class));
+							}
+						});
+
 						builder.setTitle(R.string.not_included_title);
 						builder.setMessage(R.string.not_included);
-						
+
 						// Create the AlertDialog
 						AlertDialog dialog = builder.create();
 						dialog.show();
 					}
 				}
-			}, new IntentFilter(BroadcastIntentTypes.startVote));
+			};
+			LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(startVoteReceiver, new IntentFilter(BroadcastIntentTypes.startVote));
 
 			//broadcast receiving the poll if it was modified
 			pollReceiver = new BroadcastReceiver() {
@@ -137,6 +148,20 @@ public class PollReviewFragment extends ListFragment {
 		LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(reviewAcceptsReceiver, new IntentFilter(BroadcastIntentTypes.acceptReview));
 
 		return v;
+
+		//		ShowcaseView.ConfigOptions co = new ShowcaseView.ConfigOptions();
+		//        co.hideOnClickOutside = true;
+		//
+		//        // The following code will reposition the OK button to the left.
+		//// RelativeLayout.LayoutParams lps = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+		//// lps.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+		//// lps.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+		//// int margin = ((Number) (getResources().getDisplayMetrics().density * 12)).intValue();
+		//// lps.setMargins(margin, margin, margin, margin);
+		//// co.buttonLayoutParams = lps;
+		//
+		//        sv = ShowcaseView.insertShowcaseView(R.id.buttonBlocked, this, R.string.showcase_main_title, R.string.showcase_main_message, co);
+		//        sv.setOnShowcaseEventListener(this);
 	}
 
 	@Override
@@ -146,6 +171,8 @@ public class PollReviewFragment extends ListFragment {
 
 	@Override
 	public void onDestroy() {
+		LocalBroadcastManager.getInstance(PollReviewFragment.this.getActivity()).unregisterReceiver(startVoteReceiver);
+		LocalBroadcastManager.getInstance(PollReviewFragment.this.getActivity()).unregisterReceiver(pollReceiver);
 		LocalBroadcastManager.getInstance(PollReviewFragment.this.getActivity()).unregisterReceiver(reviewAcceptsReceiver);
 		super.onDestroy();
 	}
@@ -158,4 +185,11 @@ public class PollReviewFragment extends ListFragment {
 		}
 		return false;
 	}
+
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		super.onSaveInstanceState(savedInstanceState);
+		savedInstanceState.putSerializable("poll", poll);
+	}
+
 }

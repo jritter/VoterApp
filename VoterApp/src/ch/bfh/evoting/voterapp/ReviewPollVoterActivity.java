@@ -2,14 +2,21 @@ package ch.bfh.evoting.voterapp;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.FrameLayout;
+import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 
@@ -21,12 +28,35 @@ import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 public class ReviewPollVoterActivity extends Activity {
 
 	private BroadcastReceiver pollReceiver;
+	private AlertDialog dialogBack;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		final FrameLayout overlayFramelayout = new FrameLayout(this);
+		View view = getLayoutInflater().inflate(R.layout.activity_review_poll_voter, null,false);
+		overlayFramelayout.addView(view);
+		
+		final SharedPreferences settings = getSharedPreferences(AndroidApplication.PREFS_NAME, MODE_PRIVATE);
+		
+		if(settings.getBoolean("first_run_"+this.getClass().getSimpleName(), true)){
+			final View overlay_view = getLayoutInflater().inflate(R.layout.overlay_review_poll, null,false);
+			overlayFramelayout.addView(overlay_view);
+			overlay_view.setOnTouchListener(new View.OnTouchListener() {
+
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					overlayFramelayout.removeView(overlay_view);
+					settings.edit().putBoolean("first_run_"+ReviewPollVoterActivity.this.getClass().getSimpleName(), false).commit();
+					return false;
+				}
+			});
+		}
+		setContentView(overlayFramelayout);
+		
 		AndroidApplication.getInstance().setCurrentActivity(this);
-		setContentView(R.layout.activity_review_poll_voter);
+
 
 //		final Button btn_validate_review = (Button) findViewById(R.id.button_validate_review);
 //
@@ -38,26 +68,45 @@ public class ReviewPollVoterActivity extends Activity {
 //			}
 //		});
 
-		pollReceiver = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-//				((LinearLayout)btn_validate_review.getParent()).setVisibility(View.VISIBLE);
-			}
-		};
-		LocalBroadcastManager.getInstance(this).registerReceiver(pollReceiver, new IntentFilter(BroadcastIntentTypes.pollToReview));
+//		pollReceiver = new BroadcastReceiver() {
+//			@Override
+//			public void onReceive(Context context, Intent intent) {
+////				((LinearLayout)btn_validate_review.getParent()).setVisibility(View.VISIBLE);
+//			}
+//		};
+//		LocalBroadcastManager.getInstance(this).registerReceiver(pollReceiver, new IntentFilter(BroadcastIntentTypes.pollToReview));
 	}
 	
 	@Override
 	protected void onDestroy() {
-		AndroidApplication.getInstance().setCurrentActivity(null);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(pollReceiver);
 		super.onDestroy();
 	}
+	
+	@Override
+	public void onBackPressed() {
+		//Show a dialog to ask confirmation to quit vote 
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		// Add the buttons
+		builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialogBack.dismiss();
+				ReviewPollVoterActivity.super.onBackPressed();
+			}
+		});
+		builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialogBack.dismiss();
+			}
+		});
 
-//	@Override
-//	public void onBackPressed() {
-//		//do nothing because we don't want that people access to an anterior activity
-//	}
+		builder.setTitle(R.string.dialog_title_back);
+		builder.setMessage(this.getString(R.string.dialog_back));
+
+		// Create the AlertDialog
+		dialogBack = builder.create();
+		dialogBack.show();
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -80,10 +129,6 @@ public class ReviewPollVoterActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		AndroidApplication.getInstance().setCurrentActivity(this);
-	}
-	protected void onPause() {
-		AndroidApplication.getInstance().setCurrentActivity(null);
-		super.onPause();
 	}
 	
 }

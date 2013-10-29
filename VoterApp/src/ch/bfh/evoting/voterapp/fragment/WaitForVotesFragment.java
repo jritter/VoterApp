@@ -49,6 +49,9 @@ public class WaitForVotesFragment extends ListFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);	
+		if(savedInstanceState!=null){
+			poll = (Poll)savedInstanceState.getSerializable("poll");
+		}
 	}
 
 	@Override
@@ -64,9 +67,10 @@ public class WaitForVotesFragment extends ListFragment {
 				false);
 
 		Intent intent = getActivity().getIntent();
-		poll = (Poll)intent.getSerializableExtra("poll");
-
-		if(poll==null) throw new RuntimeException("No poll defined in WaitForVotes fragment!");
+		Poll intentPoll = (Poll)intent.getSerializableExtra("poll");
+		if(intentPoll!=null){
+			poll = intentPoll;
+		}
 
 		participants = poll.getParticipants();
 
@@ -83,7 +87,7 @@ public class WaitForVotesFragment extends ListFragment {
 
 		//TODO for demo only
 		votesReceived = 0;
-		
+
 		//Register a BroadcastReceiver on new incoming vote events
 		//TODO see if needed after simulation
 		updateVoteReceiver = new BroadcastReceiver(){
@@ -97,7 +101,7 @@ public class WaitForVotesFragment extends ListFragment {
 			}
 		};
 		LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(updateVoteReceiver, new IntentFilter(BroadcastIntentTypes.newIncomingVote));
-		
+
 		//Register a BroadcastReceiver on stop poll order events
 		stopReceiver = new BroadcastReceiver(){
 
@@ -155,4 +159,11 @@ public class WaitForVotesFragment extends ListFragment {
 			LocalBroadcastManager.getInstance(this.getActivity()).unregisterReceiver(updateVoteReceiver);
 		}
 	}
+
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		super.onSaveInstanceState(savedInstanceState);
+		savedInstanceState.putSerializable("poll", poll);
+	}
+
 }

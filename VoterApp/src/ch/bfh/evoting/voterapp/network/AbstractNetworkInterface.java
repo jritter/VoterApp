@@ -4,9 +4,11 @@ import java.util.Map;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import ch.bfh.evoting.alljoyn.BusHandler;
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
@@ -58,6 +60,12 @@ public abstract class AbstractNetworkInterface implements NetworkInterface {
 	@Override
 	public abstract void setGroupPassword(String password);
 	
+	@Override
+	public abstract void lockGroup();
+	
+	@Override
+	public abstract void unlockGroup();
+	
 //	@Override
 //	public abstract void setSaltShortDigest(String saltShortDigest);
 	
@@ -70,6 +78,7 @@ public abstract class AbstractNetworkInterface implements NetworkInterface {
 	 * @param voteMessage
 	 */
 	protected final void transmitReceivedMessage(VoteMessage voteMessage) {
+		if(voteMessage==null) return;
 		
 		Intent messageArrivedIntent;
 		switch(voteMessage.getMessageType()){

@@ -229,9 +229,9 @@ public class AdhocWifiManager {
 			super.onPreExecute();
 			d.setTitle("Connecting to Network " + ssid + "...");
 			d.setMessage("...please wait a moment.");
-			if(AndroidApplication.getInstance().getCurrentActivity() instanceof NetworkConfigActivity){
+//			if(AndroidApplication.getInstance().getCurrentActivity() instanceof NetworkConfigActivity){
 				d.show();
-			}
+//			}
 		}
 
 		/*
@@ -420,6 +420,8 @@ public class AdhocWifiManager {
 								Toast.makeText(context, context.getString(R.string.join_error_admin), Toast.LENGTH_LONG).show();
 							} else if (status == 3){
 								Toast.makeText(context, context.getString(R.string.join_error_voter), Toast.LENGTH_LONG).show();
+							} else if (status == 4){
+								Toast.makeText(context, context.getString(R.string.join_error_voter_network), Toast.LENGTH_LONG).show();
 							} else {
 								Toast.makeText(context, context.getString(R.string.join_error), Toast.LENGTH_LONG).show();
 							}
@@ -463,6 +465,10 @@ public class AdhocWifiManager {
 						//other activity was already started
 					}
 				}
+			} else {
+				d.dismiss();
+				Log.e(TAG, "Wireless connection failed");
+				Toast.makeText(context, context.getString(R.string.network_connection_error), Toast.LENGTH_LONG).show();
 			}
 		}
 	}
