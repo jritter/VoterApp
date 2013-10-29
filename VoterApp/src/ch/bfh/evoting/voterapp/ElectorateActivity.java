@@ -96,6 +96,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		};
 		LocalBroadcastManager.getInstance(this).registerReceiver(participantsDiscoverer, new IntentFilter(BroadcastIntentTypes.participantStateUpdate));
 
+		active = true;
 		startPeriodicSend();
 
 
@@ -151,6 +152,8 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onResume() {
 
+		active = true;
+
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		AndroidApplication.getInstance().setVoteRunning(true);
 
@@ -167,6 +170,13 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		super.onResume();
 	}
 
+	
+
+	@Override
+	protected void onPause() {
+		active = false;
+		super.onPause();
+	}
 
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -289,8 +299,11 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 	}
 
 	private void startPeriodicSend(){
-		active = true;
 
+		if(resendElectorate!=null && !resendElectorate.isCancelled()){
+			return;
+		}
+		
 		resendElectorate = new AsyncTask<Object, Object, Object>(){
 
 			@Override

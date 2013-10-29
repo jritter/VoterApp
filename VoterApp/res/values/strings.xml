@@ -17,7 +17,6 @@
     <string name="network_key">Network key</string>
     <string name="vote_singular">vote</string>
     <string name="vote_plural">votes</string>
-    
     <string name="network_info">Network information</string>
     <string name="not_connected">No network set up</string>
     <string name="help">Help</string>
@@ -91,7 +90,9 @@
     <string name="join_error_admin">A group with the same name already exists! Please choose another name!</string>
     <string name="join_error_voter">No group with the given name exists. Please wait for the administrator to create the group.</string>
     <string name="join_error">Error creating/joining the group!</string>
+    <string name="join_error_voter_network">Error joining the group! It seems there is a problem with your network card. Please try to disable the wifi and enable it again.</string>
     <string name="join_error_invalid_name">Invalid group name! Please choose another name!</string>
+    <string name="network_connection_error">Failed to connect to network!</string>
     <string name="redo_impossible">An error occurred while trying to restart the poll.</string>
     <string name="not_included_title">Your are not in the electorate</string>
     <string name="not_included">You were not included in the electorate. So, you cannot participate to the poll. You will be redirected to the main screen.</string>
@@ -122,7 +123,14 @@
     <string name="dialog_back">By going back, you won\'t be able to participate to the vote. Do you really want that?</string>
     <string name="dialog_back_admin">By going back, you won\'t be able to administrate the vote. You will have to start the procedure from the beginning. Do you really want that?</string>
     <string name="dialog_back_result">By going back, you won\'t be able to see result of the vote. Do you really want that?</string>
-    
+
+    <!-- Help overlays -->
+    <string name="overlay_close">Touch the screen to close this help</string>
+    <string name="overlay_identification">Put your identification here...</string>
+    <string name="overlay_network_option">... then choose a method to join the network where the vote session takes place.</string>
+    <string name="overlay_review">Check the content...</string>
+    <string name="overlay_review_ok">... and press the button if you agree with it.</string>
+
     <!-- Activity titles -->
     <string name="voter_app_app_name">MobiVote</string>
     <string name="title_activity_network_config">Join Group</string>

@@ -8,10 +8,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.FrameLayout;
+import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 
@@ -28,10 +33,30 @@ public class ReviewPollVoterActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		AndroidApplication.getInstance().setCurrentActivity(this);
-		setContentView(R.layout.activity_review_poll_voter);
+		
+		final FrameLayout overlayFramelayout = new FrameLayout(this);
+		View view = getLayoutInflater().inflate(R.layout.activity_review_poll_voter, null,false);
+		overlayFramelayout.addView(view);
+		
+		final SharedPreferences settings = getSharedPreferences(AndroidApplication.PREFS_NAME, MODE_PRIVATE);
+		
+		if(settings.getBoolean("first_run_"+this.getClass().getSimpleName(), true)){
+			final View overlay_view = getLayoutInflater().inflate(R.layout.overlay_review_poll, null,false);
+			overlayFramelayout.addView(overlay_view);
+			overlay_view.setOnTouchListener(new View.OnTouchListener() {
 
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					overlayFramelayout.removeView(overlay_view);
+					settings.edit().putBoolean("first_run_"+ReviewPollVoterActivity.this.getClass().getSimpleName(), false).commit();
+					return false;
+				}
+			});
+		}
+		setContentView(overlayFramelayout);
+		
 		AndroidApplication.getInstance().setCurrentActivity(this);
+
 
 //		final Button btn_validate_review = (Button) findViewById(R.id.button_validate_review);
 //
@@ -43,13 +68,13 @@ public class ReviewPollVoterActivity extends Activity {
 //			}
 //		});
 
-		pollReceiver = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-//				((LinearLayout)btn_validate_review.getParent()).setVisibility(View.VISIBLE);
-			}
-		};
-		LocalBroadcastManager.getInstance(this).registerReceiver(pollReceiver, new IntentFilter(BroadcastIntentTypes.pollToReview));
+//		pollReceiver = new BroadcastReceiver() {
+//			@Override
+//			public void onReceive(Context context, Intent intent) {
+////				((LinearLayout)btn_validate_review.getParent()).setVisibility(View.VISIBLE);
+//			}
+//		};
+//		LocalBroadcastManager.getInstance(this).registerReceiver(pollReceiver, new IntentFilter(BroadcastIntentTypes.pollToReview));
 	}
 	
 	@Override

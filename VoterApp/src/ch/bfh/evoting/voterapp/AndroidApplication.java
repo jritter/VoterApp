@@ -18,6 +18,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -52,6 +53,13 @@ public class AndroidApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+
+		//TODO remove when not used anymore
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+		settings.edit().putBoolean("first_run_ReviewPollVoterActivity", true).commit();
+		settings.edit().putBoolean("first_run_NetworkConfigActivity", true).commit();
+
+
 		instance = this;
 		instance.initializeInstance();
 		Utility.initialiseLogging();
@@ -68,8 +76,10 @@ public class AndroidApplication extends Application {
 
 			@Override
 			protected Object doInBackground(Object... params) {
+
 				su = new SerializationUtil(new JavaSerialization());
 				ni = new AllJoynNetworkInterface(AndroidApplication.this.getApplicationContext());// new InstaCircleNetworkInterface(this.getApplicationContext());//new SimulatedNetworkInterface(this.getApplicationContext());
+
 				return null;
 			}
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -104,11 +114,11 @@ public class AndroidApplication extends Application {
 		if (currentActivity != null && currentActivity.equals(activity))
 			this.setCurrentActivity(null);
 	}
-	
+
 	public void setVoteRunning(boolean running){
 		this.voteRunning = running;
 	}
-	
+
 	public boolean isVoteRunning(){
 		return voteRunning;
 	}
@@ -135,6 +145,7 @@ public class AndroidApplication extends Application {
 
 				// Create the AlertDialog
 				builder.create().show();
+				ni.disconnect();
 			}
 		}
 	};

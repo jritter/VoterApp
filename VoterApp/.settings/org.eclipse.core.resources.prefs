@@ -1,0 +1,10 @@
+eclipse.preferences.version=1
+encoding//src/ch/bfh/evoting/voterapp/AndroidApplication.java=UTF-8
+encoding//src/ch/bfh/evoting/voterapp/DisplayResultActivity.java=UTF-8
+encoding//src/ch/bfh/evoting/voterapp/ElectorateActivity.java=UTF-8
+encoding//src/ch/bfh/evoting/voterapp/MainActivity.java=UTF-8
+encoding//src/ch/bfh/evoting/voterapp/NetworkConfigActivity.java=UTF-8
+encoding//src/ch/bfh/evoting/voterapp/ReviewPollActivity.java=UTF-8
+encoding//src/ch/bfh/evoting/voterapp/ReviewPollVoterActivity.java=UTF-8
+encoding//src/ch/bfh/evoting/voterapp/VoteActivity.java=UTF-8
+encoding//src/ch/bfh/evoting/voterapp/WaitForVotesActivity.java=UTF-8

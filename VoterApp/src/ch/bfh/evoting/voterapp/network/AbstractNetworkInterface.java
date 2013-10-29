@@ -78,6 +78,7 @@ public abstract class AbstractNetworkInterface implements NetworkInterface {
 	 * @param voteMessage
 	 */
 	protected final void transmitReceivedMessage(VoteMessage voteMessage) {
+		if(voteMessage==null) return;
 		
 		Intent messageArrivedIntent;
 		switch(voteMessage.getMessageType()){

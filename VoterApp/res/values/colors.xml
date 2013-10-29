@@ -16,4 +16,6 @@
     	
     	<color name="background">#40FFBB33</color>
     	
+    	<color name="background_overlay">#88000000</color>
+    	
 </resources>
