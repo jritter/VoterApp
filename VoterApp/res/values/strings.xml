@@ -24,7 +24,7 @@
     <string name="networks">Network connection</string>
     <string name="empty_vote">Empty vote</string>
     <string name="dialog_wait_wifi">Please wait...</string>
-    <string name="button_use_actual_ssid">Use currently connected wireless network</string>
+    <string name="button_use_actual_ssid">Use network \" %1$s \"</string>
     <string name="button_scan_nfc">Scan NFC tag</string>
     <string name="advance_network_config">Advanced network configuration</string>
     <string name="write_nfc_tag">Write NFC tag</string>
@@ -118,7 +118,11 @@
     <string name="dialog_attack_impersonalization">An attack has been detected! Someone is trying to impersonate a group member in order to be able to vote in his name. We strongly recommand to interrupt the vote session and start a new session.</string>
     <string name="dialog_attack_different_senders">An attack has been detected! Someone has sent a message on behalf of another member of the group. We strongly recommand to interrupt the vote session and start a new session.</string>
     <string name="dialog_attack_different_salts">An attack has been detected! Someone is sending different cryptographic values. The vote must be interrupted. Create a new group and give the password only to people allowed to vote.</string>
-
+    <string name="dialog_title_back">Quit?</string>
+    <string name="dialog_back">By going back, you won\'t be able to participate to the vote. Do you really want that?</string>
+    <string name="dialog_back_admin">By going back, you won\'t be able to administrate the vote. You will have to start the procedure from the beginning. Do you really want that?</string>
+    <string name="dialog_back_result">By going back, you won\'t be able to see result of the vote. Do you really want that?</string>
+    
     <!-- Activity titles -->
     <string name="voter_app_app_name">MobiVote</string>
     <string name="title_activity_network_config">Join Group</string>

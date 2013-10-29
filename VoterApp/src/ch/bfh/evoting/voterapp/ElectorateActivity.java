@@ -20,8 +20,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.app.NavUtils;
@@ -53,6 +55,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 
 	private AsyncTask<Object, Object, Object> resendElectorate;
 	private BroadcastReceiver participantsDiscoverer;
+	private AlertDialog dialogBack;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -226,10 +229,30 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		}	
 	}
 
-	//	@Override
-	//	public void onBackPressed() {
-	//		//do nothing because we don't want that people access to an anterior activity
-	//	}
+	@Override
+	public void onBackPressed() {
+		//Show a dialog to ask confirmation to quit vote 
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		// Add the buttons
+		builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialogBack.dismiss();
+				ElectorateActivity.super.onBackPressed();
+			}
+		});
+		builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialogBack.dismiss();
+			}
+		});
+
+		builder.setTitle(R.string.dialog_title_back);
+		builder.setMessage(this.getString(R.string.dialog_back_admin));
+
+		// Create the AlertDialog
+		dialogBack = builder.create();
+		dialogBack.show();
+	}
 
 
 	private void updateFromNetwork(){

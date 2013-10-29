@@ -2,8 +2,10 @@ package ch.bfh.evoting.voterapp;
 
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -21,6 +23,7 @@ import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 public class ReviewPollVoterActivity extends Activity {
 
 	private BroadcastReceiver pollReceiver;
+	private AlertDialog dialogBack;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +57,31 @@ public class ReviewPollVoterActivity extends Activity {
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(pollReceiver);
 		super.onDestroy();
 	}
+	
+	@Override
+	public void onBackPressed() {
+		//Show a dialog to ask confirmation to quit vote 
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		// Add the buttons
+		builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialogBack.dismiss();
+				ReviewPollVoterActivity.super.onBackPressed();
+			}
+		});
+		builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialogBack.dismiss();
+			}
+		});
 
-//	@Override
-//	public void onBackPressed() {
-//		//do nothing because we don't want that people access to an anterior activity
-//	}
+		builder.setTitle(R.string.dialog_title_back);
+		builder.setMessage(this.getString(R.string.dialog_back));
+
+		// Create the AlertDialog
+		dialogBack = builder.create();
+		dialogBack.show();
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

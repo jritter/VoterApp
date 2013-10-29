@@ -56,6 +56,7 @@ public class VoteActivity extends Activity {
 	private BroadcastReceiver stopReceiver;
 	
 	private Dialog dialogConfirmVote = null;
+	private AlertDialog dialogBack;
 
 	static Context ctx;
 
@@ -184,10 +185,30 @@ public class VoteActivity extends Activity {
 	}
 
 
-//	@Override
-//	public void onBackPressed() {
-//		//do nothing because we don't want that people access to an anterior activity
-//	}
+	@Override
+	public void onBackPressed() {
+		//Show a dialog to ask confirmation to quit vote 
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		// Add the buttons
+		builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialogBack.dismiss();
+				VoteActivity.super.onBackPressed();
+			}
+		});
+		builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialogBack.dismiss();
+			}
+		});
+
+		builder.setTitle(R.string.dialog_title_back);
+		builder.setMessage(this.getString(R.string.dialog_back));
+
+		// Create the AlertDialog
+		dialogBack = builder.create();
+		dialogBack.show();
+	}
 
 	/**
 	 * Method called when cast button is clicked

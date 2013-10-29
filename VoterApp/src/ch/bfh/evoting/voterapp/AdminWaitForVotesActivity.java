@@ -24,6 +24,7 @@ import android.widget.Button;
 public class AdminWaitForVotesActivity extends ListActivity implements OnClickListener {
 
 	private Button btnStopPoll;
+	private AlertDialog dialogBack;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +38,30 @@ public class AdminWaitForVotesActivity extends ListActivity implements OnClickLi
 		btnStopPoll.setOnClickListener(this);
 	}
 
-//	@Override
-//	public void onBackPressed() {
-//		//do nothing because we don't want that people access to an anterior activity
-//	}
+	@Override
+	public void onBackPressed() {
+		//Show a dialog to ask confirmation to quit vote 
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		// Add the buttons
+		builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialogBack.dismiss();
+				AdminWaitForVotesActivity.super.onBackPressed();
+			}
+		});
+		builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialogBack.dismiss();
+			}
+		});
+
+		builder.setTitle(R.string.dialog_title_back);
+		builder.setMessage(this.getString(R.string.dialog_back_result));
+
+		// Create the AlertDialog
+		dialogBack = builder.create();
+		dialogBack.show();
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
