@@ -3,16 +3,16 @@
     
       
     	
-    	<color name="theme_color">@android:color/holo_orange_dark</color>
-    	<color name="theme_color_light">@android:color/holo_orange_light</color>
+    	<color name="theme_color">#FFFF2600</color>
+    	<color name="theme_color_light">#AAFF2600</color>
     	<color name="light_green">@android:color/holo_green_light</color>
     	<color name="light_orange">@android:color/holo_orange_light</color>
     	
-    	<color name="poll">@android:color/holo_red_light</color>
-    	<color name="participant">@android:color/holo_orange_light</color>
-    	<color name="option">@android:color/holo_orange_light</color>
-    	<color name="network">@android:color/holo_orange_light</color>
-    	<color name="hotspot">@android:color/holo_orange_dark</color>
+    	<color name="poll">@color/theme_color</color>
+    	<color name="participant">@color/theme_color</color>
+    	<color name="option">@color/theme_color</color>
+    	<color name="network">@color/theme_color</color>
+    	<color name="hotspot">@color/theme_color</color>
     	
     	<color name="background">#40FFBB33</color>
     	

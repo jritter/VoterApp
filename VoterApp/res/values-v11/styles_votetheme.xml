@@ -29,9 +29,8 @@
       <item name="android:showDividers">middle</item>
       <item name="android:dividerPadding">8dip</item>
       <item name="android:measureWithLargestChild">true</item>
+      <item name="tabLayout">@layout/tab_indicator_holo</item>
   </style>
-  <!--       <item name="tabLayout">@layout/tab_indicator_holo</item>
-   -->
 
   <style name="TabVoteTheme" parent="@android:style/Widget.ActionBar.TabView">
       <item name="android:paddingLeft">16dip</item>
