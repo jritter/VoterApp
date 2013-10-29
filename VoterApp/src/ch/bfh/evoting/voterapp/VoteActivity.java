@@ -9,6 +9,7 @@ import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
+import ch.bfh.evoting.voterapp.util.Utility;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -206,6 +207,19 @@ public class VoteActivity extends Activity {
 
 		// Create the AlertDialog
 		dialogBack = builder.create();
+		
+		dialogBack.setOnShowListener(new DialogInterface.OnShowListener() {
+			@Override
+			public void onShow(DialogInterface dialog) {
+				Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+				dialogBack.getButton(AlertDialog.BUTTON_NEGATIVE).setBackgroundResource(
+						R.drawable.selectable_background_votebartheme);
+				dialogBack.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundResource(
+						R.drawable.selectable_background_votebartheme);
+				
+			}
+		});
+		
 		dialogBack.show();
 	}
 

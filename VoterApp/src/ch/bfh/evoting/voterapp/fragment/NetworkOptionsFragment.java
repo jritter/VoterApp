@@ -103,7 +103,7 @@ public class NetworkOptionsFragment extends Fragment {
 					dialogFragment = new ConnectNetworkDialogFragment(false);
 
 					dialogFragment.setTargetFragment(NetworkOptionsFragment.this, DIALOG_FRAGMENT);
-					dialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog);
+					dialogFragment.setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Dialog);
 					dialogFragment.show(getFragmentManager(), TAG);
 			}
 		});

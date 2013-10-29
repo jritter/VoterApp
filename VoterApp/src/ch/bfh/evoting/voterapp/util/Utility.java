@@ -1,14 +1,18 @@
 package ch.bfh.evoting.voterapp.util;
 
+import java.lang.reflect.Field;
+
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import de.mindpipe.android.logging.log4j.LogConfigurator;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 /**
  * Utility class 
@@ -95,5 +99,45 @@ public class Utility {
 		// Max 500ko per file
 		logConfigurator.setMaxFileSize(500000);
 		logConfigurator.configure();
+	}
+	
+	/**
+	 * 
+	 * Hack to change the color of the separator and the title text in the dialog.
+	 * Many thanks to David Wasser
+	 * http://stackoverflow.com/questions/14770400/android-alertdialog-styling
+	 * 
+	 * @param alert
+	 * @param color
+	 */
+	public static void setTextColor(DialogInterface alert, int color) {
+	    try {
+	        Class c = alert.getClass();
+	        Field mAlert = c.getDeclaredField("mAlert");
+	        mAlert.setAccessible(true);
+	        Object alertController = mAlert.get(alert);
+	        c = alertController.getClass();
+	        Field mTitleView = c.getDeclaredField("mTitleView");
+	        mTitleView.setAccessible(true);
+	        Object dialogTitle = mTitleView.get(alertController);
+	        TextView dialogTitleView = (TextView)dialogTitle;
+	        // Set text color on the title
+	        dialogTitleView.setTextColor(color);
+	        // To find the horizontal divider, first
+	        //  get container around the Title
+	        ViewGroup parent = (ViewGroup)dialogTitleView.getParent();
+	        // Then get the container around that container
+	        parent = (ViewGroup)parent.getParent();
+	        for (int i = 0; i < parent.getChildCount(); i++) {
+	            View v = parent.getChildAt(i);
+	            if (v instanceof View) {
+	            	if (v.getHeight() < 5){
+	            		v.setBackgroundColor(color);
+	            	}
+	            }
+	        }
+	    } catch (Exception e) {
+	        // Ignore any exceptions, either it works or it doesn't
+	    }
 	}
 }

@@ -1,6 +1,7 @@
 package ch.bfh.evoting.voterapp;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 import ch.bfh.evoting.voterapp.adapters.PollOptionAdapter;
@@ -10,6 +11,7 @@ import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
+import ch.bfh.evoting.voterapp.util.Utility;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -23,11 +25,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -214,6 +218,19 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 
 			// Create the AlertDialog
 			dialogAddOption = builder1.create();
+			
+			dialogAddOption.setOnShowListener(new DialogInterface.OnShowListener() {
+				@Override
+				public void onShow(DialogInterface dialog) {
+					Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+					dialogAddOption.getButton(AlertDialog.BUTTON_NEGATIVE).setBackgroundResource(
+							R.drawable.selectable_background_votebartheme);
+					dialogAddOption.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundResource(
+							R.drawable.selectable_background_votebartheme);
+					
+				}
+			});
+			
 			dialogAddOption.show();
 			return;
 		}
@@ -249,6 +266,18 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 
 		// Create the AlertDialog
 		dialogSave = builder.create();
+		
+		dialogSave.setOnShowListener(new DialogInterface.OnShowListener() {
+			@Override
+			public void onShow(DialogInterface dialog) {
+				Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+				dialogSave.getButton(AlertDialog.BUTTON_NEGATIVE).setBackgroundResource(
+						R.drawable.selectable_background_votebartheme);
+				dialogSave.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundResource(
+						R.drawable.selectable_background_votebartheme);
+			}
+		});
+		
 		dialogSave.show();
 	}
 
@@ -383,5 +412,4 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 		AndroidApplication.getInstance().setVoteRunning(false);
 		super.onResume();
 	}
-	
 }

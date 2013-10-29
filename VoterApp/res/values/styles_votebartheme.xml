@@ -30,9 +30,25 @@
         <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_votebartheme</item>
         <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Votebartheme</item>
         
-                <!-- Light.DarkActionBar specific -->
-        <item name="android:actionBarWidgetTheme">@style/Theme.Votebartheme.Widget</item>
-
+                <!-- Light.DarkActionBar specific --><item name="android:actionBarWidgetTheme">@style/Theme.Votebartheme.Widget</item>
+        <item name="android:editTextStyle">@style/EditTextVoteTheme</item>
+        <item name="android:autoCompleteTextViewStyle">@style/AutoCompleteTextViewVoteTheme</item>
+        <item name="android:checkboxStyle">@style/CheckBoxVoteTheme</item>
+        <item name="android:radioButtonStyle">@style/RadioButtonVoteTheme</item>
+        <item name="android:buttonStyle">@style/ButtonVoteTheme</item>
+        <item name="android:imageButtonStyle">@style/ImageButtonVoteTheme</item>
+        <item name="android:spinnerStyle">@style/SpinnerVoteTheme</item>
+        <item name="android:dropDownSpinnerStyle">@style/SpinnerVoteTheme.DropDown</item>
+        <item name="android:spinnerDropDownItemStyle">@style/SpinnerDropDownItemVoteTheme</item>
+        <item name="android:progressBarStyleHorizontal">@style/ProgressBarVoteTheme</item>
+        <item name="android:seekBarStyle">@style/SeekBarVoteTheme</item>
+        <item name="android:ratingBarStyle">@style/RatingBarVoteTheme</item>
+        <item name="android:ratingBarStyleIndicator">@style/RatingBarBigVoteTheme</item>
+        <item name="android:ratingBarStyleSmall">@style/RatingBarSmallVoteTheme</item>
+        <item name="android:buttonStyleToggle">@style/ToggleVoteTheme</item>
+        <item name="android:listViewStyle">@style/ListViewVoteTheme</item>
+        <item name="android:listViewWhiteStyle">@style/ListViewVoteTheme.White</item>
+        <item name="android:spinnerItemStyle">@style/SpinnerItemVoteTheme</item>
     </style>
 
     <style name="ActionBar.Solid.Votebartheme" parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">

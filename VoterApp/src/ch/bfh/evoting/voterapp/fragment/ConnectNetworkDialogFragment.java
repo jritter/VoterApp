@@ -52,6 +52,9 @@ OnClickListener, TextWatcher {
 	private String password;
 	private String networkKey;
 	private String groupName;
+	
+	private Button buttonJoin;
+	private Button buttonCancel;
 
 
 	private boolean showNetworkKeyField;
@@ -92,6 +95,8 @@ OnClickListener, TextWatcher {
 
 		txtNetworkKey = (EditText) view.findViewById(R.id.edittext_networkkey);
 		txtNetworkKey.addTextChangedListener(this);
+		
+		
 
 		if (!showNetworkKeyField) {
 			txtNetworkKey.setVisibility(View.INVISIBLE);
@@ -131,29 +136,34 @@ OnClickListener, TextWatcher {
 			}
 		});
 
-		builder.setTitle(R.string.network_password);
+		//builder.setTitle(R.string.network_password);
 
 
 
 		dialog = builder.create();
 
-
+		
 
 		// always disable the Join button since the key is always empty and
 		// therefore we are not ready to connect yet
 		dialog.setOnShowListener(new OnShowListener() {
 
 			public void onShow(DialogInterface dialog) {
+					
+					buttonJoin = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+					buttonCancel = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_NEGATIVE);
+					
+					buttonJoin.setBackgroundResource(R.drawable.selectable_background_votebartheme);
+					buttonCancel.setBackgroundResource(R.drawable.selectable_background_votebartheme);
 				
-					((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE)
-					.setEnabled(false);
-				
+					buttonJoin.setEnabled(false);
 			}
 		});
 
 		return dialog;
 	}
 	
+
 	private void saveData(){
 		password = txtPassword.getText().toString();
 		groupName = "group"+txtGroupName.getText().toString();
@@ -222,29 +232,26 @@ OnClickListener, TextWatcher {
 	 */
 	public void afterTextChanged(Editable s) {
 
-		Button joinButton = ((AlertDialog) this.getDialog())
-				.getButton(AlertDialog.BUTTON_POSITIVE);
-
 		// handling the activation of the buttons
 		if (showNetworkKeyField) {
 			// activate only if there is at least one character in the password
 			// field and 8 characters in the network key field
 			if (txtPassword.getText().toString().length() < 1
 					|| txtNetworkKey.getText().toString().length() < 8) {
-				joinButton.setEnabled(false);
+				buttonJoin.setEnabled(false);
 			} else {
-				joinButton.setEnabled(true);
+				buttonJoin.setEnabled(true);
 			}
 		} else {
 			if(AndroidApplication.getInstance().isAdmin()){
-				joinButton.setEnabled(true);
+				buttonJoin.setEnabled(true);
 			} else {
 				// activate only if there is at least one character in the password
 				// field
 				if (txtPassword.getText().toString().length() < 1) {
-					joinButton.setEnabled(false);
+					buttonJoin.setEnabled(false);
 				} else {
-					joinButton.setEnabled(true);
+					buttonJoin.setEnabled(true);
 				}
 			}
 		}

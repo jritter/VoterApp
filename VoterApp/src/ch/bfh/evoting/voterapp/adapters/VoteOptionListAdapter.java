@@ -17,6 +17,7 @@ import android.widget.Toast;
 import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.VoteActivity;
 import ch.bfh.evoting.voterapp.entities.Option;
+import ch.bfh.evoting.voterapp.util.Utility;
 
 /**
  * Adapter listing the different vote options that can be chosen in the vote
@@ -30,7 +31,7 @@ public class VoteOptionListAdapter extends ArrayAdapter<Option> {
 	private List<Option> values;
 	private int selected = -1;
 
-	private Dialog dialogConfirmVote = null;
+	private AlertDialog dialogConfirmVote = null;
 
 
 	/**
@@ -105,6 +106,19 @@ public class VoteOptionListAdapter extends ArrayAdapter<Option> {
 
 					// Create the AlertDialog
 					dialogConfirmVote = builder.create();
+					
+					dialogConfirmVote.setOnShowListener(new DialogInterface.OnShowListener() {
+						@Override
+						public void onShow(DialogInterface dialog) {
+							Utility.setTextColor(dialog, context.getResources().getColor(R.color.theme_color));
+							dialogConfirmVote.getButton(AlertDialog.BUTTON_NEGATIVE).setBackgroundResource(
+									R.drawable.selectable_background_votebartheme);
+							dialogConfirmVote.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundResource(
+									R.drawable.selectable_background_votebartheme);
+							
+						}
+					});
+					
 					dialogConfirmVote.show();
 				}
 			}

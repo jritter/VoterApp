@@ -30,6 +30,7 @@ import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.NetworkConfigActivity;
 import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
+import ch.bfh.evoting.voterapp.util.Utility;
 
 /**
  * This class implements methods which are used to adjust the wifi configuration
@@ -229,6 +230,13 @@ public class AdhocWifiManager {
 			super.onPreExecute();
 			d.setTitle("Connecting to Network " + ssid + "...");
 			d.setMessage("...please wait a moment.");
+			d.setOnShowListener(new DialogInterface.OnShowListener() {
+				@Override
+				public void onShow(DialogInterface dialog) {
+					Utility.setTextColor(dialog, context.getResources().getColor(R.color.theme_color));
+					Log.d(TAG, "Magic hack fired for Progress Dialog");
+				}
+			});
 //			if(AndroidApplication.getInstance().getCurrentActivity() instanceof NetworkConfigActivity){
 				d.show();
 //			}
