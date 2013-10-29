@@ -38,16 +38,14 @@ public class DisplayResultActivity extends ListActivity {
 		setContentView(R.layout.activity_display_result);
 		setupActionBar();
 
+		AndroidApplication.getInstance().setCurrentActivity(this);
+		AndroidApplication.getInstance().setVoteRunning(false);
+		if(AndroidApplication.getInstance().isAdmin()){
+			AndroidApplication.getInstance().getNetworkInterface().unlockGroup();
+		}
+
 		ListView lv = (ListView)findViewById(android.R.id.list);
 		
-//		LayoutInflater inflater = this.getLayoutInflater();
-//
-//		View header = inflater.inflate(R.layout.result_header, null, false);
-//		View footer = inflater.inflate(R.layout.result_footer, null, false);
-//
-//		lv.addHeaderView(header);
-//		lv.addFooterView(footer);
-
 		//Get the data in the intent
 		final Poll poll = (Poll)this.getIntent().getSerializableExtra("poll");
 		saveToDbNeeded = this.getIntent().getBooleanExtra("saveToDb", false);
@@ -141,14 +139,18 @@ public class DisplayResultActivity extends ListActivity {
 	}
 
 
-	//	@Override
-	//	public void onBackPressed() {
-	//		if(!this.saveToDbNeeded){
-	//			super.onBackPressed();
-	//		} else {
-	//			//do nothing we don't want that people reaccess to an old activity
-	//		}
-	//	}
+		@Override
+		public void onBackPressed() {
+			if(!this.saveToDbNeeded){
+				super.onBackPressed();
+			} else {
+				Intent i = new Intent(this, MainActivity.class);
+				i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | 
+						Intent.FLAG_ACTIVITY_CLEAR_TASK |
+						Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity(i);
+			}
+		}
 
 	/*
 	 * (non-Javadoc)
@@ -190,5 +192,12 @@ public class DisplayResultActivity extends ListActivity {
 		getMenuInflater().inflate(R.menu.display_results, menu);
 		return true;
 	}
+	
+	protected void onResume() {
+		super.onResume();
+		AndroidApplication.getInstance().setVoteRunning(false);
+		AndroidApplication.getInstance().setCurrentActivity(this);
+	}
+	
 
 }

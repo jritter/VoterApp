@@ -96,7 +96,7 @@
     <string name="not_included_title">Your are not in the electorate</string>
     <string name="not_included">You were not included in the electorate. So, you cannot participate to the poll. You will be redirected to the main screen.</string>
     <string name="dialog_title_network_lost">Group connection lost!</string>
-    <string name="dialog_network_lost">The network connection has been lost. The poll will be interrupted.</string>
+    <string name="dialog_network_lost">The network connection has been lost. If a vote is running, it will be interrupted.</string>
     <string name="taost_password_letter">The password must start with a letter.</string>
     <string name="dialog_title_confirm_vote">Confirm your vote.</string>
     <string name="dialog_confirm_vote">You have selected the following option:\n\n%1$s\n\nDo you want to confirm your choice and send your vote?</string>
@@ -140,7 +140,7 @@
 
     <!-- Activity subtitles -->
     <string name="choose_network">Choose the network you want to use</string>
-    <string name="check_electorate">Check electorate and wait</string>
+    <string name="check_electorate">Please wait...</string>
     <string name="review_poll">Review the poll!</string>
     <string name="welcome">Welcome to MobiVote</string>
     <string name="list_polls_title">Poll archives</string>
@@ -148,7 +148,7 @@
     <string name="vote_title">Please vote</string>
     <string name="wait_votes">Thanks for voting!\nWaiting for votes...</string>
     <string name="title_activity_network_ready">Network connection information</string>
-    <string name="title_activity_choosenetwork">Please Choose the Network you want to use</string>
+    <string name="title_activity_choosenetwork">Please choose the Network you want to use</string>
     <string name="title_activity_chooseelectorate">Please choose the electorate</string>
     <string name="title_activity_reviewpoll">Please review the poll</string>
     <string name="wait_votes_admin">Thanks for voting!\nWaiting for votes...</string>

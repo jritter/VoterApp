@@ -34,6 +34,10 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 		setContentView(R.layout.activity_review_poll);
 		setupActionBar();
 		
+		AndroidApplication.getInstance().setCurrentActivity(this);
+		AndroidApplication.getInstance().getNetworkInterface().lockGroup();
+
+		
 		btnStartPollPeriod = (Button) findViewById(R.id.button_start_poll_period);
 		btnStartPollPeriod.setOnClickListener(this);
 		
@@ -115,6 +119,10 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 		}
 	}
 
+	protected void onResume() {
+		AndroidApplication.getInstance().setCurrentActivity(this);
+		super.onResume();
+	}
 	
 //	@Override
 //	public void onBackPressed() {

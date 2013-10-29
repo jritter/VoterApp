@@ -54,13 +54,6 @@ public class WaitForVotesActivity extends ListActivity {
 		super.onResume();
 		AndroidApplication.getInstance().setCurrentActivity(this);
 	}
-	protected void onPause() {
-		AndroidApplication.getInstance().setCurrentActivity(null);
-		super.onPause();
-	}
-	protected void onDestroy() {        
-		AndroidApplication.getInstance().setCurrentActivity(null);
-		super.onDestroy();
-	}
+	
 
 }

@@ -229,9 +229,9 @@ public class AdhocWifiManager {
 			super.onPreExecute();
 			d.setTitle("Connecting to Network " + ssid + "...");
 			d.setMessage("...please wait a moment.");
-			if(AndroidApplication.getInstance().getCurrentActivity() instanceof NetworkConfigActivity){
+//			if(AndroidApplication.getInstance().getCurrentActivity() instanceof NetworkConfigActivity){
 				d.show();
-			}
+//			}
 		}
 
 		/*

@@ -60,6 +60,10 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		setContentView(R.layout.activity_electorate);
 		setupActionBar();
 		
+		AndroidApplication.getInstance().setCurrentActivity(this);
+		AndroidApplication.getInstance().setVoteRunning(true);
+		AndroidApplication.getInstance().getNetworkInterface().unlockGroup();
+		
 		btnNext = (Button) findViewById(R.id.button_next);
 		btnNext.setOnClickListener(this);
 
@@ -145,6 +149,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 	protected void onResume() {
 
 		AndroidApplication.getInstance().setCurrentActivity(this);
+		AndroidApplication.getInstance().setVoteRunning(true);
 
 		LocalBroadcastManager.getInstance(this).registerReceiver(participantsDiscoverer, new IntentFilter(BroadcastIntentTypes.participantStateUpdate));
 
@@ -269,6 +274,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 			protected Object doInBackground(Object... arg0) {
 
 				while(active){
+					Log.e("ElectorateActivity", "sending electorate "+participants + " async task "+ this);
 					//Send the list of participants in the network over the network
 					VoteMessage vm = new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_ELECTORATE, (Serializable)participants);
 					AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);

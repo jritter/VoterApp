@@ -28,6 +28,8 @@ public class ReviewPollVoterActivity extends Activity {
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		setContentView(R.layout.activity_review_poll_voter);
 
+		AndroidApplication.getInstance().setCurrentActivity(this);
+
 //		final Button btn_validate_review = (Button) findViewById(R.id.button_validate_review);
 //
 //		btn_validate_review.setOnClickListener(new OnClickListener(){
@@ -49,7 +51,6 @@ public class ReviewPollVoterActivity extends Activity {
 	
 	@Override
 	protected void onDestroy() {
-		AndroidApplication.getInstance().setCurrentActivity(null);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(pollReceiver);
 		super.onDestroy();
 	}
@@ -80,10 +81,6 @@ public class ReviewPollVoterActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		AndroidApplication.getInstance().setCurrentActivity(this);
-	}
-	protected void onPause() {
-		AndroidApplication.getInstance().setCurrentActivity(null);
-		super.onPause();
 	}
 	
 }

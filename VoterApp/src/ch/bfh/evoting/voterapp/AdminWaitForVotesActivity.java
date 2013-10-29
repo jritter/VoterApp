@@ -29,6 +29,9 @@ public class AdminWaitForVotesActivity extends ListActivity implements OnClickLi
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_admin_wait_for_votes);
+		
+		AndroidApplication.getInstance().setCurrentActivity(this);
+
 
 		btnStopPoll = (Button) findViewById(R.id.button_stop_poll);
 		btnStopPoll.setOnClickListener(this);
@@ -89,6 +92,12 @@ public class AdminWaitForVotesActivity extends ListActivity implements OnClickLi
 		}
 
 	}
+	
+	protected void onResume() {
+		super.onResume();
+		AndroidApplication.getInstance().setCurrentActivity(this);
+	}
+	
 
 	
 }

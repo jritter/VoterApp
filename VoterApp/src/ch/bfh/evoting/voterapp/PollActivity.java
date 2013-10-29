@@ -34,7 +34,8 @@ public class PollActivity extends Activity implements OnItemClickListener {
 		setContentView(R.layout.activity_poll);
 		// Show the Up button in the action bar.
 		setupActionBar();
-
+		
+		AndroidApplication.getInstance().setCurrentActivity(this);
 		AndroidApplication.getInstance().setIsAdmin(true);
 		
 		pollDbHelper = PollDbHelper.getInstance(this);
@@ -106,6 +107,11 @@ public class PollActivity extends Activity implements OnItemClickListener {
 
 	}
 
+	protected void onResume() {
+		AndroidApplication.getInstance().setCurrentActivity(this);
+		super.onResume();
+	}
+	
 //	@Override
 //	public void onBackPressed() {
 //		//do nothing because we don't want that people access to an anterior activity

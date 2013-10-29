@@ -59,10 +59,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.bfh.evoting.voterapp.MainActivity" />
         </activity>
+        <!--             android:launchMode="singleTop"
+         -->
         <activity
             android:name="ch.bfh.evoting.voterapp.PollDetailActivity"
             android:label="@string/title_activity_poll_detail"
-            android:launchMode="singleTop"
             android:parentActivityName="ch.bfh.evoting.voterapp.PollActivity"
             android:windowSoftInputMode="stateHidden" >
             <meta-data
@@ -149,6 +150,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.bfh.evoting.voterapp.NetworkConfigActivity" />
         </activity>
+        
         <activity
             android:name="com.google.zxing.client.android.CaptureActivity"
             android:configChanges="orientation|keyboardHidden"

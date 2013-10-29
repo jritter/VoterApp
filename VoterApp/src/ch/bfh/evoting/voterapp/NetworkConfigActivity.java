@@ -63,6 +63,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_network_config);
+		AndroidApplication.getInstance().setCurrentActivity(this);
 
 		Fragment fg = new NetworkOptionsFragment();
 		// adding fragment to relative layout by using layout id
@@ -166,6 +167,8 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 
 	@Override
 	protected void onResume() {
+		AndroidApplication.getInstance().setCurrentActivity(this);
+
 		active = true;
 		rescanWifiTask = new AsyncTask<Object, Object, Object>() {
 
@@ -346,6 +349,5 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 			alertDialog.show();
 		}
 	}
-
 
 }

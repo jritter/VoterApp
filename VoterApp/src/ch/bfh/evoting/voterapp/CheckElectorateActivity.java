@@ -40,6 +40,8 @@ public class CheckElectorateActivity extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		AndroidApplication.getInstance().setCurrentActivity(this);
+		AndroidApplication.getInstance().setVoteRunning(true);
+
 		setContentView(R.layout.activity_check_electorate);
 
 		setupActionBar();
@@ -159,14 +161,8 @@ public class CheckElectorateActivity extends ListActivity {
 	
 	protected void onResume() {
 		super.onResume();
+		AndroidApplication.getInstance().setVoteRunning(true);
 		AndroidApplication.getInstance().setCurrentActivity(this);
 	}
-	protected void onPause() {
-		AndroidApplication.getInstance().setCurrentActivity(null);
-		super.onPause();
-	}
-	protected void onDestroy() {        
-		AndroidApplication.getInstance().setCurrentActivity(null);
-		super.onDestroy();
-	}
+	
 }

@@ -190,7 +190,8 @@ public class NetworkInformationFragment extends Fragment {
 		WifiManager wifiman = (WifiManager) this.getActivity().getSystemService(Context.WIFI_SERVICE);
 		if (!wifiapman.isWifiAPEnabled(wifiman)) {
 			LinearLayout view = (LinearLayout)v.findViewById(R.id.view_wlan_key);
-			((LinearLayout)view.getParent()).removeView(v);
+			view.removeAllViews();
+//			((LinearLayout)view.getParent()).removeAllViews();
 		} else {
 			TextView tv_network_key = (TextView) v.findViewById(R.id.textview_network_key);
 			SharedPreferences preferences = this.getActivity().getSharedPreferences(AndroidApplication.PREFS_NAME, 0);

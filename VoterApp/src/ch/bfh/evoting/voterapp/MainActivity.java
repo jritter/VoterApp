@@ -31,7 +31,9 @@ public class MainActivity extends Activity implements OnClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
+		AndroidApplication.getInstance().setVoteRunning(false);
+		AndroidApplication.getInstance().setCurrentActivity(this);
+
 		AndroidApplication.getInstance().setIsAdmin(false);
 		
 		btnSetupNetwork = (Button) findViewById(R.id.button_joinnetwork);
@@ -48,6 +50,8 @@ public class MainActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onResume(){
 		AndroidApplication.getInstance().setIsAdmin(false);
+		AndroidApplication.getInstance().setCurrentActivity(this);
+		AndroidApplication.getInstance().setVoteRunning(false);
 		super.onResume();
 	}
 	
@@ -85,7 +89,9 @@ public class MainActivity extends Activity implements OnClickListener {
 		case R.id.network_info:
 			//Intent i = new Intent(this, ch.bfh.evoting.voterapp.NetworkInformationActivity.class);
 			//startActivity(i);
-			
+			while(AndroidApplication.getInstance().getNetworkInterface()==null){
+				//wait
+			}
 			NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();			
 			ndf.show( getFragmentManager( ), "networkInfo" );
 			
@@ -97,6 +103,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
 	
 //	@Override
 //	public void onBackPressed() {

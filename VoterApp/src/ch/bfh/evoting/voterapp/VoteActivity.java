@@ -264,6 +264,7 @@ public class VoteActivity extends Activity {
 
 		@Override
 		public void onDestroy() {
+			Log.e("VoteService", "Destroyed");
 			reset();
 			super.onDestroy();
 		}
@@ -337,12 +338,5 @@ public class VoteActivity extends Activity {
 		super.onResume();
 		AndroidApplication.getInstance().setCurrentActivity(this);
 	}
-	protected void onPause() {
-		AndroidApplication.getInstance().setCurrentActivity(null);
-		super.onPause();
-	}
-	protected void onDestroy() {        
-		AndroidApplication.getInstance().setCurrentActivity(null);
-		super.onDestroy();
-	}
+	
 }

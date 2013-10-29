@@ -41,7 +41,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 		LocalBroadcastManager.getInstance(context).registerReceiver(mGroupEventReceiver, new IntentFilter("groupDestroyed"));
 		// Listening for group destroy signal
 		LocalBroadcastManager.getInstance(context).registerReceiver(mNetworkConectionFailedReceiver, new IntentFilter("networkConnectionFailed"));
-		
+
 	}
 
 	@Override
@@ -54,11 +54,11 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 	public String getGroupName() {
 		return groupName;
 	}
-	
+
 	@Override
 	public String getGroupPassword() {
-//		SharedPreferences preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
-//		return preferences.getString("group_password", "");
+		//		SharedPreferences preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
+		//		return preferences.getString("group_password", "");
 		return this.groupPassword;
 	}
 
@@ -95,7 +95,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 		data.putString("pingString", string);
 		msg.setData(data);
 		mBusHandler.sendMessage(msg);
-		
+
 	}
 
 	@Override
@@ -105,17 +105,17 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 
 	@Override
 	public void disconnect() {
-		
+
 		//leave actual group
 		Message msg1 = mBusHandler.obtainMessage(BusHandler.LEAVE_GROUP, this.groupName);
 		mBusHandler.sendMessage(msg1);
-		
+
 		if(AndroidApplication.getInstance().isAdmin()){
 			Message msg2 = mBusHandler.obtainMessage(BusHandler.DESTROY_GROUP, this.groupName);
 			mBusHandler.sendMessage(msg2);
 		}
 		this.groupName = null;
-		
+
 	}
 
 	@Override
@@ -130,11 +130,11 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 			}
 			//generate group password
 			this.groupPassword = generatePassword();
-//			SharedPreferences preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
-//			Editor editor = preferences.edit();
-//			editor.putString("group_password", groupPassword);
-//			editor.commit();
-			
+			//			SharedPreferences preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
+			//			Editor editor = preferences.edit();
+			//			editor.putString("group_password", groupPassword);
+			//			editor.commit();
+
 		}
 		String oldNetworkName = this.groupName;
 		this.groupName = groupName;
@@ -165,21 +165,30 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 	}
 	
 	@Override
-	public void setGroupName(String groupName){
-		this.groupName = groupName;
+	public void lockGroup(){
+		 Message msg = mBusHandler.obtainMessage(BusHandler.LOCK_GROUP, groupName);
+	     mBusHandler.sendMessage(msg);
 	}
 	
 	@Override
-	public void setGroupPassword(String password){
-		this.saltShortDigest = password.substring(password.length()-3, password.length());
-		this.groupPassword = password.substring(0,password.length()-3);
+	public void unlockGroup(){
+		 Message msg = mBusHandler.obtainMessage(BusHandler.UNLOCK_GROUP, groupName);
+	     mBusHandler.sendMessage(msg);
 	}
-	
-//	@Override
-//	public void setSaltShortDigest(String saltShortDigest){
-//		this.saltShortDigest = saltShortDigest;
-//	}
-	
+
+	@Override
+	public void setGroupName(String groupName){
+		this.groupName = groupName;
+	}
+
+	@Override
+	public void setGroupPassword(String password){
+		if(password.length()>3){
+			this.saltShortDigest = password.substring(password.length()-3, password.length());
+			this.groupPassword = password.substring(0,password.length()-3);
+		}
+	}
+
 	@Override
 	public String getSaltShortDigest(){
 		return mBusHandler.getSaltShortDigest();
@@ -195,7 +204,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 			transmitReceivedMessage((VoteMessage) su.deserialize(intent.getStringExtra("message")));
 		}
 	};
-	
+
 	/**
 	 * this broadcast receiver listens for incoming messages
 	 */
@@ -210,7 +219,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 			}
 		}
 	};
-	
+
 	/**
 	 * this broadcast receiver listens for incoming messages
 	 */
@@ -220,7 +229,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 			groupName = null;
 		}
 	};
-	
+
 	/**
 	 * Helper method that generates the network password
 	 * @return
@@ -229,13 +238,13 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 	private String generatePassword(){
 		char[] chars = "abcdefghijklmnopqrstuvwxyz".toCharArray();
 		StringBuilder sb = new StringBuilder();
-		
+
 		SecureRandom random = new SecureRandom();
 		for (int i = 0; i < 10; i++) {
 			int pos = random.generateSeed(1)[0]%26;
 			if(pos<0)pos=pos+26;
-			
-		    sb.append(chars[pos]);
+
+			sb.append(chars[pos]);
 		}
 		return sb.toString();
 	}

@@ -18,7 +18,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 /**
  * Class representing the application. This class is used to do some initializations and to share data.
@@ -35,6 +37,8 @@ public class AndroidApplication extends Application {
 	private NetworkInterface ni;
 	private Activity currentActivity = null;
 	private boolean isAdmin = false;
+	private boolean voteRunning;
+
 
 
 	/**
@@ -53,14 +57,23 @@ public class AndroidApplication extends Application {
 		Utility.initialiseLogging();
 		LocalBroadcastManager.getInstance(this).registerReceiver(mGroupEventReceiver, new IntentFilter(BroadcastIntentTypes.networkGroupDestroyedEvent));
 		LocalBroadcastManager.getInstance(this).registerReceiver(mAttackDetecter, new IntentFilter(BroadcastIntentTypes.attackDetected));
+		LocalBroadcastManager.getInstance(this).registerReceiver(startPollReceiver, new IntentFilter(BroadcastIntentTypes.electorate));
 	}
 
 	/**
 	 * Initialize the Serialization method and the Network Component to use
 	 */
 	private void initializeInstance() {
-		su = new SerializationUtil(new JavaSerialization());
-		ni = new AllJoynNetworkInterface(this.getApplicationContext());// new InstaCircleNetworkInterface(this.getApplicationContext());//new SimulatedNetworkInterface(this.getApplicationContext());
+		new AsyncTask<Object, Object, Object>() {
+
+			@Override
+			protected Object doInBackground(Object... params) {
+				su = new SerializationUtil(new JavaSerialization());
+				ni = new AllJoynNetworkInterface(AndroidApplication.this.getApplicationContext());// new InstaCircleNetworkInterface(this.getApplicationContext());//new SimulatedNetworkInterface(this.getApplicationContext());
+				return null;
+			}
+		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
 	}
 
 	/**
@@ -86,19 +99,28 @@ public class AndroidApplication extends Application {
 	public void setCurrentActivity(Activity currentActivity){
 		this.currentActivity = currentActivity;
 	}
-	
+
 	public void unregisterCurrentActivity(Activity activity){
-        if (currentActivity != null && currentActivity.equals(activity))
-            this.setCurrentActivity(null);
+		if (currentActivity != null && currentActivity.equals(activity))
+			this.setCurrentActivity(null);
+	}
+	
+	public void setVoteRunning(boolean running){
+		this.voteRunning = running;
+	}
+	
+	public boolean isVoteRunning(){
+		return voteRunning;
 	}
 
 	/**
 	 * this broadcast receiver listens for information about the network group destruction
 	 */
 	private BroadcastReceiver mGroupEventReceiver = new BroadcastReceiver() {
+
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if(currentActivity!=null){
+			if(currentActivity!=null && ni.getNetworkName()!=null){
 				AlertDialog.Builder builder = new AlertDialog.Builder(currentActivity);
 				// Add the buttons
 				builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -116,14 +138,14 @@ public class AndroidApplication extends Application {
 			}
 		}
 	};
-	
+
 	/**
 	 * this broadcast receiver listens for information about an attack
 	 */
 	private BroadcastReceiver mAttackDetecter = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			if(currentActivity!=null){
+			if(currentActivity!=null && voteRunning){
 				AlertDialog.Builder builder = new AlertDialog.Builder(currentActivity);
 				// Add the buttons
 				builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -147,7 +169,25 @@ public class AndroidApplication extends Application {
 			}
 		}
 	};
-	
+
+	/**
+	 * this broadcast receiver listen for broadcasts containing the electorate. So, if the user is member
+	 * of a session, when the admin sends the electorate, the user is redirected to the correct activity, wherever
+	 * he is.
+	 */
+	private BroadcastReceiver startPollReceiver = new BroadcastReceiver(){
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if(!isAdmin && !(currentActivity instanceof CheckElectorateActivity) && currentActivity!=null){
+				Intent i = new Intent(AndroidApplication.this, CheckElectorateActivity.class);
+				i.putExtra("participants", intent.getSerializableExtra("participants"));
+				currentActivity.startActivity(i);
+			}
+		}
+	};
+
+
 	@Override
 	public void onTerminate() {
 		if(this.ni!=null)

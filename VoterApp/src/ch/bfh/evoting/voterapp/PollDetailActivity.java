@@ -67,6 +67,8 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 		// Show the Up button in the action bar.
 		setupActionBar();
 
+		AndroidApplication.getInstance().setCurrentActivity(this);
+		AndroidApplication.getInstance().setVoteRunning(false);
 		AndroidApplication.getInstance().setIsAdmin(true);
 		
 		pollDbHelper = PollDbHelper.getInstance(this);
@@ -133,6 +135,9 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 		for(Option o:poll.getOptions()){
 			if(o.getText().equals(getString(R.string.empty_vote))){
 				cbEmptyVote.setChecked(true);
+				//toogle the checkbox to add the empty vote at the end of the list
+				cbEmptyVote.performClick();
+				cbEmptyVote.performClick();
 				break;
 			}
 		}
@@ -372,4 +377,11 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 	public void onBackPressed() {
 		askToSave();
 	}
+	
+	protected void onResume() {
+		AndroidApplication.getInstance().setCurrentActivity(this);
+		AndroidApplication.getInstance().setVoteRunning(false);
+		super.onResume();
+	}
+	
 }
