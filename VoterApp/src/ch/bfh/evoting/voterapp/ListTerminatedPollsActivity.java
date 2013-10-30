@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +30,11 @@ public class ListTerminatedPollsActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		if(getResources().getBoolean(R.bool.portrait_only)){
+	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+	    }
+		
 		setContentView(R.layout.activity_list_terminated_polls);
 		setupActionBar();
 		

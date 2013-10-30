@@ -17,6 +17,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
@@ -57,6 +58,11 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		if(getResources().getBoolean(R.bool.portrait_only)){
+	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		}
+		
 		final FrameLayout overlayFramelayout = new FrameLayout(this);
 		View view = getLayoutInflater().inflate(R.layout.activity_network_config, null,false);
 		overlayFramelayout.addView(view);

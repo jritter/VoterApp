@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -58,8 +59,17 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		if(getResources().getBoolean(R.bool.portrait_only)){
+	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+	    }
+		
 		setContentView(R.layout.activity_electorate);
 		setupActionBar();
+		
+		if(getResources().getBoolean(R.bool.display_bottom_bar) == false){
+	        findViewById(R.id.layout_bottom_bar).setVisibility(View.GONE);
+	    }
 		
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		AndroidApplication.getInstance().setVoteRunning(true);
@@ -137,7 +147,9 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_electorate), getString(R.string.help_text_electorate) );
 			hdf.show( getFragmentManager( ), "help" );
 			return true;
-
+		case R.id.action_next:
+			next();
+			return true;
 		}
 		return super.onOptionsItemSelected(item); 
 	}
@@ -202,35 +214,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View view) {
 		if (view == btnNext){
-			Map<String,Participant> finalParticipants = new TreeMap<String,Participant>(new UniqueIdComparator());
-			for(Participant p: participants.values()){
-				if(p.isSelected()){
-					finalParticipants.put(p.getUniqueId(),p);
-				}
-			}
-			if(finalParticipants.size()<2){
-				Toast.makeText(this, R.string.toast_not_enough_participant_selected, Toast.LENGTH_SHORT).show();
-				return;
-			}
-			poll.setParticipants(finalParticipants);
-
-			//if this is a modification of the poll, reset all the acceptations received
-			for(Participant p: poll.getParticipants().values()){
-				p.setHasAcceptedReview(false);
-			}
-
-			active = false;
-			resendElectorate.cancel(true);
-
-			//Send poll to other participants
-			VoteMessage vm = new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_POLL_TO_REVIEW, (Serializable)poll);
-			AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);
-
-			Intent intent = new Intent(this, ReviewPollActivity.class);
-			intent.putExtra("poll", (Serializable)poll);
-			intent.putExtra("sender", AndroidApplication.getInstance().getNetworkInterface().getMyUniqueId());
-			startActivity(intent);
-			LocalBroadcastManager.getInstance(this).unregisterReceiver(participantsDiscoverer);
+			next();
 		}	
 	}
 
@@ -330,6 +314,38 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 			}
 
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+	}
+	
+	private void next() {
+		Map<String,Participant> finalParticipants = new TreeMap<String,Participant>(new UniqueIdComparator());
+		for(Participant p: participants.values()){
+			if(p.isSelected()){
+				finalParticipants.put(p.getUniqueId(),p);
+			}
+		}
+		if(finalParticipants.size()<2){
+			Toast.makeText(this, R.string.toast_not_enough_participant_selected, Toast.LENGTH_SHORT).show();
+			return;
+		}
+		poll.setParticipants(finalParticipants);
+
+		//if this is a modification of the poll, reset all the acceptations received
+		for(Participant p: poll.getParticipants().values()){
+			p.setHasAcceptedReview(false);
+		}
+
+		active = false;
+		resendElectorate.cancel(true);
+
+		//Send poll to other participants
+		VoteMessage vm = new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_POLL_TO_REVIEW, (Serializable)poll);
+		AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);
+
+		Intent intent = new Intent(this, ReviewPollActivity.class);
+		intent.putExtra("poll", (Serializable)poll);
+		intent.putExtra("sender", AndroidApplication.getInstance().getNetworkInterface().getMyUniqueId());
+		startActivity(intent);
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(participantsDiscoverer);
 	}
 
 }

@@ -6,5 +6,12 @@
         android:showAsAction="always"
         android:title="@string/help">
     </item>
+    
+    <item
+        android:id="@+id/action_start_voteperiod"
+        android:icon="@drawable/ic_action_play"
+        android:showAsAction="always|withText"
+        android:title="@string/action_start_poll_period">
+    </item>
 
 </menu>

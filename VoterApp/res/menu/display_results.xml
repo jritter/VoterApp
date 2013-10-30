@@ -6,5 +6,12 @@
         android:showAsAction="always"
         android:title="@string/help">
     </item>
+    
+    <item
+        android:id="@+id/action_redo_vote"
+        android:icon="@drawable/ic_action_undo"
+        android:showAsAction="always|withText"
+        android:title="@string/redo_poll">
+    </item>
 
 </menu>

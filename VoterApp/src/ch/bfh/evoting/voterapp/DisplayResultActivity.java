@@ -3,8 +3,9 @@ package ch.bfh.evoting.voterapp;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.app.ListActivity;
+import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -27,17 +28,28 @@ import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
  * @author Philémon von Bergen
  *
  */
-public class DisplayResultActivity extends ListActivity {
+public class DisplayResultActivity extends Activity implements OnClickListener {
 
 	private int pollId;
 	private boolean saveToDbNeeded;
 	private Poll poll;
+	
+	private Button btnRedo;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		if(getResources().getBoolean(R.bool.portrait_only)){
+	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+	    }
+		
 		setContentView(R.layout.activity_display_result);
 		setupActionBar();
+		
+		if(getResources().getBoolean(R.bool.display_bottom_bar) == false){
+	        findViewById(R.id.layout_bottom_bar).setVisibility(View.GONE);
+	    }
 
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		AndroidApplication.getInstance().setVoteRunning(false);
@@ -61,40 +73,15 @@ public class DisplayResultActivity extends ListActivity {
 		}
 		
 		if(!AndroidApplication.getInstance().isAdmin() && saveToDbNeeded){
-			LinearLayout ll = (LinearLayout)findViewById(R.id.layout_action_bar);
-			((LinearLayout)ll.getParent()).removeView(ll);
+			LinearLayout ll = (LinearLayout)findViewById(R.id.layout_bottom_bar);
+			ll.setVisibility(View.GONE);
 			
 		} else {
 
 			
 			//Set a listener on the redo button
-			Button btnRedo = (Button)findViewById(R.id.button_redo_poll);
-			btnRedo.setOnClickListener(new OnClickListener(){
-				@Override
-				public void onClick(View v) {
-					Poll newPoll = new Poll();
-					newPoll.setQuestion(poll.getQuestion());
-					List<Option> newOptions = new ArrayList<Option>();
-					for(Option op : poll.getOptions()){
-						Option newOp = new Option();
-						newOp.setText(op.getText());
-						newOptions.add(newOp);
-					}
-					newPoll.setOptions(newOptions);
-
-					PollDbHelper pollDbHelper = PollDbHelper.getInstance(DisplayResultActivity.this);
-					try {
-						int pollId = (int)pollDbHelper.savePoll(newPoll);
-						Intent i = new Intent(DisplayResultActivity.this, PollDetailActivity.class);
-						i.putExtra("pollid", pollId);
-						startActivity(i);
-					} catch (DatabaseException e) {
-						Toast.makeText(DisplayResultActivity.this, getString(R.string.redo_impossible), Toast.LENGTH_LONG).show();
-						e.printStackTrace();
-					}
-				}
-			});
-			
+			btnRedo = (Button)findViewById(R.id.button_redo_poll);
+			btnRedo.setOnClickListener(this);
 			//Poll is just finished
 			if(saveToDbNeeded){
 				btnRedo.setText(R.string.redo_poll);
@@ -152,8 +139,8 @@ public class DisplayResultActivity extends ListActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 
-		if (item.getItemId() == android.R.id.home){
-			//if ending a poll
+		switch (item.getItemId()) {
+		case android.R.id.home:
 			if(saveToDbNeeded){
 				Intent i = new Intent(DisplayResultActivity.this, MainActivity.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | 
@@ -168,9 +155,12 @@ public class DisplayResultActivity extends ListActivity {
 				startActivity(new Intent(this, ListTerminatedPollsActivity.class));
 			}
 			return true;
-		} else if (item.getItemId() == R.id.help){
+		case R.id.help:
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_display_results), getString(R.string.help_text_display_results) );
 			hdf.show( getFragmentManager( ), "help" );
+			return true;
+		case R.id.action_redo_vote:
+			redoVote();
 			return true;
 		}
 		return true;
@@ -181,6 +171,12 @@ public class DisplayResultActivity extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.display_results, menu);
+		
+		if(saveToDbNeeded){
+			menu.findItem(R.id.action_redo_vote).setTitle(R.string.redo_poll);
+		} else {
+			menu.findItem(R.id.action_redo_vote).setTitle(R.string.clone_poll);
+		}
 		return true;
 	}
 	
@@ -200,6 +196,36 @@ public class DisplayResultActivity extends ListActivity {
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
 		poll = (Poll)savedInstanceState.getSerializable("poll");
+	}
+
+	@Override
+	public void onClick(View view) {
+		if (view == btnRedo){
+			redoVote();
+		}
+	}
+	
+	private void redoVote () {
+		Poll newPoll = new Poll();
+		newPoll.setQuestion(poll.getQuestion());
+		List<Option> newOptions = new ArrayList<Option>();
+		for(Option op : poll.getOptions()){
+			Option newOp = new Option();
+			newOp.setText(op.getText());
+			newOptions.add(newOp);
+		}
+		newPoll.setOptions(newOptions);
+	
+		PollDbHelper pollDbHelper = PollDbHelper.getInstance(DisplayResultActivity.this);
+		try {
+			int pollId = (int)pollDbHelper.savePoll(newPoll);
+			Intent i = new Intent(DisplayResultActivity.this, PollDetailActivity.class);
+			i.putExtra("pollid", pollId);
+			startActivity(i);
+		} catch (DatabaseException e) {
+			Toast.makeText(DisplayResultActivity.this, getString(R.string.redo_impossible), Toast.LENGTH_LONG).show();
+			e.printStackTrace();
+		}
 	}
 
 }

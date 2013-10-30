@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
@@ -26,6 +27,10 @@ public class ReviewPollVoterActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		if(getResources().getBoolean(R.bool.portrait_only)){
+	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+	    }
 		
 		final FrameLayout overlayFramelayout = new FrameLayout(this);
 		View view = getLayoutInflater().inflate(R.layout.activity_review_poll_voter, null,false);
