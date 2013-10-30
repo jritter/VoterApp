@@ -148,20 +148,6 @@ public class PollReviewFragment extends ListFragment {
 		LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(reviewAcceptsReceiver, new IntentFilter(BroadcastIntentTypes.acceptReview));
 
 		return v;
-
-		//		ShowcaseView.ConfigOptions co = new ShowcaseView.ConfigOptions();
-		//        co.hideOnClickOutside = true;
-		//
-		//        // The following code will reposition the OK button to the left.
-		//// RelativeLayout.LayoutParams lps = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-		//// lps.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-		//// lps.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-		//// int margin = ((Number) (getResources().getDisplayMetrics().density * 12)).intValue();
-		//// lps.setMargins(margin, margin, margin, margin);
-		//// co.buttonLayoutParams = lps;
-		//
-		//        sv = ShowcaseView.insertShowcaseView(R.id.buttonBlocked, this, R.string.showcase_main_title, R.string.showcase_main_message, co);
-		//        sv.setOnShowcaseEventListener(this);
 	}
 
 	@Override

@@ -116,8 +116,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 			public void onReceive(Context context, Intent intent) {
 				active = false;
 				rescanWifiTask.cancel(true);
-				LocalBroadcastManager.getInstance(NetworkConfigActivity.this)
-				.unregisterReceiver(this);
+				LocalBroadcastManager.getInstance(NetworkConfigActivity.this).unregisterReceiver(this);
 				if(AndroidApplication.getInstance().isAdmin()){
 					Intent i = new Intent(NetworkConfigActivity.this, NetworkInformationActivity.class);
 					i.putExtra("poll", poll);
@@ -183,6 +182,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 	@Override
 	protected void onResume() {
 		AndroidApplication.getInstance().setCurrentActivity(this);
+		LocalBroadcastManager.getInstance(NetworkConfigActivity.this).registerReceiver(serviceStartedListener, new IntentFilter(BroadcastIntentTypes.networkConnectionSuccessful));
 
 		active = true;
 		rescanWifiTask = new AsyncTask<Object, Object, Object>() {

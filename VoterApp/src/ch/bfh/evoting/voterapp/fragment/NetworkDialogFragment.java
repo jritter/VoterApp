@@ -17,11 +17,7 @@ public class NetworkDialogFragment extends DialogFragment {
 	// Factory method to create a new EditTextDialogFragment 
     public static NetworkDialogFragment newInstance() {
     	NetworkDialogFragment frag = new NetworkDialogFragment();
-        //Bundle args = new Bundle( );
-        //args.putString( "subtitle", subtitle );
-        //args.putString( "text", text );
-        //frag.setArguments( args );
-        return frag;
+    	return frag;
     }
 	
 	@Override
@@ -33,9 +29,7 @@ public class NetworkDialogFragment extends DialogFragment {
 
 		AlertDialog.Builder builder = new AlertDialog.Builder( getActivity( ) )
         .setView(view)
-       // .setCustomTitle(customTitleView)
         .setIcon( android.R.drawable.ic_dialog_info )
-        //.setTitle( getArguments( ).getString( "title" ) )
         .setNeutralButton(R.string.close, new DialogInterface.OnClickListener(){
 
 			@Override

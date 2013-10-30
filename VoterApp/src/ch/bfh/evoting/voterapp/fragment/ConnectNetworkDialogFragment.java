@@ -10,7 +10,6 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.DialogInterface.OnShowListener;
 import android.os.Bundle;
 import android.text.Editable;
@@ -18,10 +17,8 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 /**
  * Fragment which is included in the the Dialog which is shown after clicking on
@@ -168,53 +165,15 @@ OnClickListener, TextWatcher {
 		password = txtPassword.getText().toString();
 		groupName = "group"+txtGroupName.getText().toString();
 		networkKey = txtNetworkKey.getText().toString();
-//		SharedPreferences preferences = getActivity().getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
-//		SharedPreferences.Editor editor = preferences.edit();
-//		editor.putString("group_name",null);
-//		editor.putString("group_password",null);
 		
 		if(!AndroidApplication.getInstance().isAdmin()){
 			
 			AndroidApplication.getInstance().getNetworkInterface().setGroupName(groupName);
 			AndroidApplication.getInstance().getNetworkInterface().setGroupPassword(password);
-			//											editor.putString("SSID", selectedResult.SSID);
-//			editor.putString("group_password",password);
-//			editor.putString("group_name",groupName);
-			//								((ConnectNetworkDialogFragment) dialog).getPassword());
 		}
-//		editor.commit();
 		
 		getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, getActivity().getIntent());
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.DialogFragment#onAttach(android.app.Activity)
-	 */
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		// Verify that the host activity implements the callback interface
-		//		try {
-		//			// Instantiate the NoticeDialogListener so we can send events to the
-		//			// host
-		//			mListener = (NoticeDialogListener) activity;
-		//		} catch (ClassCastException e) {
-		//			// The activity doesn't implement the interface, throw exception
-		//			throw new ClassCastException(activity.toString()
-		//					+ " must implement NoticeDialogListener");
-		//		}
-	}
-
-	/**
-	 * Returns the password which is defined in the textfield
-	 * 
-	 * @return the password
-	 */
-	//	public String getPassword() {
-	//		return password;
-	//	}
 
 	/**
 	 * Returns the network key which is defined in the textfield

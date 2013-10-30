@@ -20,11 +20,7 @@ public class ResultChartDialogFragment extends DialogFragment {
     	if (instance == null) {
     		instance = new ResultChartDialogFragment();
     	}
-//        Bundle args = new Bundle( );
-//        args.putString( "subtitle", subtitle );
-//        args.putString( "text", text );
-//        frag.setArguments( args );
-        return instance;
+    	return instance;
     }
 
     // Set title and default text

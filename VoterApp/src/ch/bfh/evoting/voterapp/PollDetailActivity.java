@@ -40,7 +40,6 @@ import android.widget.Toast;
  */
 public class PollDetailActivity extends Activity implements OnClickListener {
 
-	private static final int REQUEST_CODE_SETUPNETWORK = 0;
 	private ListView lv;
 	private PollOptionAdapter adapter;
 	ArrayList<Option> options;
@@ -71,15 +70,16 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 		AndroidApplication.getInstance().setIsAdmin(true);
 
 		pollDbHelper = PollDbHelper.getInstance(this);
-
-
-		if (getIntent().getIntExtra("pollid", -1) == -1 && savedPoll == null){
+		
+		if (getIntent().getIntExtra("pollid", -1) == -1 && savedPoll == null && poll==null){
 			// we didn't get a poll id, so let's create a new poll.
 			poll = new Poll();
 			options = new ArrayList<Option>();
 			poll.setOptions(options);
 		} else if (savedPoll != null) {
 			poll = savedPoll;
+			options = (ArrayList<Option>) poll.getOptions();
+		} else if(poll != null){
 			options = (ArrayList<Option>) poll.getOptions();
 		}
 		else {
@@ -353,9 +353,7 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 			});
 		}
 	}
-
-
-
+	
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
@@ -394,7 +392,7 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 	public void onBackPressed() {
 		askToSave();
 	}
-
+	
 	@Override
 	protected void onResume() {
 		AndroidApplication.getInstance().setCurrentActivity(this);

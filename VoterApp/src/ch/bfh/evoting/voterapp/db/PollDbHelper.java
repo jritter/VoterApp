@@ -111,48 +111,8 @@ public class PollDbHelper extends SQLiteOpenHelper {
 	 * @return a list of non terminated polls
 	 */
 	public List<Poll> getAllOpenPolls(){
-		SQLiteDatabase db = getReadableDatabase();
-
 		String sql1 = "SELECT * FROM " + TABLE_NAME_POLLS + " WHERE "+ POLL_IS_TERMINATED +"=0 ORDER BY ID ASC;";
-		Cursor c1 = db.rawQuery(sql1, null);
-
-		List<Poll> polls = new ArrayList<Poll>();
-
-		c1.moveToFirst();
-		while(!c1.isAfterLast()){
-			Poll poll = new Poll();
-			poll.setId(c1.getInt(c1.getColumnIndex(POLL_ID)));
-			poll.setQuestion(c1.getString(c1.getColumnIndex(POLL_QUESTION)));
-			poll.setStartTime(c1.getLong(c1.getColumnIndex(POLL_START_TIME)));
-			poll.setTerminated(c1.getInt(c1.getColumnIndex(POLL_IS_TERMINATED)) == 1);
-			poll.setNumberOfParticipants(c1.getInt(c1.getColumnIndex(POLL_NUMBER_PARTICIPANTS)));
-			String sql2 = "SELECT * FROM " + TABLE_NAME_OPTIONS + " WHERE " + OPTION_POLL_ID + "=" + c1.getInt(c1.getColumnIndex(POLL_ID)) + " ORDER BY ID ASC;";
-			Cursor c2 = db.rawQuery(sql2, null);
-
-			List<Option> options = new ArrayList<Option>();
-
-			c2.moveToFirst();
-			while(!c2.isAfterLast()){
-				Option option = new Option();
-				option.setId(c2.getInt(c2.getColumnIndex(OPTION_ID)));
-				option.setText(c2.getString(c2.getColumnIndex(OPTION_TEXT)));
-				option.setPollId(c2.getInt(c2.getColumnIndex(OPTION_POLL_ID)));
-				option.setVotes(c2.getInt(c2.getColumnIndex(OPTION_NUMBER_OF_VOTES)));
-				option.setPercentage(c2.getDouble(c2.getColumnIndex(OPTION_PERCENTAGE)));
-				options.add(option);
-				c2.moveToNext();
-			}
-			c2.close();
-
-			poll.setOptions(options);
-
-			polls.add(poll);
-			c1.moveToNext();
-		}
-
-		c1.close();
-		db.close();
-		return polls;
+		return this.getListOfPolls(sql1, null);
 	}
 	
 	/**
@@ -160,49 +120,8 @@ public class PollDbHelper extends SQLiteOpenHelper {
 	 * @return a list of terminated polls
 	 */
 	public List<Poll> getAllTerminatedPolls(){
-		SQLiteDatabase db = getReadableDatabase();
-
 		String sql1 = "SELECT * FROM " + TABLE_NAME_POLLS + " WHERE "+ POLL_IS_TERMINATED +"=1 ORDER BY ID ASC;";
-		Cursor c1 = db.rawQuery(sql1, null);
-
-		List<Poll> polls = new ArrayList<Poll>();
-
-		c1.moveToFirst();
-		while(!c1.isAfterLast()){
-			Poll poll = new Poll();
-			poll.setId(c1.getInt(c1.getColumnIndex(POLL_ID)));
-			poll.setQuestion(c1.getString(c1.getColumnIndex(POLL_QUESTION)));
-			poll.setStartTime(c1.getLong(c1.getColumnIndex(POLL_START_TIME)));
-			poll.setTerminated(c1.getInt(c1.getColumnIndex(POLL_IS_TERMINATED)) == 1);
-			poll.setNumberOfParticipants(c1.getInt(c1.getColumnIndex(POLL_NUMBER_PARTICIPANTS)));
-
-			String sql2 = "SELECT * FROM " + TABLE_NAME_OPTIONS + " WHERE " + OPTION_POLL_ID + "=" + c1.getInt(c1.getColumnIndex(POLL_ID)) + " ORDER BY ID ASC;";
-			Cursor c2 = db.rawQuery(sql2, null);
-
-			List<Option> options = new ArrayList<Option>();
-
-			c2.moveToFirst();
-			while(!c2.isAfterLast()){
-				Option option = new Option();
-				option.setId(c2.getInt(c2.getColumnIndex(OPTION_ID)));
-				option.setText(c2.getString(c2.getColumnIndex(OPTION_TEXT)));
-				option.setPollId(c2.getInt(c2.getColumnIndex(OPTION_POLL_ID)));
-				option.setVotes(c2.getInt(c2.getColumnIndex(OPTION_NUMBER_OF_VOTES)));
-				option.setPercentage(c2.getDouble(c2.getColumnIndex(OPTION_PERCENTAGE)));
-				options.add(option);
-				c2.moveToNext();
-			}
-			c2.close();
-
-			poll.setOptions(options);
-
-			polls.add(poll);
-			c1.moveToNext();
-		}
-
-		c1.close();
-		db.close();
-		return polls;
+		return this.getListOfPolls(sql1, null);
 	}
 
 	/**
@@ -210,43 +129,26 @@ public class PollDbHelper extends SQLiteOpenHelper {
 	 * @return list of all polls
 	 */
 	public List<Poll> getAllPolls(){
+		String sql1 = "SELECT * FROM " + TABLE_NAME_POLLS + " ORDER BY ID ASC;";
+		return this.getListOfPolls(sql1, null);
+	}
+	
+	/**
+	 * Helper method getting a list of poll satisfying a query
+	 * @param rawQuery the select query
+	 * @param params the parameters to inject in the query
+	 * @return the list of polls satisfying the query
+	 */
+	private List<Poll> getListOfPolls(String rawQuery, String[] params){
 		SQLiteDatabase db = getReadableDatabase();
 
-		String sql1 = "SELECT * FROM " + TABLE_NAME_POLLS + " ORDER BY ID ASC;";
-		Cursor c1 = db.rawQuery(sql1, null);
+		Cursor c1 = db.rawQuery(rawQuery, params);
 
 		List<Poll> polls = new ArrayList<Poll>();
 
 		c1.moveToFirst();
 		while(!c1.isAfterLast()){
-			Poll poll = new Poll();
-			poll.setId(c1.getInt(c1.getColumnIndex(POLL_ID)));
-			poll.setQuestion(c1.getString(c1.getColumnIndex(POLL_QUESTION)));
-			poll.setStartTime(c1.getLong(c1.getColumnIndex(POLL_START_TIME)));
-			poll.setTerminated(c1.getInt(c1.getColumnIndex(POLL_IS_TERMINATED)) == 1);
-			poll.setNumberOfParticipants(c1.getInt(c1.getColumnIndex(POLL_NUMBER_PARTICIPANTS)));
-
-			String sql2 = "SELECT * FROM " + TABLE_NAME_OPTIONS + " WHERE " + OPTION_POLL_ID + "=" + c1.getInt(c1.getColumnIndex(POLL_ID)) + " ORDER BY ID ASC;";
-			Cursor c2 = db.rawQuery(sql2, null);
-
-			List<Option> options = new ArrayList<Option>();
-
-			c2.moveToFirst();
-			while(!c2.isAfterLast()){
-				Option option = new Option();
-				option.setId(c2.getInt(c2.getColumnIndex(OPTION_ID)));
-				option.setText(c2.getString(c2.getColumnIndex(OPTION_TEXT)));
-				option.setPollId(c2.getInt(c2.getColumnIndex(OPTION_POLL_ID)));
-				option.setVotes(c2.getInt(c2.getColumnIndex(OPTION_NUMBER_OF_VOTES)));
-				option.setPercentage(c2.getDouble(c2.getColumnIndex(OPTION_PERCENTAGE)));
-				options.add(option);
-				c2.moveToNext();
-			}
-			c2.close();
-
-			poll.setOptions(options);
-
-			polls.add(poll);
+			polls.add(this.extractPoll(c1, db));
 			c1.moveToNext();
 		}
 
@@ -263,44 +165,56 @@ public class PollDbHelper extends SQLiteOpenHelper {
 	public Poll getPoll(int pollId){
 		SQLiteDatabase db = getReadableDatabase();
 
-		String sql1 = "SELECT * FROM " + TABLE_NAME_POLLS + " WHERE " + POLL_ID + "=" + pollId + " ORDER BY ID ASC;";
-		Cursor c1 = db.rawQuery(sql1, null);
+		String sql1 = "SELECT * FROM " + TABLE_NAME_POLLS + " WHERE " + POLL_ID + "=? ORDER BY ID ASC;";
+		Cursor c1 = db.rawQuery(sql1, new String[]{""+pollId});
 		
 		Poll poll = new Poll();
 
 		c1.moveToFirst();
 		while(!c1.isAfterLast()){
-			poll.setId(c1.getInt(c1.getColumnIndex(POLL_ID)));
-			poll.setQuestion(c1.getString(c1.getColumnIndex(POLL_QUESTION)));
-			poll.setStartTime(c1.getLong(c1.getColumnIndex(POLL_START_TIME)));
-			poll.setTerminated(c1.getInt(c1.getColumnIndex(POLL_IS_TERMINATED)) == 1);
-			poll.setNumberOfParticipants(c1.getInt(c1.getColumnIndex(POLL_NUMBER_PARTICIPANTS)));
-
-			String sql2 = "SELECT * FROM " + TABLE_NAME_OPTIONS + " WHERE " + OPTION_POLL_ID + "=" + c1.getInt(c1.getColumnIndex(POLL_ID)) + " ORDER BY ID ASC;";
-			Cursor c2 = db.rawQuery(sql2, null);
-
-			List<Option> options = new ArrayList<Option>();
-
-			c2.moveToFirst();
-			while(!c2.isAfterLast()){
-				Option option = new Option();
-				option.setId(c2.getInt(c2.getColumnIndex(OPTION_ID)));
-				option.setText(c2.getString(c2.getColumnIndex(OPTION_TEXT)));
-				option.setPollId(c2.getInt(c2.getColumnIndex(OPTION_POLL_ID)));
-				option.setVotes(c2.getInt(c2.getColumnIndex(OPTION_NUMBER_OF_VOTES)));
-				option.setPercentage(c2.getDouble(c2.getColumnIndex(OPTION_PERCENTAGE)));
-				options.add(option);
-				c2.moveToNext();
-			}
-			c2.close();
-
-			poll.setOptions(options);
-			
+			poll = this.extractPoll(c1, db);
 			c1.moveToNext();
 		}
 
 		c1.close();
 		db.close();
+		return poll;
+	}
+	
+	/**
+	 * Helper method getting a poll out of a cursor
+	 * @param c1 cursor containing the result of a select query on polls table
+	 * @param db open database
+	 * @return the poll contained in the query
+	 */
+	private Poll extractPoll(Cursor c1, SQLiteDatabase db){
+		Poll poll = new Poll();
+		poll.setId(c1.getInt(c1.getColumnIndex(POLL_ID)));
+		poll.setQuestion(c1.getString(c1.getColumnIndex(POLL_QUESTION)));
+		poll.setStartTime(c1.getLong(c1.getColumnIndex(POLL_START_TIME)));
+		poll.setTerminated(c1.getInt(c1.getColumnIndex(POLL_IS_TERMINATED)) == 1);
+		poll.setNumberOfParticipants(c1.getInt(c1.getColumnIndex(POLL_NUMBER_PARTICIPANTS)));
+
+		String sql2 = "SELECT * FROM " + TABLE_NAME_OPTIONS + " WHERE " + OPTION_POLL_ID + "=? ORDER BY ID ASC;";
+		Cursor c2 = db.rawQuery(sql2, new String[]{""+c1.getInt(c1.getColumnIndex(POLL_ID))});
+
+		List<Option> options = new ArrayList<Option>();
+
+		c2.moveToFirst();
+		while(!c2.isAfterLast()){
+			Option option = new Option();
+			option.setId(c2.getInt(c2.getColumnIndex(OPTION_ID)));
+			option.setText(c2.getString(c2.getColumnIndex(OPTION_TEXT)));
+			option.setPollId(c2.getInt(c2.getColumnIndex(OPTION_POLL_ID)));
+			option.setVotes(c2.getInt(c2.getColumnIndex(OPTION_NUMBER_OF_VOTES)));
+			option.setPercentage(c2.getDouble(c2.getColumnIndex(OPTION_PERCENTAGE)));
+			options.add(option);
+			c2.moveToNext();
+		}
+		c2.close();
+
+		poll.setOptions(options);
+		
 		return poll;
 	}
 	
@@ -386,13 +300,7 @@ public class PollDbHelper extends SQLiteOpenHelper {
 	 */
 	public int getNumberOfOpenPolls(){
 		String countQuery = "SELECT  * FROM " + TABLE_NAME_POLLS + " WHERE "+ POLL_IS_TERMINATED +"=0 ORDER BY ID ASC;";
-		SQLiteDatabase db = this.getReadableDatabase();
-		Cursor cursor = db.rawQuery(countQuery, null);
-		int count = cursor.getCount();
-		cursor.close();
-		db.close();
-
-		return count;
+		return this.count(countQuery, null);
 	}
 	
 	/**
@@ -401,13 +309,7 @@ public class PollDbHelper extends SQLiteOpenHelper {
 	 */
 	public int getNumberOfTerminatedPolls(){
 		String countQuery = "SELECT  * FROM " + TABLE_NAME_POLLS + " WHERE "+ POLL_IS_TERMINATED +"=1 ORDER BY ID ASC;";
-		SQLiteDatabase db = this.getReadableDatabase();
-		Cursor cursor = db.rawQuery(countQuery, null);
-		int count = cursor.getCount();
-		cursor.close();
-		db.close();
-
-		return count;
+		return this.count(countQuery, null);
 	}
 	
 	/**
@@ -416,13 +318,7 @@ public class PollDbHelper extends SQLiteOpenHelper {
 	 */
 	public int getNumberOfPolls(){
 		String countQuery = "SELECT  * FROM " + TABLE_NAME_POLLS + " ORDER BY ID ASC;";
-		SQLiteDatabase db = this.getReadableDatabase();
-		Cursor cursor = db.rawQuery(countQuery, null);
-		int count = cursor.getCount();
-		cursor.close();
-		db.close();
-
-		return count;
+		return this.count(countQuery, null);
 	}
 
 	/**
@@ -431,9 +327,19 @@ public class PollDbHelper extends SQLiteOpenHelper {
 	 * @return number of option of this poll
 	 */
 	public int getNumberOfOptionsForPoll(int pollId){
-		String countQuery = "SELECT  * FROM " + TABLE_NAME_OPTIONS + " WHERE " + OPTION_POLL_ID + "=" + pollId + " ORDER BY ID ASC;";
+		String countQuery = "SELECT  * FROM " + TABLE_NAME_OPTIONS + " WHERE " + OPTION_POLL_ID + "=? ORDER BY ID ASC;";
+		return this.count(countQuery, new String[]{""+pollId});
+	}
+	
+	/**
+	 * Helper method executing a count query
+	 * @param rawQuery the SQL query
+	 * @param params the parameters to inject in the query
+	 * @return the number of records matching the query
+	 */
+	private int count(String rawQuery, String[] params){
 		SQLiteDatabase db = this.getReadableDatabase();
-		Cursor cursor = db.rawQuery(countQuery, null);
+		Cursor cursor = db.rawQuery(rawQuery, params);
 		int count = cursor.getCount();
 		cursor.close();
 		db.close();

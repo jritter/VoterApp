@@ -18,10 +18,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-/**
- * @author tgdriju1
- *
- */
 public class ResultChartFragment extends Fragment {
 	
 	String [] labels;

@@ -1,50 +1,29 @@
 package ch.bfh.evoting.voterapp.fragment;
 
-import java.io.Serializable;
-import java.util.HashMap;
 
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.NetworkConfigActivity;
-import ch.bfh.evoting.voterapp.NetworkInformationActivity;
 import ch.bfh.evoting.voterapp.R;
-import ch.bfh.evoting.voterapp.VoteActivity;
 import ch.bfh.evoting.voterapp.network.wifi.AdhocWifiManager;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.app.ListFragment;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.SimpleCursorAdapter;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-import android.widget.TextView;
 
 /**
  * Fragment displaying the review of a poll

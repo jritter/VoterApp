@@ -75,6 +75,21 @@ public class NetworkInformationActivity extends Activity implements OnClickListe
 			} else {
 				super.onBackPressed();
 			}
+			if(AndroidApplication.getInstance().getNetworkInterface().getGroupName()!=null){
+				if(AndroidApplication.getInstance().isAdmin()){
+					//poll details
+					NavUtils.navigateUpFromSameTask(this);
+				} else {
+					Intent i = new Intent(this, MainActivity.class);
+					i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | 
+							Intent.FLAG_ACTIVITY_CLEAR_TASK |
+							Intent.FLAG_ACTIVITY_NEW_TASK);
+					startActivity(i);
+				}
+			} else {
+				//net config
+				super.onBackPressed();
+			}
 			return true;
 		} else if (item.getItemId() == R.id.help) {
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance(

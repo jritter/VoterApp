@@ -89,8 +89,6 @@ public class NetworkInformationFragment extends Fragment {
 			paramsAvailable = false;
 		} else {
 			paramsAvailable = true;
-//			SharedPreferences preferences = this.getActivity().getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
-//			groupPassword = preferences.getString("group_password", null);
 			groupPassword = AndroidApplication.getInstance().getNetworkInterface().getGroupPassword()
 					+ AndroidApplication.getInstance().getNetworkInterface().getSaltShortDigest();
 		}
@@ -164,7 +162,7 @@ public class NetworkInformationFragment extends Fragment {
 			}
 		}
 		
-		
+		//TODO can we remove this
 		//v.findViewById(R.id.layout_bottom_action_bar).setVisibility(View.VISIBLE);
 		//btnWriteNfcTag = (Button) v.findViewById(R.id.button_write_nfc_tag);
 
@@ -178,13 +176,6 @@ public class NetworkInformationFragment extends Fragment {
 		}*/
 
 
-
-//		TextView tv_network_name = (TextView) v.findViewById(R.id.textview_network_name);
-//		tv_network_name.setText(ssid);
-//
-//		TextView tv_network_password = (TextView) v.findViewById(R.id.textview_network_password);
-//		tv_network_password.setText(groupPassword);
-		
 		TextView tv_network_name = (TextView) v.findViewById(R.id.textview_network_name);
 		tv_network_name.setText(ssid);
 
@@ -199,7 +190,6 @@ public class NetworkInformationFragment extends Fragment {
 		if (!wifiapman.isWifiAPEnabled(wifiman)) {
 			LinearLayout view = (LinearLayout)v.findViewById(R.id.view_wlan_key);
 			view.removeAllViews();
-//			((LinearLayout)view.getParent()).removeAllViews();
 		} else {
 			TextView tv_network_key = (TextView) v.findViewById(R.id.textview_network_key);
 			SharedPreferences preferences = this.getActivity().getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
@@ -321,6 +311,8 @@ public class NetworkInformationFragment extends Fragment {
 	 * 
 	 * @param mimeType
 	 *            The string with the mime type name
+	 * @param payload content to put in record
+	 * @return a record containing the payload
 	 */
 	public NdefRecord createMimeRecord(String mimeType, byte[] payload) {
 		byte[] mimeBytes = mimeType.getBytes(Charset.forName("US-ASCII"));
