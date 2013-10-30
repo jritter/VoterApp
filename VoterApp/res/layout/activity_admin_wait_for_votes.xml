@@ -24,6 +24,7 @@
     </fragment>
 
     <LinearLayout
+         android:id="@+id/layout_bottom_bar"
 	     style="@style/ActionBar.Solid.Votebartheme"
 	     android:layout_width="fill_parent"
 	     android:layout_height="wrap_content"

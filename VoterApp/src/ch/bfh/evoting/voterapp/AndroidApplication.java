@@ -9,7 +9,6 @@ import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.JavaSerialization;
 import ch.bfh.evoting.voterapp.util.SerializationUtil;
 import ch.bfh.evoting.voterapp.util.Utility;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
@@ -39,6 +38,8 @@ public class AndroidApplication extends Application {
 	private Activity currentActivity = null;
 	private boolean isAdmin = false;
 	private boolean voteRunning;
+	
+	private AlertDialog dialogNetworkLost;
 
 
 
@@ -143,8 +144,19 @@ public class AndroidApplication extends Application {
 				builder.setTitle(R.string.dialog_title_network_lost);
 				builder.setMessage(R.string.dialog_network_lost);
 
+				
+				dialogNetworkLost = builder.create();
+				dialogNetworkLost.setOnShowListener(new DialogInterface.OnShowListener() {
+					@Override
+					public void onShow(DialogInterface dialog) {
+						Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+						dialogNetworkLost.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
+								R.drawable.selectable_background_votebartheme);
+					}
+				});
+				
 				// Create the AlertDialog
-				builder.create().show();
+				dialogNetworkLost.show();
 				ni.disconnect();
 			}
 		}

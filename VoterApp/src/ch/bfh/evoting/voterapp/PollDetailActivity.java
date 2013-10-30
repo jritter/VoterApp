@@ -17,6 +17,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
@@ -69,9 +70,18 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		if(getResources().getBoolean(R.bool.portrait_only)){
+	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+	    }
+		
 		setContentView(R.layout.activity_poll_detail);
 		// Show the Up button in the action bar.
 		setupActionBar();
+		
+		if(getResources().getBoolean(R.bool.display_bottom_bar) == false){
+	        findViewById(R.id.layout_bottom_bar).setVisibility(View.GONE);
+	    }
 
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		AndroidApplication.getInstance().setVoteRunning(false);
@@ -196,6 +206,8 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_poll_details), getString(R.string.help_text_poll_details) );
 			hdf.show( getFragmentManager( ), "help" );
 			return true;
+		case R.id.action_start_vote:
+			startVote();
 		}
 		return super.onOptionsItemSelected(item); 
 	}
@@ -304,66 +316,7 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 		}
 
 		if (view == btnStartPoll){
-
-			if(!etOption.getText().toString().equals("")){
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				// Add the buttons
-				builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						btnAddOption.performClick();
-						btnStartPoll.performClick();
-						dialogAddOption.dismiss();
-						return;
-					}
-				});
-				builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						etOption.setText("");
-						btnStartPoll.performClick();
-						dialogAddOption.dismiss();
-						return;
-					}
-				});
-
-				builder.setTitle(R.string.dialog_title_add_option);
-				builder.setMessage(R.string.dialog_add_option);
-
-				// Create the AlertDialog
-				dialogAddOption = builder.create();
-				dialogAddOption.show();
-				return;
-			}
-
-			//save the poll
-			if (poll.getId()>-1){
-				updatePoll();
-			}
-			else {
-				savePoll();
-			}
-
-			//Check if it is complete
-			if(poll.getQuestion()==null || poll.getQuestion().equals("")){
-				Toast.makeText(this, getString(R.string.toast_question_empty), Toast.LENGTH_SHORT).show();
-				return;
-			}
-			if(poll.getOptions().size()<2){
-				Toast.makeText(this, getString(R.string.toast_not_enough_options), Toast.LENGTH_SHORT).show();
-				return;
-			}
-			for(Option o : poll.getOptions()){
-				if(o.getText()==null || o.getText().equals("")){
-					Toast.makeText(this, getString(R.string.toast_option_empty), Toast.LENGTH_SHORT).show();
-					return;
-				}
-			}
-
-			//Network interface can be null since it is created in an async task, so we wait until the task is completed
-			this.waitForNetworkInterface(new Callable<Void>() {
-				public Void call() {
-					return goToNetworkConfig();
-				}
-			});
+			startVote();
 		}
 	}
 
@@ -468,5 +421,67 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 		NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();			
 		ndf.show( getFragmentManager( ), "networkInfo" );
 		return null;
+	}
+	
+	private void startVote() {
+		if(!etOption.getText().toString().equals("")){
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			// Add the buttons
+			builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					btnAddOption.performClick();
+					btnStartPoll.performClick();
+					dialogAddOption.dismiss();
+					return;
+				}
+			});
+			builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					etOption.setText("");
+					btnStartPoll.performClick();
+					dialogAddOption.dismiss();
+					return;
+				}
+			});
+
+			builder.setTitle(R.string.dialog_title_add_option);
+			builder.setMessage(R.string.dialog_add_option);
+
+			// Create the AlertDialog
+			dialogAddOption = builder.create();
+			dialogAddOption.show();
+			return;
+		}
+
+		//save the poll
+		if (poll.getId()>-1){
+			updatePoll();
+		}
+		else {
+			savePoll();
+		}
+
+		//Check if it is complete
+		if(poll.getQuestion()==null || poll.getQuestion().equals("")){
+			Toast.makeText(this, getString(R.string.toast_question_empty), Toast.LENGTH_SHORT).show();
+			return;
+		}
+		if(poll.getOptions().size()<2){
+			Toast.makeText(this, getString(R.string.toast_not_enough_options), Toast.LENGTH_SHORT).show();
+			return;
+		}
+		for(Option o : poll.getOptions()){
+			if(o.getText()==null || o.getText().equals("")){
+				Toast.makeText(this, getString(R.string.toast_option_empty), Toast.LENGTH_SHORT).show();
+				return;
+			}
+		}
+
+		//Network interface can be null since it is created in an async task, so we wait until the task is completed
+		this.waitForNetworkInterface(new Callable<Void>() {
+			public Void call() {
+				return goToNetworkConfig();
+			}
+		});
 	}
 }

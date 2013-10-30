@@ -10,6 +10,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.nfc.NdefMessage;
@@ -49,6 +50,12 @@ public class NetworkInformationActivity extends Activity implements OnClickListe
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		
+		super.onCreate(savedInstanceState);
+		
+		if(getResources().getBoolean(R.bool.portrait_only)){
+	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+	    }
+		
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		AndroidApplication.getInstance().getNetworkInterface().unlockGroup();
 
@@ -58,11 +65,15 @@ public class NetworkInformationActivity extends Activity implements OnClickListe
 			poll = serializedPoll;
 		}
 		
-		super.onCreate(savedInstanceState);
+		
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		
 		setContentView(R.layout.activity_network_information);
 		setupActionBar();
+		
+		if(getResources().getBoolean(R.bool.display_bottom_bar) == false){
+	        findViewById(R.id.layout_bottom_bar).setVisibility(View.GONE);
+	    }
 		
 		btnRecreateNetwork = (Button) findViewById(R.id.button_recreate_network);
 		btnRecreateNetwork.setOnClickListener(this);
@@ -74,7 +85,7 @@ public class NetworkInformationActivity extends Activity implements OnClickListe
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.network_informations, menu);
+		getMenuInflater().inflate(R.menu.network_information, menu);
 		return true;
 	}
 
@@ -87,27 +98,41 @@ public class NetworkInformationActivity extends Activity implements OnClickListe
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == android.R.id.home) {
-			// This ID represents the Home or Up button. In the case of this
-			// activity, the Up button is shown. Use NavUtils to allow users
-			// to navigate up one level in the application structure. For
-			// more details, see the Navigation pattern on Android Design:
-			//
-			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
-			//
+		
+		Intent i;
+		
+		switch (item.getItemId()) {
+		case android.R.id.home:
 			if (this.getIntent().getBooleanExtra("goToMain", false)) {
 				NavUtils.navigateUpFromSameTask(this);
 			} else {
 				super.onBackPressed();
 			}
 			return true;
-		} else if (item.getItemId() == R.id.help) {
+		case R.id.help:
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance(
 					getString(R.string.help_title_network_info),
 					getString(R.string.help_text_network_info));
 			hdf.show(getFragmentManager(), "help");
 			return true;
+			
+		case R.id.action_modify_network:
+			i = new Intent(this, NetworkConfigActivity.class);
+			i.putExtra("poll", poll);
+			startActivity(i);
+			return true;
+		case R.id.action_next:
+			if(AndroidApplication.getInstance().isAdmin()){
+				i = new Intent(this, ElectorateActivity.class);
+				i.putExtra("poll", poll);
+				startActivity(i);
+			} else {
+				i = new Intent(this, CheckElectorateActivity.class);
+				startActivity(i);
+			}
+			return true;
 		}
+		
 		return super.onOptionsItemSelected(item);
 	}
 

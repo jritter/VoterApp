@@ -5,6 +5,7 @@ import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,6 +22,11 @@ public class WaitForVotesActivity extends ListActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		if(getResources().getBoolean(R.bool.portrait_only)){
+	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+	    }
+		
 		AndroidApplication.getInstance().setCurrentActivity(this);
 
 		setContentView(R.layout.activity_wait_for_votes);

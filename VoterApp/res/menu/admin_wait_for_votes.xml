@@ -7,4 +7,10 @@
         android:title="@string/help">
     </item>
 
+    <item
+        android:id="@+id/action_finish_vote"
+        android:icon="@drawable/ic_action_cancel"
+        android:showAsAction="always|withText"
+        android:title="@string/action_stop_poll">
+    </item>
 </menu>
