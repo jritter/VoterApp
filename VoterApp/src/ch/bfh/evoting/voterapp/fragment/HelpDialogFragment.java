@@ -5,11 +5,14 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnShowListener;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
 public class HelpDialogFragment extends DialogFragment {
+	
+	private AlertDialog dialog;
 
     // Factory method to create a new EditTextDialogFragment 
     public static HelpDialogFragment newInstance( String subtitle, String text ) {
@@ -46,7 +49,18 @@ public class HelpDialogFragment extends DialogFragment {
 			}
         	
         });
+        
+        dialog = builder.create();
 
-        return builder.create( );
+		dialog.setOnShowListener(new OnShowListener() {
+
+			public void onShow(DialogInterface dialog) {
+				((AlertDialog) dialog).getButton(AlertDialog.BUTTON_NEUTRAL)
+						.setBackgroundResource(
+								R.drawable.selectable_background_votebartheme);
+			}
+		});
+
+        return dialog;
     }
 }

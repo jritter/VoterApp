@@ -6,12 +6,14 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentTransaction;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnShowListener;
 import android.os.Bundle;
 import android.view.View;
 
 public class ResultChartDialogFragment extends DialogFragment {
 	
 	private static ResultChartDialogFragment instance = null;
+	private AlertDialog dialog;
 
     public static ResultChartDialogFragment newInstance() {
     	
@@ -45,7 +47,18 @@ public class ResultChartDialogFragment extends DialogFragment {
 				dismiss();
 			}
         });
+        
+        dialog = builder.create();
 
-        return builder.create( );
+		dialog.setOnShowListener(new OnShowListener() {
+
+			public void onShow(DialogInterface dialog) {
+				((AlertDialog) dialog).getButton(AlertDialog.BUTTON_NEUTRAL)
+						.setBackgroundResource(
+								R.drawable.selectable_background_votebartheme);
+			}
+		});
+
+        return dialog;
     }
 }

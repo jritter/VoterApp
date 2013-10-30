@@ -9,7 +9,7 @@ import org.achartengine.renderer.SimpleSeriesRenderer;
 
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Poll;
-
+import ch.bfh.evoting.voterapp.R;
 import android.content.Context;
 import android.graphics.Color;
 
@@ -61,7 +61,7 @@ public class PieChartView extends GraphicalView {
 	public static GraphicalView getNewInstance(Context context, Poll poll) {
 
 		BASE_COLOR = context.getResources().getColor(
-				android.R.color.holo_orange_dark);
+				R.color.theme_color);
 		BASE_COLOR_RED = Color.red(BASE_COLOR);
 		BASE_COLOR_GREEN = Color.green(BASE_COLOR);
 		BASE_COLOR_BLUE = Color.blue(BASE_COLOR);
