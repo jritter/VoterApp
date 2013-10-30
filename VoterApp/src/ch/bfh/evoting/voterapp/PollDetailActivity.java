@@ -3,6 +3,7 @@ package ch.bfh.evoting.voterapp;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
 
 import ch.bfh.evoting.voterapp.adapters.PollOptionAdapter;
 import ch.bfh.evoting.voterapp.db.PollDbHelper;
@@ -16,6 +17,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
@@ -74,7 +76,7 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		AndroidApplication.getInstance().setVoteRunning(false);
 		AndroidApplication.getInstance().setIsAdmin(true);
-		
+
 		pollDbHelper = PollDbHelper.getInstance(this);
 
 
@@ -183,10 +185,12 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 			askToSave();
 			return true;
 		case R.id.action_network_info:
-			//Intent i = new Intent(this, NetworkInformationActivity.class);
-			//startActivity(i);
-			NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();
-			ndf.show( getFragmentManager( ), "networkInfo" );
+			//Network interface can be null since it is created in an async task, so we wait until the task is completed
+			this.waitForNetworkInterface(new Callable<Void>() {
+				public Void call() {
+					return showNetworkInfoDialog();
+				}
+			});
 			return true;
 		case R.id.help:
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_poll_details), getString(R.string.help_text_poll_details) );
@@ -195,7 +199,8 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 		}
 		return super.onOptionsItemSelected(item); 
 	}
-	
+
+
 	private void askToSave(){
 		if(!etOption.getText().toString().equals("")){
 			AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
@@ -218,7 +223,7 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 
 			// Create the AlertDialog
 			dialogAddOption = builder1.create();
-			
+
 			dialogAddOption.setOnShowListener(new DialogInterface.OnShowListener() {
 				@Override
 				public void onShow(DialogInterface dialog) {
@@ -227,10 +232,10 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 							R.drawable.selectable_background_votebartheme);
 					dialogAddOption.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundResource(
 							R.drawable.selectable_background_votebartheme);
-					
+
 				}
 			});
-			
+
 			dialogAddOption.show();
 			return;
 		}
@@ -266,7 +271,7 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 
 		// Create the AlertDialog
 		dialogSave = builder.create();
-		
+
 		dialogSave.setOnShowListener(new DialogInterface.OnShowListener() {
 			@Override
 			public void onShow(DialogInterface dialog) {
@@ -277,7 +282,7 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 						R.drawable.selectable_background_votebartheme);
 			}
 		});
-		
+
 		dialogSave.show();
 	}
 
@@ -353,20 +358,16 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 				}
 			}
 
-			//then start next activity
-			if(AndroidApplication.getInstance().getNetworkInterface().getGroupName()==null){
-				Intent i = new Intent(this, NetworkConfigActivity.class);
-				i.putExtra("poll", (Serializable)this.poll);
-				startActivity(i);
-			} else {
-				Intent i = new Intent(this, NetworkInformationActivity.class);
-				i.putExtra("poll", (Serializable)this.poll);
-				startActivity(i);
-			}
-
-
+			//Network interface can be null since it is created in an async task, so we wait until the task is completed
+			this.waitForNetworkInterface(new Callable<Void>() {
+				public Void call() {
+					return goToNetworkConfig();
+				}
+			});
 		}
 	}
+
+
 
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -406,10 +407,66 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 	public void onBackPressed() {
 		askToSave();
 	}
-	
+
+	@Override
 	protected void onResume() {
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		AndroidApplication.getInstance().setVoteRunning(false);
 		super.onResume();
+	}
+
+	private void waitForNetworkInterface(final Callable<Void> methodToExecute){
+		//Network interface can be null since it is created in an async task, so we wait until the task is completed
+		if(AndroidApplication.getInstance().getNetworkInterface()==null){
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage(R.string.dialog_wait_wifi);
+			final AlertDialog waitDialog = builder.create();
+			waitDialog.show();
+
+			new AsyncTask<Object, Object, Object>(){
+
+				@Override
+				protected Object doInBackground(Object... params) {
+					while(AndroidApplication.getInstance().getNetworkInterface()==null){
+						//wait
+					}
+					waitDialog.dismiss();
+					try {
+						methodToExecute.call();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					return null;
+				}
+
+			}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+			return;
+		}
+		//then start next activity
+		try {
+			methodToExecute.call();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private Void goToNetworkConfig(){
+		//then start next activity
+		if(AndroidApplication.getInstance().getNetworkInterface().getGroupName()==null){
+			Intent i = new Intent(this, NetworkConfigActivity.class);
+			i.putExtra("poll", (Serializable)this.poll);
+			startActivity(i);
+		} else {
+			Intent i = new Intent(this, NetworkInformationActivity.class);
+			i.putExtra("poll", (Serializable)this.poll);
+			startActivity(i);
+		}
+		return null;
+	}
+
+	private Void showNetworkInfoDialog(){
+		NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();			
+		ndf.show( getFragmentManager( ), "networkInfo" );
+		return null;
 	}
 }

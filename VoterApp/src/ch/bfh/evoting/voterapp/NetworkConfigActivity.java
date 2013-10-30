@@ -73,13 +73,19 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 		if(settings.getBoolean("first_run_"+this.getClass().getSimpleName(), true)){
 			final View overlay_view = getLayoutInflater().inflate(R.layout.overlay_network_config, null,false);
 			overlayFramelayout.addView(overlay_view);
-			overlay_view.setOnTouchListener(new View.OnTouchListener() {
+			overlay_view.setOnClickListener(new View.OnClickListener() {
+
+//				@Override
+//				public boolean onClick(View v, MotionEvent event) {
+//					overlayFramelayout.removeView(overlay_view);
+//					settings.edit().putBoolean("first_run_"+NetworkConfigActivity.this.getClass().getSimpleName(), false).commit();
+//					return false;
+//				}
 
 				@Override
-				public boolean onTouch(View v, MotionEvent event) {
+				public void onClick(View v) {
 					overlayFramelayout.removeView(overlay_view);
-					settings.edit().putBoolean("first_run_"+NetworkConfigActivity.this.getClass().getSimpleName(), false).commit();
-					return false;
+					settings.edit().putBoolean("first_run_"+NetworkConfigActivity.this.getClass().getSimpleName(), false).commit();					
 				}
 			});
 		}

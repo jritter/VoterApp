@@ -43,13 +43,13 @@ public class ReviewPollVoterActivity extends Activity {
 		if(settings.getBoolean("first_run_"+this.getClass().getSimpleName(), true)){
 			final View overlay_view = getLayoutInflater().inflate(R.layout.overlay_review_poll, null,false);
 			overlayFramelayout.addView(overlay_view);
-			overlay_view.setOnTouchListener(new View.OnTouchListener() {
-
+			
+			overlay_view.setOnClickListener(new View.OnClickListener() {
+				
 				@Override
-				public boolean onTouch(View v, MotionEvent event) {
+				public void onClick(View v) {
 					overlayFramelayout.removeView(overlay_view);
-					settings.edit().putBoolean("first_run_"+ReviewPollVoterActivity.this.getClass().getSimpleName(), false).commit();
-					return false;
+					settings.edit().putBoolean("first_run_"+ReviewPollVoterActivity.this.getClass().getSimpleName(), false).commit();					
 				}
 			});
 		}

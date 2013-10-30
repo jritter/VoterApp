@@ -3,7 +3,9 @@ package ch.bfh.evoting.voterapp;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.Menu;
@@ -34,10 +36,10 @@ public class PollActivity extends Activity implements OnItemClickListener {
 		setContentView(R.layout.activity_poll);
 		// Show the Up button in the action bar.
 		setupActionBar();
-		
+
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		AndroidApplication.getInstance().setIsAdmin(true);
-		
+
 		pollDbHelper = PollDbHelper.getInstance(this);
 
 		lvPolls = (ListView) findViewById(R.id.listview_polls);
@@ -47,7 +49,7 @@ public class PollActivity extends Activity implements OnItemClickListener {
 		polls.add(poll);
 		lvPolls.setAdapter(new PollAdapter(this, R.layout.list_item_poll, polls));
 		lvPolls.setOnItemClickListener(this);
-		
+
 	}
 
 	/**
@@ -79,10 +81,32 @@ public class PollActivity extends Activity implements OnItemClickListener {
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		case R.id.action_network_info:
-			//Intent i = new Intent(this, NetworkInformationActivity.class);
-			//startActivity(i);
-			NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();
-			ndf.show( getFragmentManager( ), "networkInfo" );
+
+			//Network interface can be null since it is created in an async task, so we wait until the task is completed
+			if(AndroidApplication.getInstance().getNetworkInterface()==null){
+				AlertDialog.Builder builder = new AlertDialog.Builder(this);
+				builder.setMessage(R.string.dialog_wait_wifi);
+				final AlertDialog waitDialog = builder.create();
+				waitDialog.show();
+
+				new AsyncTask<Object, Object, Object>(){
+
+					@Override
+					protected Object doInBackground(Object... params) {
+						while(AndroidApplication.getInstance().getNetworkInterface()==null){
+							//wait
+						}
+						waitDialog.dismiss();
+						showNetworkInfoDialog();
+						return null;
+					}
+
+				}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+				return true;
+			}
+
+			showNetworkInfoDialog();
+
 			return true;
 		case R.id.help:
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_poll), getString(R.string.help_text_poll) );
@@ -90,6 +114,11 @@ public class PollActivity extends Activity implements OnItemClickListener {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	private void showNetworkInfoDialog(){
+		NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();			
+		ndf.show( getFragmentManager( ), "networkInfo" );
 	}
 
 	@Override
@@ -111,9 +140,5 @@ public class PollActivity extends Activity implements OnItemClickListener {
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		super.onResume();
 	}
-	
-//	@Override
-//	public void onBackPressed() {
-//		//do nothing because we don't want that people access to an anterior activity
-//	}
+
 }
