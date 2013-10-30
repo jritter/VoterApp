@@ -105,15 +105,41 @@ public class VoteActivity extends Activity {
 
 		});
 
-		Log.e("VoteActivity", "Scroll: LastVisible item="+lvChoices.getLastVisiblePosition()+" lvChoices.getCount()-2="+(lvChoices.getCount()-2));
-		//TODO getLastVisiblePosition is -1
-		if(lvChoices.getLastVisiblePosition() < lvChoices.getCount()-2){
+//		Log.e("VoteActivity", "Scroll: LastVisible item="+lvChoices.getLastVisiblePosition()+" lvChoices.getCount()-2="+(lvChoices.getCount()-2));
+//		//TODO getLastVisiblePosition is -1
+//		if(lvChoices.getLastVisiblePosition() < lvChoices.getCount()-2){
+//
+//			//animate scroll
+//			new AsyncTask<Object, Object, Object>(){
+//
+//				@Override
+//				protected Object doInBackground(Object... params) {
+//					SystemClock.sleep(300);
+//					Log.d("VoteActivity", "Doing demo scroll");
+//					lvChoices.smoothScrollToPositionFromTop(lvChoices.getAdapter().getCount()-1, 0, 1000);
+//					SystemClock.sleep(1050);
+//					lvChoices.smoothScrollToPositionFromTop(0, 0, 1000);
+//					SystemClock.sleep(1050);
+//					scrolled = false;
+//					demoScrollDone = true;
+//					return null;
+//				}
+//
+//			}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+//		} else {
+//			Log.d("VoteActivity", "Demo scroll not needed");
+//			scrolled = true;
+//		}
 
-			//animate scroll
-			new AsyncTask<Object, Object, Object>(){
+		lvChoices.post(new Runnable(){
 
-				@Override
-				protected Object doInBackground(Object... params) {
+			@Override
+			public void run() {
+				Log.e("VoteActivity", "Scroll: LastVisible item="+lvChoices.getLastVisiblePosition()+" lvChoices.getCount()-2="+(lvChoices.getCount()-2));
+				//TODO getLastVisiblePosition is -1
+				if(lvChoices.getLastVisiblePosition() < lvChoices.getCount()-2){
+
+
 					SystemClock.sleep(300);
 					Log.d("VoteActivity", "Doing demo scroll");
 					lvChoices.smoothScrollToPositionFromTop(lvChoices.getAdapter().getCount()-1, 0, 1000);
@@ -122,14 +148,16 @@ public class VoteActivity extends Activity {
 					SystemClock.sleep(1050);
 					scrolled = false;
 					demoScrollDone = true;
-					return null;
-				}
 
-			}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-		} else {
-			Log.d("VoteActivity", "Demo scroll not needed");
-			scrolled = true;
-		}
+
+
+				} else {
+					Log.d("VoteActivity", "Demo scroll not needed");
+					scrolled = true;
+				}
+			}
+
+		});
 
 
 		//		//Set a listener on the cast button
