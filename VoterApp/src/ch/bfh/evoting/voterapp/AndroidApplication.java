@@ -78,7 +78,7 @@ public class AndroidApplication extends Application {
 			protected Object doInBackground(Object... params) {
 
 				su = new SerializationUtil(new JavaSerialization());
-				ni = new AllJoynNetworkInterface(AndroidApplication.this.getApplicationContext());// new InstaCircleNetworkInterface(this.getApplicationContext());//new SimulatedNetworkInterface(this.getApplicationContext());
+				ni = new AllJoynNetworkInterface(AndroidApplication.this.getApplicationContext());///* new InstaCircleNetworkInterface(this.getApplicationContext());*/new SimulatedNetworkInterface(AndroidApplication.this.getApplicationContext());
 
 				return null;
 			}

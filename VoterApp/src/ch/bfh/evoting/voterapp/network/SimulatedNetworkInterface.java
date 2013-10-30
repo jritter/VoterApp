@@ -1,8 +1,7 @@
 /*
- * This class was commented out because is no more used since we adopted AllJoyn as network layer
- * We keep it 
+ * This network interface was used at the beginning of the project to simulate the network
+ * It is no more needed but we keep it for development reasons
  */
-
 //package ch.bfh.evoting.voterapp.network;
 //
 //import java.util.Map;
@@ -16,7 +15,8 @@
 //import ch.bfh.evoting.voterapp.entities.VoteMessage;
 //import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 //import ch.bfh.evoting.voterapp.util.NetworkSimulator;
-////public class SimulatedNetworkInterface extends AbstractNetworkInterface{
+//
+//public class SimulatedNetworkInterface extends AbstractNetworkInterface{
 //
 //	private NetworkSimulator ns;
 //
@@ -41,21 +41,11 @@
 //		return "Simulated network";
 //	}
 //
-//	@Override
-//	public String getConversationPassword() {
-//		return "1234";
-//	}
-//
-//	@Override
-//	public Map<String,Participant> getConversationParticipants(){
-//		return ns.createDummyParticipants();
-//	}
-//
+//	
 //	/**
 //	 * This method can be used to send a broadcast message
 //	 * 
 //	 * @param votemessage The votemessage which should be sent
-//	 * @param sender The origin of the message
 //	 */
 //	@Override
 //	public void sendMessage(VoteMessage votemessage){
@@ -67,7 +57,6 @@
 //	 * 
 //	 * 
 //	 * @param votemessage The votemessage which should be sent
-//	 * @param sender The origin of the message
 //	 * @param destinationUniqueId The destination of the message
 //	 */
 //	@Override
@@ -80,29 +69,14 @@
 //		//Not needed. As no real connection was needed
 //	}
 //
-//	@Override
-//	public String getMyIpAddress() {
-//
-//		String packageName = context.getPackageName();
-//		if(packageName.equals("ch.bfh.evoting.voterapp")){
-//			int higher = 15;
-//			int lower = 2;
-//			int random = (int)(Math.random() * (higher-lower)) + lower;
-//			return "192.168.1."+random;
-//		} else if (packageName.equals("ch.bfh.evoting.adminapp")){
-//			return "192.168.1.1";
-//		} else {
-//			return "";
-//		}
-//	}
-//
+//	
 //	/**
 //	 * this broadcast receiver listens for incoming instacircle messages
 //	 */
 //	private BroadcastReceiver messageReceiver = new BroadcastReceiver() {
 //		@Override
 //		public void onReceive(Context context, Intent intent) {
-//			handleReceivedMessage((Message) intent.getSerializableExtra("message"));
+//			handleReceivedMessage((VoteMessage) intent.getSerializableExtra("message"));
 //		}
 //	};
 //	
@@ -112,13 +86,10 @@
 //	 * 
 //	 * @param message
 //	 */
-//	private void handleReceivedMessage(Message message) {
-//		if(message.getMessageType()==Message.MSG_CONTENT){
+//	private void handleReceivedMessage(VoteMessage voteMessage) {
 //			// Extract the votemessage out of the message
-//			VoteMessage voteMessage = (VoteMessage) su.deserialize(message.getMessage());
 //			if(voteMessage==null) return;
 //			this.transmitReceivedMessage(voteMessage);
-//		}
 //	}
 //
 //	/**
@@ -133,8 +104,72 @@
 //	};
 //
 //	@Override
-//	public void joinNetwork(String networkName) {
+//	public void joinGroup(String groupName) {
 //		//Not needed
+//	}
+//
+//
+//	@Override
+//	public String getGroupName() {
+//		return "group1";
+//	}
+//
+//
+//	@Override
+//	public String getGroupPassword() {
+//		return "1234";
+//	}
+//
+//
+//	@Override
+//	public String getSaltShortDigest() {
+//		return "abc";
+//	}
+//
+//
+//	@Override
+//	public String getMyUniqueId() {
+//		String packageName = context.getPackageName();
+//		if(packageName.equals("ch.bfh.evoting.voterapp")){
+//			int higher = 15;
+//			int lower = 2;
+//			int random = (int)(Math.random() * (higher-lower)) + lower;
+//			return "192.168.1."+random;
+//		} else if (packageName.equals("ch.bfh.evoting.adminapp")){
+//			return "192.168.1.1";
+//		} else {
+//			return "";
+//		}
+//	}
+//
+//
+//	@Override
+//	public Map<String, Participant> getGroupParticipants() {
+//		return ns.createDummyParticipants();
+//	}
+//
+//
+//	@Override
+//	public void setGroupName(String groupName) {
+//		//Not needed		
+//	}
+//
+//
+//	@Override
+//	public void setGroupPassword(String password) {
+//		//Not needed		
+//	}
+//
+//
+//	@Override
+//	public void lockGroup() {
+//		//Not needed		
+//	}
+//
+//
+//	@Override
+//	public void unlockGroup() {
+//		//Not needed		
 //	}
 //
 //

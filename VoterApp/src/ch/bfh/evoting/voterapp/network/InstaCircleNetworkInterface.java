@@ -1,3 +1,7 @@
+/*
+ * This network interface is no more used since the AllJoyn is used as network layer
+ * We keep it if that would change some day
+ */
 //package ch.bfh.evoting.voterapp.network;
 //
 //import java.net.InetAddress;
@@ -26,6 +30,9 @@
 //import ch.bfh.evoting.voterapp.AndroidApplication;
 //import ch.bfh.evoting.voterapp.entities.Participant;
 //import ch.bfh.evoting.voterapp.entities.VoteMessage;
+//import ch.bfh.evoting.voterapp.network.wifi.AdhocWifiManager;
+//import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
+//import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 //
 //public class InstaCircleNetworkInterface extends AbstractNetworkInterface {
 //
@@ -59,37 +66,6 @@
 //		return preferences.getString("SSID", "");
 //	}
 //
-//	@Override
-//	public String getConversationPassword() {
-//		try{
-//			return dbHelper.getCipherKey();
-//		} catch (CursorIndexOutOfBoundsException e){
-//			return null;
-//		}
-//	}
-//
-//	@Override
-//	public Map<String,Participant> getConversationParticipants(){
-//		ArrayList<Participant> participants = new ArrayList<Participant>(); 
-//
-//		Cursor c = dbHelper.queryParticipants();
-//
-//		if (c != null){
-//			while(c.moveToNext()){
-//				Participant p = new Participant(c.getString(c.getColumnIndex("identification")), c.getString(c.getColumnIndex("ip_address")), false, false);
-//				participants.add(p);
-//			}
-//		}
-//		c.close();
-//
-//		Map<String,Participant> map = new HashMap<String,Participant>();
-//		for(Participant p:participants){
-//			map.put(p.getIpAddress(), p);
-//		}
-//
-//		return map;
-//	}
-//
 //	/**
 //	 * This method can be used to send a broadcast message
 //	 * 
@@ -98,8 +74,7 @@
 //	 */
 //	@Override
 //	public void sendMessage(VoteMessage votemessage){
-//		votemessage.setSenderIPAdress(this.getMyIpAddress());
-//		votemessage.setTimestamp(System.currentTimeMillis());
+//		votemessage.setSenderUniqueId(this.getMyIpAddress());
 //		Message message = new Message(su.serialize(votemessage), Message.MSG_CONTENT, this.getMyIpAddress());
 //		Intent intent = new Intent("messageSend");
 //		intent.putExtra("message", message);
@@ -117,12 +92,11 @@
 //	 */
 //	@Override
 //	public void sendMessage(VoteMessage votemessage, String destinationUniqueId){
-//		votemessage.setSenderIPAdress(this.getMyIpAddress());
-//		votemessage.setTimestamp(System.currentTimeMillis());
+//		votemessage.setSenderUniqueId(this.getMyIpAddress());
 //		Message message = new Message(su.serialize(votemessage), Message.MSG_CONTENT, this.getMyIpAddress());
 //		Intent intent = new Intent("messageSend");
 //		intent.putExtra("message", message);
-//		intent.putExtra("ipAddress", destinationIPAddress);
+//		intent.putExtra("ipAddress", destinationUniqueId);
 //		intent.putExtra("broadcast", false);
 //		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 //	}
@@ -180,16 +154,7 @@
 //		}
 //	};
 //
-//	@Override
-//	public String getMyIpAddress(){
-//		return getIPAddress(true);
-//	}
 //	
-//	@Override
-//	public void disconnect(){
-//		this.dbHelper.closeConversation();
-//	}
-//
 //	/**
 //	 * Get IP address from first non-localhost interface
 //	 * @param ipv4  true=return ipv4, false=return ipv6
@@ -201,7 +166,7 @@
 //		WifiManager wifiManager = (WifiManager) this.context.getSystemService(Context.WIFI_SERVICE);
 //		String ipString = null;
 //
-//		if(new ch.bfh.evoting.votinglib.network.wifi.WifiAPManager().isWifiAPEnabled(wifiManager)){
+//		if(new WifiAPManager().isWifiAPEnabled(wifiManager)){
 //
 //			try{
 //				for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en
@@ -244,13 +209,82 @@
 //		
 //	}
 //	
-//	@Override
-//	public void joinNetwork(String networkName) {
+//		@Override
+//	public void joinGroup(String groupName) {
 //		Intent intent = new Intent(context, NetworkService.class);
 //
 //		context.stopService(intent);
-//		context.startService(intent);
+//		context.startService(intent);		
+//	}
+//
+//	@Override
+//	public String getGroupName() {
+//		return null;
+//	}
+//
+//	@Override
+//	public String getGroupPassword() {
+//		try{
+//			return dbHelper.getCipherKey();
+//		} catch (CursorIndexOutOfBoundsException e){
+//			return null;
+//		}
+//	}
+//
+//	@Override
+//	public String getSaltShortDigest() {
+//		return null;
+//	}
+//
+//	@Override
+//	public String getMyUniqueId() {
+//		return getIPAddress(true);
+//	}
+//
+//	@Override
+//	public Map<String, Participant> getGroupParticipants() {
+//		ArrayList<Participant> participants = new ArrayList<Participant>(); 
+//
+//		Cursor c = dbHelper.queryParticipants();
+//
+//		if (c != null){
+//			while(c.moveToNext()){
+//				Participant p = new Participant(c.getString(c.getColumnIndex("identification")), c.getString(c.getColumnIndex("ip_address")), false, false);
+//				participants.add(p);
+//			}
+//		}
+//		c.close();
+//
+//		Map<String,Participant> map = new HashMap<String,Participant>();
+//		for(Participant p:participants){
+//			map.put(p.getUniqueId(), p);
+//		}
+//
+//		return map;
+//	}
+//
+//	@Override
+//	public void setGroupName(String groupName) {
+//		
+//	}
+//
+//	@Override
+//	public void setGroupPassword(String password) {
+//		
+//	}
+//
+//	@Override
+//	public void lockGroup() {
+//		
+//	}
+//
+//	@Override
+//	public void unlockGroup() {
 //		
 //	}
 //	
+//	@Override
+//	public void disconnect(){
+//		this.dbHelper.closeConversation();
+//	}
 //}
