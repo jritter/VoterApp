@@ -1,76 +1,33 @@
 package ch.bfh.evoting.voterapp.network;
 
-import java.util.Map;
-
 import android.content.Context;
 import android.content.Intent;
-import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
-import ch.bfh.evoting.alljoyn.BusHandler;
 import ch.bfh.evoting.voterapp.AndroidApplication;
-import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.SerializationUtil;
 
+/**
+ * Abstract implementation of the Network Interface
+ * This class only provide a method used to send to correct broadcast depending of the type of message received 
+ * @author Philémon von Bergen
+ *
+ */
 public abstract class AbstractNetworkInterface implements NetworkInterface {
 
 	protected Context context;
 	protected final SerializationUtil su;
 
-
+	/**
+	 * Create an object of this class
+	 * @param context Android context of the application
+	 */
 	public AbstractNetworkInterface(Context context){
 		this.context = context;
 		su = AndroidApplication.getInstance().getSerializationUtil();		
 	}
-	
-
-	@Override
-	public abstract void joinGroup(String groupName);
-	
-	@Override
-	public abstract String getNetworkName();
-
-	@Override
-	public abstract String getGroupName();
-	
-	@Override
-	public abstract String getGroupPassword();
-
-	@Override
-	public abstract String getMyIpAddress();
-
-	@Override
-	public abstract Map<String, Participant> getConversationParticipants();
-
-	@Override
-	public abstract void sendMessage(VoteMessage votemessage);
-
-	@Override
-	public abstract void sendMessage(VoteMessage votemessage, String destinationIPAddress);
-	
-	@Override
-	public abstract void disconnect();
-	
-	@Override
-	public abstract void setGroupName(String groupName);
-	
-	@Override
-	public abstract void setGroupPassword(String password);
-	
-	@Override
-	public abstract void lockGroup();
-	
-	@Override
-	public abstract void unlockGroup();
-	
-//	@Override
-//	public abstract void setSaltShortDigest(String saltShortDigest);
-	
-	@Override
-	public abstract String getSaltShortDigest();
 	
 	/**
 	 * This method checks the message type and inform the application of the new incoming message.
@@ -92,13 +49,13 @@ public abstract class AbstractNetworkInterface implements NetworkInterface {
 			// notify the UI that new message has arrived
 			messageArrivedIntent = new Intent(BroadcastIntentTypes.pollToReview);
 			messageArrivedIntent.putExtra("poll", voteMessage.getMessageContent());
-			messageArrivedIntent.putExtra("sender", voteMessage.getSenderIPAddress());
+			messageArrivedIntent.putExtra("sender", voteMessage.getSenderUniqueId());
 			LocalBroadcastManager.getInstance(context).sendBroadcast(messageArrivedIntent);
 			break;
 		case VOTE_MESSAGE_ACCEPT_REVIEW:
 			// notify the UI that new message has arrived
 			messageArrivedIntent = new Intent(BroadcastIntentTypes.acceptReview);
-			messageArrivedIntent.putExtra("participant", voteMessage.getSenderIPAddress());
+			messageArrivedIntent.putExtra("participant", voteMessage.getSenderUniqueId());
 			LocalBroadcastManager.getInstance(context).sendBroadcast(messageArrivedIntent);
 			break;
 		case VOTE_MESSAGE_START_POLL:
@@ -115,7 +72,7 @@ public abstract class AbstractNetworkInterface implements NetworkInterface {
 			// notify the UI that new message has arrived
 			messageArrivedIntent = new Intent(BroadcastIntentTypes.newVote);
 			messageArrivedIntent.putExtra("vote", voteMessage.getMessageContent());
-			messageArrivedIntent.putExtra("voter", voteMessage.getSenderIPAddress());
+			messageArrivedIntent.putExtra("voter", voteMessage.getSenderUniqueId());
 			LocalBroadcastManager.getInstance(context).sendBroadcast(messageArrivedIntent);
 			break;
 		}

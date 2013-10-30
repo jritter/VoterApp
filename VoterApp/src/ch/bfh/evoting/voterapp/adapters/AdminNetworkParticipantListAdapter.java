@@ -31,9 +31,6 @@ public class AdminNetworkParticipantListAdapter extends ArrayAdapter<Participant
 	private Context context;
 	private List<Participant> values;
 
-	//private CheckBox cbInElectorate;
-	//private TextView tvContent;
-
 	/**
 	 * Create an adapter object
 	 * @param context android context
@@ -84,7 +81,7 @@ public class AdminNetworkParticipantListAdapter extends ArrayAdapter<Participant
 				//Send the updated list of participants in the network over the network
 				Map<String,Participant> map = new TreeMap<String,Participant>();
 				for(Participant p : values){
-					map.put(p.getIpAddress(), p);
+					map.put(p.getUniqueId(), p);
 				}
 				VoteMessage vm = new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_ELECTORATE, (Serializable)map);
 				AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);

@@ -19,41 +19,42 @@ import android.widget.Button;
 import android.widget.Toast;
 
 /**
- * Class displaying the activity that allows the user to check if the poll is correct
+ * Class displaying the activity that allows the user to check if the poll is
+ * correct
+ * 
  * @author Philémon von Bergen
- *
+ * 
  */
 public class ReviewPollActivity extends Activity implements OnClickListener {
 
 	private Poll poll;
-	
+
 	private Button btnStartPollPeriod;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		if(getResources().getBoolean(R.bool.portrait_only)){
-	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-	    }
-		
+
+		if (getResources().getBoolean(R.bool.portrait_only)) {
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		}
+
 		setContentView(R.layout.activity_review_poll);
 		setupActionBar();
-		
-		if(getResources().getBoolean(R.bool.display_bottom_bar) == false){
-	        findViewById(R.id.layout_bottom_bar).setVisibility(View.GONE);
-	    }
-		
+
+		if (getResources().getBoolean(R.bool.display_bottom_bar) == false) {
+			findViewById(R.id.layout_bottom_bar).setVisibility(View.GONE);
+		}
+
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		AndroidApplication.getInstance().getNetworkInterface().lockGroup();
 
-		
 		btnStartPollPeriod = (Button) findViewById(R.id.button_start_poll_period);
 		btnStartPollPeriod.setOnClickListener(this);
-		
+
 		Intent intent = getIntent();
-		Poll intentPoll = (Poll)intent.getSerializableExtra("poll");
-		if(intentPoll!=null){
+		Poll intentPoll = (Poll) intent.getSerializableExtra("poll");
+		if (intentPoll != null) {
 			poll = intentPoll;
 		}
 
@@ -65,14 +66,14 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 		getMenuInflater().inflate(R.menu.review_poll, menu);
 		return true;
 	}
-	
+
 	/**
 	 * Set up the {@link android.app.ActionBar}.
 	 */
 	private void setupActionBar() {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -82,18 +83,20 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 			NavUtils.navigateUpTo(this, i);
 			return true;
 		case R.id.help:
-			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_review), getString(R.string.help_text_review) );
-	        hdf.show( getFragmentManager( ), "help" );
-	        return true;
+			HelpDialogFragment hdf = HelpDialogFragment.newInstance(
+					getString(R.string.help_title_review),
+					getString(R.string.help_text_review));
+			hdf.show(getFragmentManager(), "help");
+			return true;
 		case R.id.action_start_voteperiod:
 			startVotePeriod();
 		}
-		return super.onOptionsItemSelected(item); 
+		return super.onOptionsItemSelected(item);
 	}
-	
-	private boolean isContainedInParticipants(String ipAddress){
-		for(Participant p : poll.getParticipants().values()){
-			if(p.getIpAddress().equals(ipAddress)){
+
+	private boolean isContainedInParticipants(String uniqueId) {
+		for (Participant p : poll.getParticipants().values()) {
+			if (p.getUniqueId().equals(uniqueId)) {
 				return true;
 			}
 		}
@@ -102,16 +105,17 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 
 	@Override
 	public void onClick(View view) {
-		if (view == btnStartPollPeriod){
-			startVotePeriod();			
+		if (view == btnStartPollPeriod) {
+			startVotePeriod();
 		}
 	}
 
+	@Override
 	protected void onResume() {
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		super.onResume();
 	}
-	
+
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
@@ -121,35 +125,33 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
-		poll = (Poll)savedInstanceState.getSerializable("poll");
+		poll = (Poll) savedInstanceState.getSerializable("poll");
 	}
-	
-//	@Override
-//	public void onBackPressed() {
-//		//do nothing because we don't want that people access to an anterior activity
-//	}
-	
-	private void startVotePeriod(){
-		for(Participant p:poll.getParticipants().values()){
-			if(!p.hasAcceptedReview()){
-				Toast.makeText(this, R.string.toast_not_everybody_accepted, Toast.LENGTH_LONG).show();
+
+	private void startVotePeriod() {
+		for (Participant p : poll.getParticipants().values()) {
+			if (!p.hasAcceptedReview()) {
+				Toast.makeText(this, R.string.toast_not_everybody_accepted,
+						Toast.LENGTH_LONG).show();
 				return;
 			}
 		}
-		//Send start poll signal over the network
-		VoteMessage vm = new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_START_POLL, null);
+		// Send start poll signal over the network
+		VoteMessage vm = new VoteMessage(
+				VoteMessage.Type.VOTE_MESSAGE_START_POLL, null);
 		AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);
 
 		poll.setStartTime(System.currentTimeMillis());
 		poll.setNumberOfParticipants(poll.getParticipants().values().size());
-		
-		if(isContainedInParticipants(AndroidApplication.getInstance().getNetworkInterface().getMyIpAddress())){
+
+		if (isContainedInParticipants(AndroidApplication.getInstance()
+				.getNetworkInterface().getMyUniqueId())) {
 			Intent intent = new Intent(this, VoteActivity.class);
-			intent.putExtra("poll", (Serializable)poll);
+			intent.putExtra("poll", (Serializable) poll);
 			startActivity(intent);
 		} else {
 			Intent intent = new Intent(this, AdminWaitForVotesActivity.class);
-			intent.putExtra("poll", (Serializable)poll);
+			intent.putExtra("poll", (Serializable) poll);
 			startActivity(intent);
 		}
 	}

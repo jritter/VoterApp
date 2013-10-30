@@ -75,7 +75,7 @@ public class ReviewPollAdapter extends BaseAdapter {
 				ivAcceptImage.setVisibility(View.VISIBLE);
 				btnValidateReview.setVisibility(View.GONE);
 			} else {
-				if(participant.getIpAddress().equals(AndroidApplication.getInstance().getNetworkInterface().getMyIpAddress())){
+				if(participant.getUniqueId().equals(AndroidApplication.getInstance().getNetworkInterface().getMyUniqueId())){
 					pgWaitForAccept.setVisibility(View.GONE);
 					ivAcceptImage.setVisibility(View.GONE);
 					btnValidateReview.setVisibility(View.VISIBLE);

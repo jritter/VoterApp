@@ -1,12 +1,3 @@
-/*
- *  UniCrypt Cryptographic Library
- *  Copyright (c) 2013 Berner Fachhochschule, Biel, Switzerland.
- *  All rights reserved.
- *
- *  Distributable under GPL license.
- *  See terms of license at gnu.org.
- *  
- */
 
 package ch.bfh.evoting.voterapp.network.wifi;
 
@@ -219,8 +210,4 @@ TextWatcher {
 
 	}
 	
-	@Override
-	public void onBackPressed() {
-		//do nothing because we don't want that people access to an anterior activity
-	}
 }

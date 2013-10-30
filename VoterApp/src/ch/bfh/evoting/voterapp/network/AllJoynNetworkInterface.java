@@ -58,18 +58,16 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 
 	@Override
 	public String getGroupPassword() {
-		//		SharedPreferences preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
-		//		return preferences.getString("group_password", "");
 		return this.groupPassword;
 	}
 
 	@Override
-	public String getMyIpAddress() {
+	public String getMyUniqueId() {
 		return mBusHandler.getIdentification();
 	}
 
 	@Override
-	public Map<String, Participant> getConversationParticipants() {
+	public Map<String, Participant> getGroupParticipants() {
 		TreeMap<String,Participant> parts = new TreeMap<String,Participant>();
 		for(String s : mBusHandler.getParticipants(this.groupName)){
 			String wellKnownName = s;
@@ -83,7 +81,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 
 	@Override
 	public void sendMessage(VoteMessage votemessage) {
-		votemessage.setSenderIPAdress(getMyIpAddress());
+		votemessage.setSenderUniqueId(getMyUniqueId());
 		SerializationUtil su = AndroidApplication.getInstance().getSerializationUtil();
 		String string = su.serialize(votemessage);
 
@@ -100,7 +98,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 	}
 
 	@Override
-	public void sendMessage(VoteMessage votemessage, String destinationIPAddress) {
+	public void sendMessage(VoteMessage votemessage, String destinationUniqueId) {
 		throw new UnsupportedOperationException("Unicast is not supported with AllJoyn Network interface");
 	}
 
@@ -132,11 +130,6 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 			}
 			//generate group password
 			this.groupPassword = generatePassword();
-			//			SharedPreferences preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
-			//			Editor editor = preferences.edit();
-			//			editor.putString("group_password", groupPassword);
-			//			editor.commit();
-
 		}
 		String oldNetworkName = this.groupName;
 		this.groupName = groupName;
@@ -208,7 +201,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 	};
 
 	/**
-	 * this broadcast receiver listens for incoming messages
+	 * this broadcast receiver listens for incoming event indicating that the joined group was destroyed
 	 */
 	private BroadcastReceiver mGroupEventReceiver = new BroadcastReceiver() {
 		@Override
@@ -223,7 +216,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 	};
 
 	/**
-	 * this broadcast receiver listens for incoming messages
+	 * this broadcast receiver listens for incoming events notifying that connection to network failed
 	 */
 	private BroadcastReceiver mNetworkConectionFailedReceiver = new BroadcastReceiver() {
 		@Override
@@ -234,10 +227,10 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 
 	/**
 	 * Helper method that generates the network password
-	 * @return
-	 * Source: http://stackoverflow.com/questions/5683327/how-to-generate-a-random-string-of-20-characters
+	 * @return a random string of 10 lower case chars
 	 */
 	private String generatePassword(){
+		//Inspired from: http://stackoverflow.com/questions/5683327/how-to-generate-a-random-string-of-20-characters
 		char[] chars = "abcdefghijklmnopqrstuvwxyz".toCharArray();
 		StringBuilder sb = new StringBuilder();
 

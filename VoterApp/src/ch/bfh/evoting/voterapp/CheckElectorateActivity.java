@@ -2,22 +2,18 @@ package ch.bfh.evoting.voterapp;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import ch.bfh.evoting.voterapp.adapters.NetworkParticipantListAdapter;
-import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
-import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.app.AlertDialog;
@@ -43,6 +39,7 @@ public class CheckElectorateActivity extends ListActivity {
 	
 	private Dialog dialogBack = null;
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -64,7 +61,7 @@ public class CheckElectorateActivity extends ListActivity {
 		Map<String, Participant> participants = new TreeMap<String, Participant>();
 		
 		if(this.getIntent().getSerializableExtra("participants") == null){
-		participants = AndroidApplication.getInstance().getNetworkInterface().getConversationParticipants();
+		participants = AndroidApplication.getInstance().getNetworkInterface().getGroupParticipants();
 		if(participants.size()==0)
 			participants.put("",new Participant("Please wait...", "", false, false));
 		} else {
@@ -81,7 +78,7 @@ public class CheckElectorateActivity extends ListActivity {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 
-				Map<String,Participant> participants = AndroidApplication.getInstance().getNetworkInterface().getConversationParticipants();
+				Map<String,Participant> participants = AndroidApplication.getInstance().getNetworkInterface().getGroupParticipants();
 				npa.clear();
 				npa.addAll(participants.values());
 				npa.notifyDataSetChanged();
@@ -95,7 +92,6 @@ public class CheckElectorateActivity extends ListActivity {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 
-				@SuppressWarnings("unchecked")
 				Map<String,Participant> participants = (Map<String,Participant>)intent.getSerializableExtra("participants");
 				npa.clear();
 				npa.addAll(participants.values());
@@ -156,8 +152,6 @@ public class CheckElectorateActivity extends ListActivity {
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		case R.id.network_info:
-			//Intent i = new Intent(this, ch.bfh.evoting.voterapp.NetworkInformationActivity.class);
-			//startActivity(i);
 			NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();
 			ndf.show( getFragmentManager( ), "networkInfo" );
 			return true;

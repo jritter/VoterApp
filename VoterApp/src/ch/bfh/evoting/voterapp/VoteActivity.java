@@ -16,7 +16,6 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -28,16 +27,10 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 /**
  * Activity displaying the vote options in the voting phase
@@ -86,9 +79,6 @@ public class VoteActivity extends Activity {
 		//Set the question text
 		TextView tvQuestion = (TextView)findViewById(R.id.textview_vote_poll_question);
 		tvQuestion.setText(poll.getQuestion());
-
-
-
 
 		//create the list of vote options
 		volAdapter = new VoteOptionListAdapter(this, R.layout.list_item_vote, poll.getOptions());
@@ -379,6 +369,7 @@ public class VoteActivity extends Activity {
 
 	}
 
+	@Override
 	protected void onResume() {
 		super.onResume();
 		AndroidApplication.getInstance().setCurrentActivity(this);

@@ -11,7 +11,7 @@ public class Participant implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	private String identification;
-	private String ipAddress;
+	private String uniqueId;
 	private boolean hasVoted;
 	private boolean isSelected;
 	private boolean hasAcceptedReview;
@@ -19,13 +19,13 @@ public class Participant implements Serializable{
 	/**
 	 * Construct a Participant object
 	 * @param identification the identification of the participant
-	 * @param ipAddress the IP address of the participant
+	 * @param uniqueId the IP address of the participant
 	 * @param isSelected indicate if the participant in the network is selected as member of the electorate
 	 * @param hasVoted indicated if the participant already has submitted a vote
 	 */
-	public Participant(String identification, String ipAddress, boolean isSelected, boolean hasVoted){
+	public Participant(String identification, String uniqueId, boolean isSelected, boolean hasVoted){
 		this.identification = identification;
-		this.ipAddress = ipAddress;
+		this.uniqueId = uniqueId;
 		this.hasVoted = hasVoted;
 		this.isSelected = isSelected;
 	}
@@ -47,19 +47,19 @@ public class Participant implements Serializable{
 	}
 
 	/**
-	 * Get the IP address of the participant
-	 * @return the IP address of the participant
+	 * Get the unique identifier of the participant
+	 * @return the unique identifier of the participant
 	 */
-	public String getIpAddress() {
-		return ipAddress;
+	public String getUniqueId() {
+		return uniqueId;
 	}
 
 	/**
 	 * Set the IP address of the participant
-	 * @param ipAddress the IP address of the participant
+	 * @param uniqueId the unique identifier of the participant
 	 */
-	public void setIpAddress(String ipAddress) {
-		this.ipAddress = ipAddress;
+	public void setUniqueId(String uniqueId) {
+		this.uniqueId = uniqueId;
 	}
 	
 	/**
@@ -94,10 +94,18 @@ public class Participant implements Serializable{
 		this.isSelected = isSelected;
 	}
 	
+	/**
+	 * Indicate if the participant has accepted the review of the poll
+	 * @return true if participant has accepted, else otherwise
+	 */
 	public boolean hasAcceptedReview() {
 		return hasAcceptedReview;
 	}
 
+	/**
+	 * Set the flag indicating if the participant has accepted the review of the poll
+	 * @param hasAcceptedReview true if participant has accepted, else otherwise
+	 */
 	public void setHasAcceptedReview(boolean hasAcceptedReview) {
 		this.hasAcceptedReview = hasAcceptedReview;
 	}
@@ -109,7 +117,7 @@ public class Participant implements Serializable{
 		result = prime * result
 				+ ((identification == null) ? 0 : identification.hashCode());
 		result = prime * result
-				+ ((ipAddress == null) ? 0 : ipAddress.hashCode());
+				+ ((uniqueId == null) ? 0 : uniqueId.hashCode());
 		return result;
 	}
 
@@ -127,10 +135,10 @@ public class Participant implements Serializable{
 				return false;
 		} else if (!identification.equals(other.identification))
 			return false;
-		if (ipAddress == null) {
-			if (other.ipAddress != null)
+		if (uniqueId == null) {
+			if (other.uniqueId != null)
 				return false;
-		} else if (!ipAddress.equals(other.ipAddress))
+		} else if (!uniqueId.equals(other.uniqueId))
 			return false;
 		return true;
 	}

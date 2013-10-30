@@ -5,7 +5,11 @@ import java.util.Comparator;
 
 import ch.bfh.evoting.voterapp.entities.Option;
 
-
+/**
+ * Comparator used to sort the options in the descendant order of the number of votes they received
+ * @author Philémon von Bergen
+ *
+ */
 public class OptionsComparator implements Comparator<Option>, Serializable{
 
 	private static final long serialVersionUID = 1L;

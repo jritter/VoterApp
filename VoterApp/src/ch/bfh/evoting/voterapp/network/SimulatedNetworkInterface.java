@@ -1,3 +1,8 @@
+/*
+ * This class was commented out because is no more used since we adopted AllJoyn as network layer
+ * We keep it 
+ */
+
 //package ch.bfh.evoting.voterapp.network;
 //
 //import java.util.Map;
@@ -63,10 +68,10 @@
 //	 * 
 //	 * @param votemessage The votemessage which should be sent
 //	 * @param sender The origin of the message
-//	 * @param destinationIPAddress The destination of the message
+//	 * @param destinationUniqueId The destination of the message
 //	 */
 //	@Override
-//	public void sendMessage(VoteMessage votemessage, String destinationIPAddress){
+//	public void sendMessage(VoteMessage votemessage, String destinationUniqueId){
 //		//Not needed. As this is a simulation, no real message will be sent
 //	}
 //	

@@ -76,19 +76,6 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 			LinearLayout ll = (LinearLayout)findViewById(R.id.layout_bottom_bar);
 			ll.setVisibility(View.GONE);
 			
-			//register a listener of messages of the admin sending the electorate
-			//TODO is that a good idea? when to unregister it
-//			redoPollReceiver = new BroadcastReceiver(){
-//
-//				@Override
-//				public void onReceive(Context context, Intent intent) {
-//					LocalBroadcastManager.getInstance(DisplayResultActivity.this).unregisterReceiver(this);
-//					Intent i = new Intent(DisplayResultActivity.this, CheckElectorateActivity.class);
-//					i.putExtra("participants", intent.getSerializableExtra("participants"));
-//					startActivity(i);
-//				}
-//			};
-//			LocalBroadcastManager.getInstance(this).registerReceiver(redoPollReceiver, new IntentFilter(BroadcastIntentTypes.electorate));
 		} else {
 
 			
@@ -151,6 +138,7 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			if(saveToDbNeeded){

@@ -142,6 +142,7 @@ public class PollActivity extends Activity implements OnItemClickListener {
 
 	}
 
+	@Override
 	protected void onResume() {
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		super.onResume();

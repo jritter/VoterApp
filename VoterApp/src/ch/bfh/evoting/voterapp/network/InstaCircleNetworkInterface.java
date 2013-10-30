@@ -113,10 +113,10 @@
 //	 * 
 //	 * @param votemessage The votemessage which should be sent
 //	 * @param sender The origin of the message
-//	 * @param destinationIPAddress The destination of the message
+//	 * @param destinationUniqueId The destination of the message
 //	 */
 //	@Override
-//	public void sendMessage(VoteMessage votemessage, String destinationIPAddress){
+//	public void sendMessage(VoteMessage votemessage, String destinationUniqueId){
 //		votemessage.setSenderIPAdress(this.getMyIpAddress());
 //		votemessage.setTimestamp(System.currentTimeMillis());
 //		Message message = new Message(su.serialize(votemessage), Message.MSG_CONTENT, this.getMyIpAddress());
@@ -170,7 +170,6 @@
 //	private BroadcastReceiver serviceStopListener = new BroadcastReceiver() {
 //		@Override
 //		public void onReceive(Context context, Intent intent) {
-//			// TODO not possible anymore since moved in VotingLib => find a solution
 //			WifiManager wifiman = (WifiManager) AndroidApplication.getInstance().getSystemService(Context.WIFI_SERVICE);
 //			new AdhocWifiManager(wifiman)
 //			.restoreWifiConfiguration(AndroidApplication.getInstance().getBaseContext());

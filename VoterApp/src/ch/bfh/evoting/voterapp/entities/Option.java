@@ -25,6 +25,7 @@ public class Option implements Serializable {
 	 * Constructs an Option object
 	 * @param text text of the option
 	 * @param votes number of votes this option has received
+	 * @param percentage percentage of votes this option received
 	 * @param id id in the database
 	 * @param pollId id of the poll to whom it belongs
 	 */
@@ -110,7 +111,7 @@ public class Option implements Serializable {
 
 	/**
 	 * Set the id in the database
-	 * @param id
+	 * @param id the id of this option in the database
 	 */
 	public void setId(int id) {
 		this.id = id;

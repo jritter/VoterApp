@@ -12,12 +12,10 @@ import java.lang.reflect.Method;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
-import android.os.SystemClock;
 import android.util.Base64;
 import android.util.Log;
 import ch.bfh.evoting.voterapp.AndroidApplication;
@@ -114,7 +112,6 @@ public class WifiAPManager {
 		preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
 		editor = preferences.edit();
 		editor.putString("originalApConfig", serializedAPConfig);
-//		editor.putString("group_password", config.preSharedKey);
 		editor.putString("SSID", config.SSID);
 		editor.commit();
 		AndroidApplication.getInstance().getNetworkInterface().setGroupPassword(config.preSharedKey);
@@ -207,14 +204,12 @@ public class WifiAPManager {
 			wifi.setWifiEnabled(false);
 			Method method1 = wifi.getClass().getMethod("setWifiApEnabled",
 					WifiConfiguration.class, boolean.class);
-			// method1.invoke(wifi, null, enabled); // true
 			method1.invoke(wifi, config, enabled); // true
 			Method method2 = wifi.getClass().getMethod("getWifiApState");
 			state = (Integer) method2.invoke(wifi);
 			Log.d(TAG, "State: " + state);
 		} catch (Exception e) {
 			Log.e(TAG, ""+e.getMessage());
-			// toastText += "ERROR " + e.getMessage();
 		}
 
 		// hold thread up while processing occurs
@@ -350,7 +345,6 @@ public class WifiAPManager {
 
 		private boolean mode; // enable or disable wifi AP
 		private ProgressDialog d;
-		private Context context;
 
 		/**
 		 * enable/disable the wifi ap
@@ -362,7 +356,6 @@ public class WifiAPManager {
 		 * @author http://stackoverflow.com/a/7049074/1233435
 		 */
 		public SetWifiAPTask(boolean mode, Context context) {
-			this.context = context;
 			this.mode = mode;
 			if (mode) {
 				d = new ProgressDialog(context);
