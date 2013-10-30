@@ -106,51 +106,30 @@ public class VoteActivity extends Activity {
 
 		});
 
-//		Log.e("VoteActivity", "Scroll: LastVisible item="+lvChoices.getLastVisiblePosition()+" lvChoices.getCount()-2="+(lvChoices.getCount()-2));
-//		//TODO getLastVisiblePosition is -1
-//		if(lvChoices.getLastVisiblePosition() < lvChoices.getCount()-2){
-//
-//			//animate scroll
-//			new AsyncTask<Object, Object, Object>(){
-//
-//				@Override
-//				protected Object doInBackground(Object... params) {
-//					SystemClock.sleep(300);
-//					Log.d("VoteActivity", "Doing demo scroll");
-//					lvChoices.smoothScrollToPositionFromTop(lvChoices.getAdapter().getCount()-1, 0, 1000);
-//					SystemClock.sleep(1050);
-//					lvChoices.smoothScrollToPositionFromTop(0, 0, 1000);
-//					SystemClock.sleep(1050);
-//					scrolled = false;
-//					demoScrollDone = true;
-//					return null;
-//				}
-//
-//			}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-//		} else {
-//			Log.d("VoteActivity", "Demo scroll not needed");
-//			scrolled = true;
-//		}
-
 		lvChoices.post(new Runnable(){
 
 			@Override
 			public void run() {
 				Log.e("VoteActivity", "Scroll: LastVisible item="+lvChoices.getLastVisiblePosition()+" lvChoices.getCount()-2="+(lvChoices.getCount()-2));
-				//TODO getLastVisiblePosition is -1
-				if(lvChoices.getLastVisiblePosition() < lvChoices.getCount()-2){
+				if(lvChoices.getLastVisiblePosition() < lvChoices.getCount()-1){
 
-
-					SystemClock.sleep(300);
-					Log.d("VoteActivity", "Doing demo scroll");
-					lvChoices.smoothScrollToPositionFromTop(lvChoices.getAdapter().getCount()-1, 0, 1000);
-					SystemClock.sleep(1050);
-					lvChoices.smoothScrollToPositionFromTop(0, 0, 1000);
-					SystemClock.sleep(1050);
-					scrolled = false;
-					demoScrollDone = true;
-
-
+					//animate scroll
+					new AsyncTask<Object, Object, Object>(){
+		
+						@Override
+						protected Object doInBackground(Object... params) {
+							SystemClock.sleep(500);
+							Log.d("VoteActivity", "Doing demo scroll");
+							lvChoices.smoothScrollToPositionFromTop(lvChoices.getAdapter().getCount(), 0, 1500);
+							SystemClock.sleep(1550);
+							lvChoices.smoothScrollToPositionFromTop(0, 0, 1500);
+							scrolled = false;
+							SystemClock.sleep(1550);
+							demoScrollDone = true;
+							return null;
+						}
+		
+					}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
 				} else {
 					Log.d("VoteActivity", "Demo scroll not needed");
@@ -160,21 +139,6 @@ public class VoteActivity extends Activity {
 
 		});
 
-
-		//		//Set a listener on the cast button
-		//		Button btnCast = (Button)findViewById(R.id.button_castvote);
-		//		btnCast.setOnClickListener(new OnClickListener(){
-		//			@Override
-		//			public void onClick(View v) {
-		//				if(!scrolled){
-		//					Toast.makeText(VoteActivity.this, getString(R.string.scroll), Toast.LENGTH_SHORT).show();
-		//				} else if (volAdapter.getSelectedPosition() == -1){
-		//					Toast.makeText(VoteActivity.this, getString(R.string.choose_one_option), Toast.LENGTH_SHORT).show();
-		//				} else {
-		//					castBallot();
-		//				}
-		//			}
-		//		});
 
 		//Register a BroadcastReceiver on stop poll order events
 		stopReceiver = new BroadcastReceiver(){
