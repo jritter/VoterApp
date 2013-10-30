@@ -79,9 +79,9 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 		return super.onOptionsItemSelected(item); 
 	}
 	
-	private boolean isContainedInParticipants(String ipAddress){
+	private boolean isContainedInParticipants(String uniqueId){
 		for(Participant p : poll.getParticipants().values()){
-			if(p.getIpAddress().equals(ipAddress)){
+			if(p.getUniqueId().equals(uniqueId)){
 				return true;
 			}
 		}
@@ -105,7 +105,7 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 			poll.setStartTime(System.currentTimeMillis());
 			poll.setNumberOfParticipants(poll.getParticipants().values().size());
 			
-			if(isContainedInParticipants(AndroidApplication.getInstance().getNetworkInterface().getMyIpAddress())){
+			if(isContainedInParticipants(AndroidApplication.getInstance().getNetworkInterface().getMyUniqueId())){
 				Intent intent = new Intent(this, VoteActivity.class);
 				intent.putExtra("poll", (Serializable)poll);
 				startActivity(intent);
@@ -117,6 +117,7 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 		}
 	}
 
+	@Override
 	protected void onResume() {
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		super.onResume();
@@ -134,8 +135,4 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 		poll = (Poll)savedInstanceState.getSerializable("poll");
 	}
 	
-//	@Override
-//	public void onBackPressed() {
-//		//do nothing because we don't want that people access to an anterior activity
-//	}
 }

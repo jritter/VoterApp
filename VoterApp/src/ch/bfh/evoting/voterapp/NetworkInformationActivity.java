@@ -1,46 +1,21 @@
 package ch.bfh.evoting.voterapp;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.PendingIntent;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
-import android.nfc.NfcAdapter;
-import android.nfc.Tag;
-import android.nfc.tech.Ndef;
-import android.nfc.tech.NdefFormatable;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewTreeObserver;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
-
 public class NetworkInformationActivity extends Activity implements OnClickListener {
 	
-	private Button btnWriteNfcTag;
 	private Button btnNext;
 	private Button btnRecreateNetwork;
 	
@@ -114,6 +89,7 @@ public class NetworkInformationActivity extends Activity implements OnClickListe
 	@Override
 	public void onClick(View view) {
 
+		//TODO can we remove this ??
 		/*if (view == btnWriteNfcTag){
 			if (!nfcAdapter.isEnabled()) {
 

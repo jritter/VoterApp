@@ -64,15 +64,7 @@ public class NetworkArrayAdapter extends ArrayAdapter<HashMap<String, Object>> {
 		
 		this.hideCreateNetwork = hideCreateNetwork;
 	}
-	
-	
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.widget.ArrayAdapter#getView(int, android.view.View,
-	 * android.view.ViewGroup)
-	 */
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View view = convertView;
 		if (view == null) {

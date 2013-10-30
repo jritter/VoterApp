@@ -35,8 +35,8 @@ public class PollOptionAdapter extends ArrayAdapter<Option> {
 	 *            android context
 	 * @param textViewResourceId
 	 *            id of the layout that must be inflated
-	 * @param objects
-	 *            list of options that have to be listed
+	 * @param poll
+	 *            poll from which the options should be listed
 	 */
 	public PollOptionAdapter(Context context, int textViewResourceId,
 			Poll poll) {

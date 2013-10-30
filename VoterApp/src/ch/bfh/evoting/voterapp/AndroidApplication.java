@@ -21,7 +21,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 /**
  * Class representing the application. This class is used to do some initializations and to share data.

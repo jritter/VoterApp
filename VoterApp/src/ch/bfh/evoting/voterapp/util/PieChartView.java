@@ -19,7 +19,7 @@ import android.graphics.Color;
  * used to diplay the income, cost and sub total in the results view.
  * 
  * @author Daniel Kvist
- * 
+ * http://danielkvist.net/code/piechart-with-achartengine-in-android
  */
 public class PieChartView extends GraphicalView {
 
@@ -33,7 +33,6 @@ public class PieChartView extends GraphicalView {
 
 	/**
 	 * 
-	 * http://danielkvist.net/code/piechart-with-achartengine-in-android
 	 * 
 	 * Constructor that only calls the super method. It is not used to
 	 * instantiate the object from outside of this class.
@@ -52,10 +51,8 @@ public class PieChartView extends GraphicalView {
 	 * 
 	 * @param context
 	 *            the context
-	 * @param income
-	 *            the total income
-	 * @param costs
-	 *            the total cost
+	 * @param poll
+	 * 			  the poll which results will be displayed
 	 * @return a GraphicalView object as a pie chart
 	 */
 	public static GraphicalView getNewInstance(Context context, Poll poll) {

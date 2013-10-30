@@ -1,24 +1,17 @@
 package ch.bfh.evoting.voterapp;
 
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
-import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
-import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 
 /**
  * Class displaying the activity showing the entire poll, in order to allow the user to check if it is correct
@@ -56,25 +49,6 @@ public class ReviewPollVoterActivity extends Activity {
 		setContentView(overlayFramelayout);
 		
 		AndroidApplication.getInstance().setCurrentActivity(this);
-
-
-//		final Button btn_validate_review = (Button) findViewById(R.id.button_validate_review);
-//
-//		btn_validate_review.setOnClickListener(new OnClickListener(){
-//			@Override
-//			public void onClick(View v) {
-//				AndroidApplication.getInstance().getNetworkInterface().sendMessage(new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_ACCEPT_REVIEW, ""));
-//				((LinearLayout)btn_validate_review.getParent()).setVisibility(View.GONE);
-//			}
-//		});
-
-//		pollReceiver = new BroadcastReceiver() {
-//			@Override
-//			public void onReceive(Context context, Intent intent) {
-////				((LinearLayout)btn_validate_review.getParent()).setVisibility(View.VISIBLE);
-//			}
-//		};
-//		LocalBroadcastManager.getInstance(this).registerReceiver(pollReceiver, new IntentFilter(BroadcastIntentTypes.pollToReview));
 	}
 	
 	@Override
@@ -126,6 +100,7 @@ public class ReviewPollVoterActivity extends Activity {
 		return super.onOptionsItemSelected(item);
 	}
 	
+	@Override
 	protected void onResume() {
 		super.onResume();
 		AndroidApplication.getInstance().setCurrentActivity(this);

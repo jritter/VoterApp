@@ -1,7 +1,6 @@
 package ch.bfh.evoting.voterapp;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
@@ -20,20 +19,17 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -50,7 +46,6 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 	ArrayList<Option> options;
 
 	private ImageButton btnAddOption;
-	private Button btnSavePoll;
 	private Button btnStartPoll;
 	private EditText etOption;
 	private EditText etQuestion;
@@ -60,8 +55,6 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 	private Poll savedPoll;
 
 	private PollDbHelper pollDbHelper;
-
-	private boolean updatePoll = false;
 
 	private AlertDialog dialogSave;
 	private AlertDialog dialogAddOption;
@@ -85,21 +78,17 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 			poll = new Poll();
 			options = new ArrayList<Option>();
 			poll.setOptions(options);
-			updatePoll = false;
 		} else if (savedPoll != null) {
 			poll = savedPoll;
 			options = (ArrayList<Option>) poll.getOptions();
-			updatePoll = true;
 		}
 		else {
 			poll = pollDbHelper.getPoll(getIntent().getIntExtra("pollid", -1));
 			options = (ArrayList<Option>) poll.getOptions();
-			updatePoll = true;
 		}
 
 		lv = (ListView) findViewById(R.id.listview_pollquestions);
 		btnAddOption = (ImageButton) findViewById(R.id.button_addoption);
-		//		btnSavePoll = (Button) findViewById(R.id.button_save_poll);
 		btnStartPoll = (Button) findViewById(R.id.button_start_poll);
 		etOption = (EditText) findViewById(R.id.edittext_option);
 		etQuestion = (EditText) findViewById(R.id.edittext_question);
@@ -107,7 +96,6 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 		etQuestion.setText(poll.getQuestion());
 
 		btnAddOption.setOnClickListener(this);
-		//		btnSavePoll.setOnClickListener(this);
 		btnStartPoll.setOnClickListener(this);
 
 		adapter = new PollOptionAdapter(this, R.id.listview_pollquestions, poll);
@@ -120,7 +108,6 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 
 			@Override
 			public void onClick(View v) {
-				//cbEmptyVote.toggle();
 				if(cbEmptyVote.isChecked()){
 					poll.getOptions().add(new Option(getString(R.string.empty_vote),0,0,0,0));
 				} else {

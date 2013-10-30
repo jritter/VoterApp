@@ -2,11 +2,9 @@ package ch.bfh.evoting.voterapp;
 
 import java.util.List;
 
-import ch.bfh.evoting.voterapp.adapters.PollAdapter;
 import ch.bfh.evoting.voterapp.adapters.PollArchiveAdapter;
 import ch.bfh.evoting.voterapp.db.PollDbHelper;
 import ch.bfh.evoting.voterapp.entities.Poll;
-import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import android.os.Bundle;
 import android.app.Activity;
@@ -92,12 +90,6 @@ public class ListTerminatedPollsActivity extends Activity {
 		getMenuInflater().inflate(R.menu.archive, menu);
 		return true;
 	}
-
-//	@Override
-//	public void onBackPressed() {
-//		//People can go back to calling activity
-//		super.onBackPressed();
-//	}
 
 	/*
 	 * (non-Javadoc)

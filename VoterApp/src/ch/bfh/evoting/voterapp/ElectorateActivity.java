@@ -7,15 +7,13 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import ch.bfh.evoting.voterapp.adapters.AdminNetworkParticipantListAdapter;
-import ch.bfh.evoting.voterapp.adapters.NetworkParticipantListAdapter;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
-import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
-import ch.bfh.evoting.voterapp.util.IPAddressComparator;
+import ch.bfh.evoting.voterapp.util.UniqueIdComparator;
 import ch.bfh.evoting.voterapp.util.Utility;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -33,7 +31,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ListView;
@@ -80,7 +77,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 			poll = serializedPoll;
 		}
 
-		participants = AndroidApplication.getInstance().getNetworkInterface().getConversationParticipants();
+		participants = AndroidApplication.getInstance().getNetworkInterface().getGroupParticipants();
 		npa = new AdminNetworkParticipantListAdapter(this, R.layout.list_item_participant_network_admin, new ArrayList<Participant>(participants.values()));
 		lvElectorate.setAdapter(npa);
 
@@ -133,9 +130,6 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		case R.id.network_info:
-			//Intent i = new Intent(this, NetworkInformationActivity.class);
-			//startActivity(i);
-			
 			NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();			
 			ndf.show( getFragmentManager( ), "networkInfo" );
 			return true;
@@ -208,10 +202,10 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View view) {
 		if (view == btnNext){
-			Map<String,Participant> finalParticipants = new TreeMap<String,Participant>(new IPAddressComparator());
+			Map<String,Participant> finalParticipants = new TreeMap<String,Participant>(new UniqueIdComparator());
 			for(Participant p: participants.values()){
 				if(p.isSelected()){
-					finalParticipants.put(p.getIpAddress(),p);
+					finalParticipants.put(p.getUniqueId(),p);
 				}
 			}
 			if(finalParticipants.size()<2){
@@ -234,7 +228,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 
 			Intent intent = new Intent(this, ReviewPollActivity.class);
 			intent.putExtra("poll", (Serializable)poll);
-			intent.putExtra("sender", AndroidApplication.getInstance().getNetworkInterface().getMyIpAddress());
+			intent.putExtra("sender", AndroidApplication.getInstance().getNetworkInterface().getMyUniqueId());
 			startActivity(intent);
 			LocalBroadcastManager.getInstance(this).unregisterReceiver(participantsDiscoverer);
 		}	
@@ -281,7 +275,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 
 
 	private void updateFromNetwork(){
-		Map<String,Participant> newReceivedMapOfParticipants = AndroidApplication.getInstance().getNetworkInterface().getConversationParticipants();
+		Map<String,Participant> newReceivedMapOfParticipants = AndroidApplication.getInstance().getNetworkInterface().getGroupParticipants();
 		for(String ip : newReceivedMapOfParticipants.keySet()){
 			if(!participants.containsKey(ip)){
 				//Participant is not already know

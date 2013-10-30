@@ -1,9 +1,7 @@
 package ch.bfh.evoting.voterapp;
 
-import java.io.Serializable;
 
 import ch.bfh.evoting.voterapp.AndroidApplication;
-import ch.bfh.evoting.voterapp.VoteActivity.VoteService;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
@@ -27,17 +25,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.provider.ContactsContract;
-import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
@@ -238,16 +231,8 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 			super.onBackPressed();
 			return true;
 		}else if(item.getItemId()==R.id.network_info){
-
-			//Intent i = new Intent(this,
-			//		ch.bfh.evoting.voterapp.NetworkInformationActivity.class);
-			//startActivity(i);
-			//LocalBroadcastManager.getInstance(this).unregisterReceiver(
-			//		serviceStartedListener);
-
 			NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();			
 			ndf.show( getFragmentManager( ), "networkInfo" );
-
 			return true;
 		} else if (item.getItemId()==R.id.help){
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance(
@@ -306,8 +291,6 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 				// saving the values that we got
 				SharedPreferences.Editor editor = preferences.edit();
 				editor.putString("SSID", config[0]);
-				//				editor.putString("group_name", config[1]);
-				//				editor.putString("group_password", config[2]);
 				editor.commit();
 
 				AndroidApplication.getInstance().getNetworkInterface().setGroupName(config[1]);
@@ -321,12 +304,6 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 			}
 		}
 	}
-
-	//	@Override
-	//	public void onBackPressed() {
-	//		// do nothing because we don't want that people access to an anterior
-	//		// activity
-	//	}
 
 	/**
 	 * This method initiates the connect process

@@ -21,13 +21,11 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
-import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.WindowManager.BadTokenException;
 import android.widget.Toast;
 import ch.bfh.evoting.voterapp.AndroidApplication;
-import ch.bfh.evoting.voterapp.NetworkConfigActivity;
 import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.Utility;
@@ -237,9 +235,7 @@ public class AdhocWifiManager {
 					Log.d(TAG, "Magic hack fired for Progress Dialog");
 				}
 			});
-//			if(AndroidApplication.getInstance().getCurrentActivity() instanceof NetworkConfigActivity){
-				d.show();
-//			}
+			d.show();
 		}
 
 		/*

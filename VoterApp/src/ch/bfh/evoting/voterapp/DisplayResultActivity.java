@@ -64,19 +64,6 @@ public class DisplayResultActivity extends ListActivity {
 			LinearLayout ll = (LinearLayout)findViewById(R.id.layout_action_bar);
 			((LinearLayout)ll.getParent()).removeView(ll);
 			
-			//register a listener of messages of the admin sending the electorate
-			//TODO is that a good idea? when to unregister it
-//			redoPollReceiver = new BroadcastReceiver(){
-//
-//				@Override
-//				public void onReceive(Context context, Intent intent) {
-//					LocalBroadcastManager.getInstance(DisplayResultActivity.this).unregisterReceiver(this);
-//					Intent i = new Intent(DisplayResultActivity.this, CheckElectorateActivity.class);
-//					i.putExtra("participants", intent.getSerializableExtra("participants"));
-//					startActivity(i);
-//				}
-//			};
-//			LocalBroadcastManager.getInstance(this).registerReceiver(redoPollReceiver, new IntentFilter(BroadcastIntentTypes.electorate));
 		} else {
 
 			
@@ -166,7 +153,6 @@ public class DisplayResultActivity extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		if (item.getItemId() == android.R.id.home){
-//			LocalBroadcastManager.getInstance(this).registerReceiver(redoPollReceiver, new IntentFilter(BroadcastIntentTypes.electorate));
 			//if ending a poll
 			if(saveToDbNeeded){
 				Intent i = new Intent(DisplayResultActivity.this, MainActivity.class);

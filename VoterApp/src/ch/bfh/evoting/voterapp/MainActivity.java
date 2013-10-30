@@ -1,12 +1,9 @@
 package ch.bfh.evoting.voterapp;
 
-import java.io.Serializable;
 import java.util.concurrent.Callable;
 
-import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
-import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
@@ -24,8 +21,6 @@ import android.widget.Button;
  *
  */
 public class MainActivity extends Activity implements OnClickListener {
-
-	private static final String TAG = WifiAPManager.class.getName();
 
 	private Button btnSetupNetwork;
 	private Button btnPollArchive;
@@ -47,8 +42,6 @@ public class MainActivity extends Activity implements OnClickListener {
 		btnSetupNetwork.setOnClickListener(this);
 		btnPolls.setOnClickListener(this);
 		btnPollArchive.setOnClickListener(this);
-
-
 	}
 
 	@Override
@@ -62,7 +55,6 @@ public class MainActivity extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View view) {
 		if (view == btnSetupNetwork) {
-
 
 			this.waitForNetworkInterface(new Callable<Void>() {
 				public Void call() {

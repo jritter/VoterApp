@@ -85,7 +85,7 @@ public class PollReviewFragment extends ListFragment {
 				@Override
 				public void onReceive(Context context, Intent intent) {
 
-					if(isContainedInParticipants(AndroidApplication.getInstance().getNetworkInterface().getMyIpAddress())){
+					if(isContainedInParticipants(AndroidApplication.getInstance().getNetworkInterface().getMyUniqueId())){
 						Intent i = new Intent(PollReviewFragment.this.getActivity(), VoteActivity.class);
 						poll.setStartTime(System.currentTimeMillis());
 						poll.setNumberOfParticipants(poll.getParticipants().values().size());
@@ -177,9 +177,9 @@ public class PollReviewFragment extends ListFragment {
 		super.onDestroy();
 	}
 
-	private boolean isContainedInParticipants(String ipAddress){
+	private boolean isContainedInParticipants(String uniqueId){
 		for(Participant p : poll.getParticipants().values()){
-			if(p.getIpAddress().equals(ipAddress)){
+			if(p.getUniqueId().equals(uniqueId)){
 				return true;
 			}
 		}

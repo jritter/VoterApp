@@ -46,7 +46,6 @@ public class JavaSerialization implements Serialization {
 	/**
 	 * Deserialize the given string base64 encoded
 	 * @param s encoded serialized object
-	 * @param classType not needed for Java serialization
 	 */
 	@Override
 	public Object deserialize(String s) {

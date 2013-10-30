@@ -1,6 +1,5 @@
 package ch.bfh.evoting.voterapp;
 
-
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import android.app.AlertDialog;
 import android.app.ListActivity;
@@ -51,11 +50,6 @@ public class WaitForVotesActivity extends ListActivity {
 		dialogBack.show();
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
-	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -74,6 +68,7 @@ public class WaitForVotesActivity extends ListActivity {
 		return true;
 	}
 	
+	@Override
 	protected void onResume() {
 		super.onResume();
 		AndroidApplication.getInstance().setCurrentActivity(this);
