@@ -75,13 +75,6 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 			overlayFramelayout.addView(overlay_view);
 			overlay_view.setOnClickListener(new View.OnClickListener() {
 
-//				@Override
-//				public boolean onClick(View v, MotionEvent event) {
-//					overlayFramelayout.removeView(overlay_view);
-//					settings.edit().putBoolean("first_run_"+NetworkConfigActivity.this.getClass().getSimpleName(), false).commit();
-//					return false;
-//				}
-
 				@Override
 				public void onClick(View v) {
 					overlayFramelayout.removeView(overlay_view);
