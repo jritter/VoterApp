@@ -87,11 +87,11 @@ public class NetworkInformationActivity extends Activity implements OnClickListe
 					//poll details
 					NavUtils.navigateUpFromSameTask(this);
 				} else {
-					Intent i = new Intent(this, MainActivity.class);
-					i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | 
+					Intent intent = new Intent(this, MainActivity.class);
+					intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | 
 							Intent.FLAG_ACTIVITY_CLEAR_TASK |
 							Intent.FLAG_ACTIVITY_NEW_TASK);
-					startActivity(i);
+					startActivity(intent);
 				}
 			} else {
 				//net config
