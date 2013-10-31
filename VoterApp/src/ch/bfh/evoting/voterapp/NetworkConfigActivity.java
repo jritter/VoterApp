@@ -64,7 +64,12 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 		}
 		
 		final FrameLayout overlayFramelayout = new FrameLayout(this);
-		View view = getLayoutInflater().inflate(R.layout.activity_network_config, null,false);
+		FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+				FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+		layoutParams.setMargins(getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), 0, getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), 0);
+		overlayFramelayout.setLayoutParams(layoutParams);
+		
+		View view = getLayoutInflater().inflate(R.layout.activity_network_config, overlayFramelayout,false);
 		overlayFramelayout.addView(view);
 		
 		final SharedPreferences settings = getSharedPreferences(AndroidApplication.PREFS_NAME, MODE_PRIVATE);
