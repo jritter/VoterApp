@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.util.OptionsComparator;
+import ch.bfh.evoting.voterapp.util.ResultChartItem;
 import ch.bfh.evoting.voterapp.util.Separator;
 
 /**
@@ -55,6 +57,10 @@ public class ResultAdapter extends BaseAdapter {
 		
 		data.add(new Separator(context.getResources().getString(R.string.question)));
 		data.add(poll);
+		if (context.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE){
+			data.add(new Separator(context.getResources().getString(R.string.result_chart)));
+			data.add(new ResultChartItem());
+		}
 		data.add(new Separator(context.getResources().getString(R.string.options)));
 		data.addAll(options);
 		data.add(new Separator(context.getResources().getString(R.string.poll_start_time)));
@@ -102,6 +108,9 @@ public class ResultAdapter extends BaseAdapter {
 			view = inflater.inflate(R.layout.list_item_separator, parent, false);
 			TextView tvSeparator = (TextView) view.findViewById(R.id.textview_separator);
 			tvSeparator.setText(((Separator)this.getItem(position)).getText());
+		}
+		else if (this.getItem(position) instanceof ResultChartItem){
+			view = inflater.inflate(R.layout.list_item_chartfragment, parent, false);
 		}
 		else {
 			view = inflater.inflate(R.layout.list_item_string, parent, false);

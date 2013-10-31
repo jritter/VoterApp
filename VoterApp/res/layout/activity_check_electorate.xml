@@ -2,18 +2,33 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context=".CheckElectorateActivity">
+    tools:context=".CheckElectorateActivity" >
 
-    <TextView
-        android:id="@+id/textview_check_electorate"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal"
         android:layout_margin="@dimen/margin"
-        android:gravity="center_vertical|center_horizontal"
-        android:minHeight="70dp"
-        android:text="@string/check_electorate"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:gravity="center_vertical|center_horizontal" >
+
+        <ProgressBar
+            android:id="@+id/progessbar_wait"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right" />
+
+        <TextView
+            android:id="@+id/textview_check_electorate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="@string/check_electorate"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    </LinearLayout>
 
     
     <ListView

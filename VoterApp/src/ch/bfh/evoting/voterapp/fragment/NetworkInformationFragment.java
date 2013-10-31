@@ -25,14 +25,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
+import ch.bfh.evoting.voterapp.util.Utility;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -43,14 +46,14 @@ import com.google.zxing.qrcode.QRCodeWriter;
  * Fragment displaying the review of a poll
  * 
  */
-public class NetworkInformationFragment extends Fragment {
+public class NetworkInformationFragment extends Fragment implements
+		OnClickListener {
 
 	private boolean paramsAvailable = false;
 	private String ssid;
 	private String groupPassword;
 	private String groupName;
 	private boolean nfcAvailable;
-
 
 	private NfcAdapter nfcAdapter;
 	private boolean writeNfcEnabled;
@@ -59,24 +62,25 @@ public class NetworkInformationFragment extends Fragment {
 	private IntentFilter[] intentFiltersArray;
 
 	private ProgressDialog writeNfcTagDialog;
-
+	private AlertDialog alertDialog;
+	private Button btnWriteNfcTag;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);	
+		super.onCreate(savedInstanceState);
 	}
-
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
-		View v = inflater.inflate(R.layout.fragment_network_information, container, false);
-		
+		View v = inflater.inflate(R.layout.fragment_network_information,
+				container, false);
+
+		btnWriteNfcTag = (Button) v.findViewById(R.id.button_write_nfc_tag);
+
 		nfcAvailable = getActivity().getPackageManager().hasSystemFeature(
 				PackageManager.FEATURE_NFC);
-
-
 
 		ssid = AndroidApplication.getInstance().getNetworkInterface()
 				.getNetworkName();
@@ -89,15 +93,16 @@ public class NetworkInformationFragment extends Fragment {
 			paramsAvailable = false;
 		} else {
 			paramsAvailable = true;
-			groupPassword = AndroidApplication.getInstance().getNetworkInterface().getGroupPassword()
-					+ AndroidApplication.getInstance().getNetworkInterface().getSaltShortDigest();
+			groupPassword = AndroidApplication.getInstance()
+					.getNetworkInterface().getGroupPassword()
+					+ AndroidApplication.getInstance().getNetworkInterface()
+							.getSaltShortDigest();
 		}
-
-		
 
 		if (paramsAvailable) {
 
-			final ImageView ivQrCode = (ImageView) v.findViewById(R.id.imageview_qrcode);
+			final ImageView ivQrCode = (ImageView) v
+					.findViewById(R.id.imageview_qrcode);
 
 			ivQrCode.getViewTreeObserver().addOnPreDrawListener(
 					new ViewTreeObserver.OnPreDrawListener() {
@@ -120,17 +125,20 @@ public class NetworkInformationFragment extends Fragment {
 							try {
 								QRCodeWriter writer = new QRCodeWriter();
 								BitMatrix qrcode = writer.encode(ssid + "||"
-										+ groupName +"||" + groupPassword, BarcodeFormat.QR_CODE,
-										size, size);
+										+ groupName + "||" + groupPassword,
+										BarcodeFormat.QR_CODE, size, size);
 								ivQrCode.setImageBitmap(qrCode2Bitmap(qrcode));
-								android.view.ViewGroup.LayoutParams params = ivQrCode.getLayoutParams();
+								android.view.ViewGroup.LayoutParams params = ivQrCode
+										.getLayoutParams();
 								params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
 								ivQrCode.setLayoutParams(params);
-								
-								
-								params = NetworkInformationFragment.this.getView().getRootView().getLayoutParams();
+
+								params = NetworkInformationFragment.this
+										.getView().getRootView()
+										.getLayoutParams();
 								params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-								NetworkInformationFragment.this.getView().getRootView().setLayoutParams(params);
+								NetworkInformationFragment.this.getView()
+										.getRootView().setLayoutParams(params);
 
 							} catch (WriterException e) {
 								Log.d(this.getClass().getSimpleName(),
@@ -146,14 +154,17 @@ public class NetworkInformationFragment extends Fragment {
 				nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
 				if (nfcAdapter.isEnabled()) {
 
-					// Setting up a pending intent that is invoked when an NFC tag
+					// Setting up a pending intent that is invoked when an NFC
+					// tag
 					// is tapped on the back
-					pendingIntent = PendingIntent.getActivity(getActivity(), 0, new Intent(
-							getActivity(), getClass())
-					.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+					pendingIntent = PendingIntent.getActivity(getActivity(), 0,
+							new Intent(getActivity(), getClass())
+									.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
+							0);
 
 					nfcIntentFilter = new IntentFilter();
-					nfcIntentFilter.addAction(NfcAdapter.ACTION_NDEF_DISCOVERED);
+					nfcIntentFilter
+							.addAction(NfcAdapter.ACTION_NDEF_DISCOVERED);
 					nfcIntentFilter.addAction(NfcAdapter.ACTION_TAG_DISCOVERED);
 					intentFiltersArray = new IntentFilter[] { nfcIntentFilter };
 				} else {
@@ -161,53 +172,49 @@ public class NetworkInformationFragment extends Fragment {
 				}
 			}
 		}
-		
-		//TODO can we remove this
-		//v.findViewById(R.id.layout_bottom_action_bar).setVisibility(View.VISIBLE);
-		//btnWriteNfcTag = (Button) v.findViewById(R.id.button_write_nfc_tag);
 
-		/*if (nfcAvailable && paramsAvailable){
-
+		if (nfcAvailable && paramsAvailable) {
 			nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
-
 			btnWriteNfcTag.setOnClickListener(this);
 		} else {
-			((LinearLayout)btnWriteNfcTag.getParent()).removeView(btnWriteNfcTag);
-		}*/
+			btnWriteNfcTag.setVisibility(View.GONE);
+		}
 
-
-		TextView tv_network_name = (TextView) v.findViewById(R.id.textview_network_name);
+		TextView tv_network_name = (TextView) v
+				.findViewById(R.id.textview_network_name);
 		tv_network_name.setText(ssid);
 
-		TextView tv_group_name = (TextView) v.findViewById(R.id.textview_group_name);
+		TextView tv_group_name = (TextView) v
+				.findViewById(R.id.textview_group_name);
 		tv_group_name.setText(groupName.replace("group", ""));
-		
-		TextView tv_group_password = (TextView) v.findViewById(R.id.textview_group_password);
+
+		TextView tv_group_password = (TextView) v
+				.findViewById(R.id.textview_group_password);
 		tv_group_password.setText(groupPassword);
-		
+
 		WifiAPManager wifiapman = new WifiAPManager();
-		WifiManager wifiman = (WifiManager) this.getActivity().getSystemService(Context.WIFI_SERVICE);
+		WifiManager wifiman = (WifiManager) this.getActivity()
+				.getSystemService(Context.WIFI_SERVICE);
 		if (!wifiapman.isWifiAPEnabled(wifiman)) {
-			LinearLayout view = (LinearLayout)v.findViewById(R.id.view_wlan_key);
+			LinearLayout view = (LinearLayout) v
+					.findViewById(R.id.view_wlan_key);
 			view.removeAllViews();
 		} else {
-			TextView tv_network_key = (TextView) v.findViewById(R.id.textview_network_key);
-			SharedPreferences preferences = this.getActivity().getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
+			TextView tv_network_key = (TextView) v
+					.findViewById(R.id.textview_network_key);
+			SharedPreferences preferences = this.getActivity()
+					.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
 			tv_network_key.setText(preferences.getString("wlan_key", ""));
 		}
 
 		return v;
 	}
 
-
-
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 	}
-	
-	
-	
+
 	private Bitmap qrCode2Bitmap(BitMatrix qrcode) {
 
 		final int WHITE = 0x00EAEAEA;
@@ -228,98 +235,92 @@ public class NetworkInformationFragment extends Fragment {
 		bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
 		return bitmap;
 	}
+
 	
-	/**
-	 * Writes an NFC Tag
-	 * 
-	 * @param tag
-	 *            The reference to the tag
-	 * @param message
-	 *            the message which should be written on the message
-	 * @return true if successful, false otherwise
-	 */
-	public boolean writeTag(Tag tag, NdefMessage message) {
 
-		AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
-		alertDialog.setTitle("InstaCircle - write NFC Tag failed");
-		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
-				new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which) {
-				dialog.dismiss();
-			}
-		});
-		try {
-			// see if tag is already NDEF formatted
-			Ndef ndef = Ndef.get(tag);
-			if (ndef != null) {
-				ndef.connect();
-				if (!ndef.isWritable()) {
-					Log.d(this.getClass().getSimpleName(), "This tag is read only.");
-					alertDialog.setMessage("This tag is read only.");
-					alertDialog.show();
-					return false;
-				}
+	@Override
+	public void onClick(View view) {
+		if (view == btnWriteNfcTag) {
+			if (!nfcAdapter.isEnabled()) {
 
-				// work out how much space we need for the data
-				int size = message.toByteArray().length;
-				if (ndef.getMaxSize() < size) {
-					Log.d(this.getClass().getSimpleName(), "Tag doesn't have enough free space.");
-					alertDialog
-					.setMessage("Tag doesn't have enough free space.");
-					alertDialog.show();
-					return false;
-				}
+				// if nfc is available but deactivated ask the user whether he
+				// wants to enable it. If yes, redirect to the settings.
+				alertDialog = new AlertDialog.Builder(getActivity()).create();
+				alertDialog.setTitle(getResources().getString(
+						R.string.enable_nfc));
+				alertDialog.setMessage(getResources().getString(
+						R.string.enable_nfc_question));
+				alertDialog.setButton(AlertDialog.BUTTON_POSITIVE,
+						getResources().getString(R.string.yes),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+								dialog.dismiss();
+								startActivity(new Intent(
+										android.provider.Settings.ACTION_WIRELESS_SETTINGS));
+							}
+						});
+				alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE,
+						getResources().getString(R.string.no),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+								dialog.dismiss();
+							}
+						});
 
-				ndef.writeNdefMessage(message);
-				Log.d(this.getClass().getSimpleName(), "Tag written successfully.");
+				alertDialog
+						.setOnShowListener(new DialogInterface.OnShowListener() {
+							@Override
+							public void onShow(DialogInterface dialog) {
+								Utility.setTextColor(dialog, getResources()
+										.getColor(R.color.theme_color));
+								alertDialog
+										.getButton(AlertDialog.BUTTON_POSITIVE)
+										.setBackgroundResource(
+												R.drawable.selectable_background_votebartheme);
+								alertDialog
+										.getButton(AlertDialog.BUTTON_NEGATIVE)
+										.setBackgroundResource(
+												R.drawable.selectable_background_votebartheme);
+							}
+						});
+				alertDialog.show();
 
 			} else {
-				// attempt to format tag
-				NdefFormatable format = NdefFormatable.get(tag);
-				if (format != null) {
-					try {
-						format.connect();
-						format.format(message);
-						Log.d(this.getClass().getSimpleName(), "Tag written successfully!");
-					} catch (IOException e) {
-						alertDialog.setMessage("Unable to format tag to NDEF.");
-						alertDialog.show();
-						Log.d(this.getClass().getSimpleName(), "Unable to format tag to NDEF.");
-						return false;
+				// display a progress dialog waiting for the NFC tag to be
+				// tapped
+				writeNfcEnabled = true;
+				writeNfcTagDialog = new ProgressDialog(getActivity());
+				writeNfcTagDialog.setMessage(getResources().getString(
+						R.string.tap_nfc_tag));
+				writeNfcTagDialog.setCancelable(false);
+				writeNfcTagDialog.setButton(DialogInterface.BUTTON_NEGATIVE,
+						"Cancel", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog,
+									int which) {
+								writeNfcEnabled = false;
+								dialog.dismiss();
 
-					}
-				} else {
-					Log.d(this.getClass().getSimpleName(), "Tag doesn't appear to support NDEF format.");
-					alertDialog
-					.setMessage("Tag doesn't appear to support NDEF format.");
-					alertDialog.show();
-					return false;
-				}
+							}
+						});
+				writeNfcTagDialog
+						.setOnShowListener(new DialogInterface.OnShowListener() {
+							@Override
+							public void onShow(DialogInterface dialog) {
+								Utility.setTextColor(dialog, getResources()
+										.getColor(R.color.theme_color));
+								writeNfcTagDialog
+										.getButton(AlertDialog.BUTTON_NEGATIVE)
+										.setBackgroundResource(
+												R.drawable.selectable_background_votebartheme);
+							}
+						});
+
+				writeNfcTagDialog.show();
 			}
-		} catch (Exception e) {
-			Log.d(this.getClass().getSimpleName(), "Failed to write tag");
-			return false;
 		}
-		alertDialog.setTitle("InstaCircle");
-		alertDialog.setMessage("NFC Tag written successfully.");
-		alertDialog.show();
-		return true;
-	}
 
-	/**
-	 * Creates a custom MIME type encapsulated in an NDEF record
-	 * 
-	 * @param mimeType
-	 *            The string with the mime type name
-	 * @param payload content to put in record
-	 * @return a record containing the payload
-	 */
-	public NdefRecord createMimeRecord(String mimeType, byte[] payload) {
-		byte[] mimeBytes = mimeType.getBytes(Charset.forName("US-ASCII"));
-		NdefRecord mimeRecord = new NdefRecord(NdefRecord.TNF_MIME_MEDIA,
-				mimeBytes, new byte[0], payload);
-		return mimeRecord;
 	}
-	
 
 }

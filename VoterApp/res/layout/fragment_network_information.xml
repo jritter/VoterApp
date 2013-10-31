@@ -88,7 +88,16 @@
     <ImageView
         android:id="@+id/imageview_qrcode"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:contentDescription="@string/description_qrcode" />
+    
+    <Button
+            android:id="@+id/button_write_nfc_tag"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="40dip"
+            android:text="@string/write_nfc_tag"
+            style="@style/MainButtons" />
 
 </LinearLayout>

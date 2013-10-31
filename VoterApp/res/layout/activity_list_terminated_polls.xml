@@ -5,14 +5,12 @@
     android:orientation="vertical" >
 
     <TextView
-        android:id="@+id/textview_list_polls_title"
+        android:id="@+id/textview_identification"
+        style="?android:attr/listSeparatorTextViewStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin"
-        android:gravity="center_vertical|center_horizontal"
-        android:minHeight="70dp"
-        android:text="@string/list_polls_title"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:gravity="center_vertical"
+        android:text="@string/archived_votes" />
 
     <ListView
         android:id="@+id/listview_polls"

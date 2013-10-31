@@ -20,7 +20,7 @@
     <string name="network_info">Network information</string>
     <string name="not_connected">No network set up</string>
     <string name="help">Help</string>
-    <string name="networks">Network connection</string>
+    <string name="networks">Network Connection for Voting</string>
     <string name="empty_vote">Empty vote</string>
     <string name="dialog_wait_wifi">Please wait...</string>
     <string name="button_use_actual_ssid">Use network \" %1$s \"</string>
@@ -61,11 +61,15 @@
     <string name="delete_option">Delete Option</string>
     <string name="content">Content</string>
     <string name="allow_empty_vote">Allow empty votes</string>
-    <string name="networks">Networks</string>
     <string name="identification">Your identification</string>
     <string name="next">Next</string>
     <string name="recreate_network">Modify</string>
     <string name="question">Question</string>
+    <string name="tap_nfc_tag">Please tap a writeable NFC Tag on the back of your device</string>
+    <string name="enable_nfc">Enable NFC</string>
+    <string name="enable_nfc_question">In order to use this feature, NFC must be enabled. Enable now?</string>
+    <string name="archived_votes">Archived Votes</string>
+    <string name="result_chart">Result Chart</string>
 
     <!-- Action bar titles -->
     <string name="action_rescan_wifi">Rescan Wifi Networks</string>
@@ -100,8 +104,14 @@
     <string name="dialog_title_network_lost">Group connection lost!</string>
     <string name="dialog_network_lost">The network connection has been lost. The vote will be interrupted.</string>
     <string name="taost_password_letter">The password must start with a letter.</string>
-    <string name="dialog_title_confirm_vote">Confirm your vote.</string>
-    <string name="dialog_confirm_vote">You have selected the following option:\n\n%1$s\n\nDo you want to confirm your choice and send your vote?</string>
+    <string name="dialog_title_confirm_vote">Confirm your vote</string>
+    
+    <string name="dialog_confirm_vote">
+        <![CDATA[
+			You have selected the following option:<br /><br /><b>%1$s</b><br /><br />Do you want to confirm your choice and send your vote?"
+		]]>
+    </string>  
+        
     <string name="toast_poll_saved">Vote has been saved.</string>
     <string name="toast_poll_updated">Vote has been updated.</string>
     <string name="toast_question_empty">Question cannot be empty.</string>
@@ -141,13 +151,13 @@
     <string name="app_name">VotingLib</string>
     <string name="title_activity_wait_for_votes">Waiting...</string>
     <string name="title_activity_vote">Vote</string>
-    <string name="title_activity_list_terminated_polls">Vote Archives</string>
+    <string name="title_activity_list_terminated_polls">Vote Archive</string>
     <string name="title_activity_display_result">Vote Results</string>
     <string name="title_activity_network_informations">Network Information</string>
     <string name="title_activity_create_network">Create a network</string>
     <string name="title_activity_poll">Vote Administration</string>
     <string name="title_activity_network_config">Network Configuration</string>
-    <string name="title_activity_poll_detail">Vote Detail</string>
+    <string name="title_activity_poll_detail">Vote Setup</string>
     <string name="title_activity_electorate">Choose electorate</string>
     <string name="title_activity_review_poll">Vote review</string>
     <string name="title_activity_wait_for_votes_admin">Waiting...</string>
