@@ -226,8 +226,9 @@ public class AdhocWifiManager {
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
-			d.setTitle("Connecting to Network " + ssid + "...");
+			//d.setTitle("Connecting to Network " + ssid + "...");
 			d.setMessage("...please wait a moment.");
+			d.setProgressStyle(ProgressDialog.THEME_HOLO_LIGHT);
 			d.setOnShowListener(new DialogInterface.OnShowListener() {
 				@Override
 				public void onShow(DialogInterface dialog) {

@@ -1,0 +1,13 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+    
+    <fragment
+        android:id="@+id/fragment_result_chart"
+        android:name="ch.bfh.evoting.voterapp.fragment.ResultChartFragment"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:layout_margin="@dimen/margin" />
+
+</LinearLayout>

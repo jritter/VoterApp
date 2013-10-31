@@ -5,6 +5,7 @@ import java.util.List;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -101,7 +102,7 @@ public class VoteOptionListAdapter extends ArrayAdapter<Option> {
 					Option op = getItemSelected();
 
 					builder.setTitle(R.string.dialog_title_confirm_vote);
-					builder.setMessage(context.getString(R.string.dialog_confirm_vote, op.getText()));
+					builder.setMessage(Html.fromHtml(context.getString(R.string.dialog_confirm_vote, op.getText())));
 
 					// Create the AlertDialog
 					dialogConfirmVote = builder.create();
