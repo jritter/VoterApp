@@ -20,6 +20,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
+import android.widget.Toast;
 
 /**
  * Class representing the application. This class is used to do some initializations and to share data.
@@ -131,6 +132,7 @@ public class AndroidApplication extends Application {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if(currentActivity!=null && ni.getNetworkName()!=null){
+				if(voteRunning){
 				AlertDialog.Builder builder = new AlertDialog.Builder(currentActivity);
 				// Add the buttons
 				builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -156,6 +158,10 @@ public class AndroidApplication extends Application {
 				
 				// Create the AlertDialog
 				dialogNetworkLost.show();
+				} else {
+					for(int i=0; i < 2; i++)
+						Toast.makeText(currentActivity, getResources().getString(R.string.toast_network_lost), Toast.LENGTH_SHORT).show();
+				}
 				ni.disconnect();
 			}
 		}

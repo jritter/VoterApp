@@ -102,10 +102,11 @@
     <string name="not_included_title">Your are not in the electorate</string>
     <string name="not_included">You were not included in the electorate. So, you cannot participate to the vote. You will be redirected to the main screen.</string>
     <string name="dialog_title_network_lost">Group connection lost!</string>
-    <string name="dialog_network_lost">The network connection has been lost. The vote will be interrupted.</string>
+    <string name="dialog_network_lost">The group connection has been lost. The vote will be interrupted.</string>
     <string name="taost_password_letter">The password must start with a letter.</string>
     <string name="dialog_title_confirm_vote">Confirm your vote</string>
-    
+    <string name="toast_network_lost">You have been disconnected from the group.</string>
+  
     <string name="dialog_confirm_vote">
         <![CDATA[
 			You have selected the following option:<br /><br /><b>%1$s</b><br /><br />Do you want to confirm your choice and send your vote?"
