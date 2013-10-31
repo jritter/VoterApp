@@ -324,7 +324,8 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 			}
 		}
 		if(finalParticipants.size()<2){
-			Toast.makeText(this, R.string.toast_not_enough_participant_selected, Toast.LENGTH_SHORT).show();
+			for(int i=0; i < 2; i++)
+				Toast.makeText(this, R.string.toast_not_enough_participant_selected, Toast.LENGTH_SHORT).show();
 			return;
 		}
 		poll.setParticipants(finalParticipants);

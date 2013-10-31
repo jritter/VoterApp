@@ -448,16 +448,19 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 
 		//Check if it is complete
 		if(poll.getQuestion()==null || poll.getQuestion().equals("")){
-			Toast.makeText(this, getString(R.string.toast_question_empty), Toast.LENGTH_SHORT).show();
+			for(int i=0; i < 2; i++)
+				Toast.makeText(this, getString(R.string.toast_question_empty), Toast.LENGTH_SHORT).show();
 			return;
 		}
 		if(poll.getOptions().size()<2){
-			Toast.makeText(this, getString(R.string.toast_not_enough_options), Toast.LENGTH_SHORT).show();
+			for(int i=0; i < 2; i++)
+				Toast.makeText(this, getString(R.string.toast_not_enough_options), Toast.LENGTH_SHORT).show();
 			return;
 		}
 		for(Option o : poll.getOptions()){
 			if(o.getText()==null || o.getText().equals("")){
-				Toast.makeText(this, getString(R.string.toast_option_empty), Toast.LENGTH_SHORT).show();
+				for(int i=0; i < 2; i++)
+					Toast.makeText(this, getString(R.string.toast_option_empty), Toast.LENGTH_SHORT).show();
 				return;
 			}
 		}

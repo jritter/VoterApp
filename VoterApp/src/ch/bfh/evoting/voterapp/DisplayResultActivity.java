@@ -224,7 +224,8 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 			i.putExtra("pollid", pollId);
 			startActivity(i);
 		} catch (DatabaseException e) {
-			Toast.makeText(DisplayResultActivity.this, getString(R.string.redo_impossible), Toast.LENGTH_LONG).show();
+			for(int i=0; i < 2; i++)
+				Toast.makeText(DisplayResultActivity.this, getString(R.string.redo_impossible), Toast.LENGTH_LONG).show();
 			e.printStackTrace();
 		}
 	}

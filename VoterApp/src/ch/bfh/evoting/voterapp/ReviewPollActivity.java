@@ -131,8 +131,8 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 	private void startVotePeriod() {
 		for (Participant p : poll.getParticipants().values()) {
 			if (!p.hasAcceptedReview()) {
-				Toast.makeText(this, R.string.toast_not_everybody_accepted,
-						Toast.LENGTH_LONG).show();
+				for(int i=0; i < 2; i++)
+					Toast.makeText(this, R.string.toast_not_everybody_accepted,	Toast.LENGTH_LONG).show();
 				return;
 			}
 		}
