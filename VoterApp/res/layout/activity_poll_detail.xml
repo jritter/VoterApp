@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="@string/hint_enter_question"
-        android:inputType="textMultiLine" >
+        android:inputType="textMultiLine|textCapSentences" >
 
         <requestFocus />
     </EditText>
@@ -72,7 +72,7 @@
             android:ems="10"
             android:gravity="top"
             android:hint="@string/hint_enter_option"
-            android:inputType="text" />
+            android:inputType="textCapSentences" />
 
         <ImageButton
             android:id="@+id/button_addoption"
@@ -93,17 +93,6 @@
         android:dividerPadding="8dp"
         android:orientation="horizontal"
         android:showDividers="middle" >
-
-        <!-- <Button
-            android:id="@+id/button_save_poll"
-            style="@style/BottomBar"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.18"
-            android:drawableLeft="@drawable/ic_action_save"
-            android:paddingLeft="16dp"
-            android:paddingRight="8dp"
-            android:text="@string/save" />  -->
 
         <Button
             android:id="@+id/button_start_poll"

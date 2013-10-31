@@ -50,7 +50,7 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 		if(getResources().getBoolean(R.bool.display_bottom_bar) == false){
 	        findViewById(R.id.layout_bottom_bar).setVisibility(View.GONE);
 	    }
-
+		
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		AndroidApplication.getInstance().setVoteRunning(false);
 		if(AndroidApplication.getInstance().isAdmin()){
@@ -174,6 +174,7 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 		
 		if(saveToDbNeeded){
 			menu.findItem(R.id.action_redo_vote).setTitle(R.string.redo_poll);
+			menu.findItem(R.id.action_redo_vote).setVisible(AndroidApplication.getInstance().isAdmin());
 		} else {
 			menu.findItem(R.id.action_redo_vote).setTitle(R.string.clone_poll);
 		}

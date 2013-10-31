@@ -38,8 +38,7 @@
             android:layout_below="@id/textview_identification"
             android:ems="10"
             android:hint="@string/your_identification"
-            android:inputType="textPersonName" >
-
+            android:inputType="textCapSentences|textPersonName">
         </EditText>
 
         <TextView
@@ -58,52 +57,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/textview_networks" >
-
         </RelativeLayout>
-        <!--
-             <fragment
-            android:id="@+id/fragment_network_list"
-            android:name="ch.bfh.evoting.votinglib.fragment.NetworkListFragment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_below="@id/separator_identification_2"
-            android:layout_centerHorizontal="true" />
-        -->
+       
     </RelativeLayout>
-
-    <!--
-    <LinearLayout
-        style="@style/ActionBar.Solid.Votebartheme"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:divider="?android:dividerVertical"
-        android:dividerPadding="8dp"
-        android:orientation="horizontal"
-        android:showDividers="middle" >
-
-            <Button
-	       android:id="@+id/button_rescan_wifi"
-	       style="@style/BottomBar"
-	       android:layout_width="0dp"
-	       android:layout_height="wrap_content"
-	       android:layout_weight="0.18"
-	       android:paddingLeft="16dp"
-	       android:paddingRight="16dp"
-	       android:drawableLeft="@drawable/ic_action_refresh"
-	       android:text="@string/rescan_wifi" />
-
-         <Button
-            android:id="@+id/button_scan_qrcode"
-            style="@style/BottomBar"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.18"
-            android:drawableLeft="@drawable/ic_action_camera"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:text="@string/scan_qrcode" />
-    </LinearLayout>
-    -->
 
 </LinearLayout>

@@ -21,7 +21,6 @@ import android.os.Bundle;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
 public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 
@@ -119,8 +118,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 
 	@Override
 	public void joinGroup(String groupName) {
-		Log.e("AJNetworkInterface", "Group name is "+groupName);
-		if(groupName==null || AndroidApplication.getInstance().isAdmin()){
+		if(AndroidApplication.getInstance().isAdmin()){
 			//Generate group name
 			int groupNumber = 1;
 			groupName = "group"+groupNumber;
