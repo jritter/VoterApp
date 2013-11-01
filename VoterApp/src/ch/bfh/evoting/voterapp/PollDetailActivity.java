@@ -181,19 +181,59 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 
 	}
 
-	/**
-	 * Set up the {@link android.app.ActionBar}.
-	 */
-	private void setupActionBar() {
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+	@Override
+	protected void onResume() {
+		AndroidApplication.getInstance().setCurrentActivity(this);
+		AndroidApplication.getInstance().setVoteRunning(false);
+		super.onResume();
 	}
 
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		super.onSaveInstanceState(savedInstanceState);
+		savedInstanceState.putSerializable("poll", poll);
+	}
+
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+
+		savedPoll = (Poll)savedInstanceState.getSerializable("poll");
+	}
+	
+	@Override
+	public void onBackPressed() {
+		askToSave();
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu items for use in the action bar
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.poll_detail, menu);
 		return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+	public void onClick(View view) {	
+		if (view == btnAddOption){ 
+			if (!etOption.getText().toString().equals("")){
+				Option option = new Option();
+				option.setText(etOption.getText().toString());
+				if(cbEmptyVote.isChecked()){
+					options.add(options.size()-1,option);
+				} else {
+					options.add(option);
+				}
+				poll.setOptions(options);
+				adapter.notifyDataSetChanged();
+				etOption.setText("");
+			}
+		}
+
+		if (view == btnStartPoll){
+			startVote();
+		}
 	}
 
 	@Override
@@ -220,7 +260,35 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 		return super.onOptionsItemSelected(item); 
 	}
 
+	@Override
+	public void afterTextChanged(Editable edit) {
+	}
 
+	@Override
+	public void beforeTextChanged(CharSequence s, int start, int count,
+			int after) {
+	}
+
+	@Override
+	public void onTextChanged(CharSequence s, int start, int before, int count) {
+			changesMade = true;
+	}
+	
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Set up the {@link android.app.ActionBar}.
+	 */
+	private void setupActionBar() {
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+	}
+
+	/**
+	 * Show the dialog asking if the user want to add the option in edition if there is one
+	 * and ask to save if changes have been made
+	 */
 	private void askToSave(){
 		if(!etOption.getText().toString().equals("")){
 			AlertDialog.Builder builder1 = new AlertDialog.Builder(this);
@@ -304,41 +372,9 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 		}
 	}
 
-	@Override
-	public void onClick(View view) {	
-		if (view == btnAddOption){ 
-			if (!etOption.getText().toString().equals("")){
-				Option option = new Option();
-				option.setText(etOption.getText().toString());
-				if(cbEmptyVote.isChecked()){
-					options.add(options.size()-1,option);
-				} else {
-					options.add(option);
-				}
-				poll.setOptions(options);
-				adapter.notifyDataSetChanged();
-				etOption.setText("");
-			}
-		}
-
-		if (view == btnStartPoll){
-			startVote();
-		}
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle savedInstanceState) {
-		super.onSaveInstanceState(savedInstanceState);
-		savedInstanceState.putSerializable("poll", poll);
-	}
-
-	@Override
-	public void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-
-		savedPoll = (Poll)savedInstanceState.getSerializable("poll");
-	}
-
+	/**
+	 * Save the poll in the database
+	 */
 	private void savePoll() {
 		poll.setQuestion(etQuestion.getText().toString());
 		poll.setOptions(options);
@@ -350,6 +386,9 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 		}
 	}
 
+	/**
+	 * Update the poll in the database
+	 */
 	private void updatePoll() {
 		poll.setQuestion(etQuestion.getText().toString());
 		poll.setOptions(options);
@@ -360,18 +399,10 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 		}
 	}
 
-	@Override
-	public void onBackPressed() {
-		askToSave();
-	}
-
-	@Override
-	protected void onResume() {
-		AndroidApplication.getInstance().setCurrentActivity(this);
-		AndroidApplication.getInstance().setVoteRunning(false);
-		super.onResume();
-	}
-
+	/**
+	 * Network interface can be null since it is created in an async task, so we wait until the task is completed
+	 * @param methodToExecute the callback to execute when the network information is created
+	 */
 	private void waitForNetworkInterface(final Callable<Void> methodToExecute){
 		//Network interface can be null since it is created in an async task, so we wait until the task is completed
 		if(AndroidApplication.getInstance().getNetworkInterface()==null){
@@ -407,6 +438,10 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 		}
 	}
 
+	/**
+	 * Shows the Network Configuration or Network Information activity
+	 * @return
+	 */
 	private Void goToNetworkConfig(){
 		//then start next activity
 		if(AndroidApplication.getInstance().getNetworkInterface().getGroupName()==null){
@@ -421,12 +456,19 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 		return null;
 	}
 
+	/**
+	 * Show the dialog containing the network informations
+	 * @return
+	 */
 	private Void showNetworkInfoDialog(){
 		NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();			
 		ndf.show( getFragmentManager( ), "networkInfo" );
 		return null;
 	}
 
+	/**
+	 * Start the vote phase
+	 */
 	private void startVote() {
 		if(!etOption.getText().toString().equals("")){
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -490,19 +532,5 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 				return goToNetworkConfig();
 			}
 		});
-	}
-
-	@Override
-	public void afterTextChanged(Editable edit) {
-	}
-
-	@Override
-	public void beforeTextChanged(CharSequence s, int start, int count,
-			int after) {
-	}
-
-	@Override
-	public void onTextChanged(CharSequence s, int start, int before, int count) {
-			changesMade = true;
 	}
 }

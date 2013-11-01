@@ -102,6 +102,10 @@ public class MainActivity extends Activity implements OnClickListener {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+	
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
 
 	private void waitForNetworkInterface(final Callable<Void> methodToExecute){
 		//Network interface can be null since it is created in an async task, so we wait until the task is completed

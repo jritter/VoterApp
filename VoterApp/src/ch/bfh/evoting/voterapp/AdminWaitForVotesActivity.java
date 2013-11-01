@@ -48,6 +48,12 @@ public class AdminWaitForVotesActivity extends ListActivity implements OnClickLi
 		btnStopPoll = (Button) findViewById(R.id.button_stop_poll);
 		btnStopPoll.setOnClickListener(this);
 	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		AndroidApplication.getInstance().setCurrentActivity(this);
+	}
 
 	@Override
 	public void onBackPressed() {
@@ -116,11 +122,10 @@ public class AdminWaitForVotesActivity extends ListActivity implements OnClickLi
 
 	}
 	
-	protected void onResume() {
-		super.onResume();
-		AndroidApplication.getInstance().setCurrentActivity(this);
-	}
 	
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
 
 	private void finishVote(){
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);

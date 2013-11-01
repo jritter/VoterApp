@@ -30,6 +30,12 @@ public class WaitForVotesActivity extends ListActivity {
 
 		setContentView(R.layout.activity_wait_for_votes);
 	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		AndroidApplication.getInstance().setCurrentActivity(this);
+	}
 
 	@Override
 	public void onBackPressed() {
@@ -73,12 +79,5 @@ public class WaitForVotesActivity extends ListActivity {
 		getMenuInflater().inflate(R.menu.wait_for_votes, menu);
 		return true;
 	}
-	
-	@Override
-	protected void onResume() {
-		super.onResume();
-		AndroidApplication.getInstance().setCurrentActivity(this);
-	}
-	
 
 }

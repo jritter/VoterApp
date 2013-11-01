@@ -159,7 +159,47 @@ public class NetworkOptionsFragment extends Fragment {
 
 		return v;
 	}
+	
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+	}
+	
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch(requestCode){
 
+		case DIALOG_FRAGMENT:
+
+			WifiManager wifiManager = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
+			AdhocWifiManager adhoc = new AdhocWifiManager(wifiManager);
+
+			if (resultCode == Activity.RESULT_OK) {
+
+				adhoc.connectToNetwork(this.getCurrentSsid(this.getActivity()),
+						((ConnectNetworkDialogFragment) dialogFragment).getNetworkKey(),
+						getActivity());
+
+
+				dialogFragment.dismiss();
+			} else if (resultCode == Activity.RESULT_CANCELED){
+				dialogFragment.dismiss();
+			}
+
+			break;
+		default:
+			activity.onActivityResult(requestCode, resultCode, data);
+		}
+	}
+	
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
+
+	/**
+	 * Controls if identification is empty and shows a dialog
+	 * @return true if identification was filled, false otherwise
+	 */
 	private boolean checkIdentification() {
 		if(((NetworkConfigActivity)this.getActivity()).getIdentification().equals("")){
 			//show dialog
@@ -195,41 +235,11 @@ public class NetworkOptionsFragment extends Fragment {
 		return true;
 	}
 
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		switch(requestCode){
-
-		case DIALOG_FRAGMENT:
-
-			WifiManager wifiManager = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
-			AdhocWifiManager adhoc = new AdhocWifiManager(wifiManager);
-
-			if (resultCode == Activity.RESULT_OK) {
-
-				adhoc.connectToNetwork(this.getCurrentSsid(this.getActivity()),
-						((ConnectNetworkDialogFragment) dialogFragment).getNetworkKey(),
-						getActivity());
-
-
-				dialogFragment.dismiss();
-			} else if (resultCode == Activity.RESULT_CANCELED){
-				dialogFragment.dismiss();
-			}
-
-			break;
-		default:
-			activity.onActivityResult(requestCode, resultCode, data);
-		}
-	}
-
-
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-	}
-
-
+	/**
+	 * Return the ssid of the currently connected network
+	 * @param context android context
+	 * @return the ssid of the currently connected network
+	 */
 	public String getCurrentSsid(Context context) {
 		String ssid = null;
 		ConnectivityManager connManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

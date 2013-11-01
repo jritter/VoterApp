@@ -163,6 +163,21 @@ public class PollReviewFragment extends ListFragment {
 		super.onDestroy();
 	}
 
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		super.onSaveInstanceState(savedInstanceState);
+		savedInstanceState.putSerializable("poll", poll);
+	}
+	
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Indicate if the peer identified with the given string is contained in the list of participants
+	 * @param uniqueId identifier of the peer
+	 * @return true if it is contained in the list of participants, false otherwise
+	 */
 	private boolean isContainedInParticipants(String uniqueId){
 		for(Participant p : poll.getParticipants().values()){
 			if(p.getUniqueId().equals(uniqueId)){
@@ -170,12 +185,6 @@ public class PollReviewFragment extends ListFragment {
 			}
 		}
 		return false;
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle savedInstanceState) {
-		super.onSaveInstanceState(savedInstanceState);
-		savedInstanceState.putSerializable("poll", poll);
 	}
 
 }

@@ -70,11 +70,6 @@ public class NetworkListFragment extends ListFragment implements OnItemClickList
 		public void onItemSelected(String id);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.support.v4.app.Fragment#onCreate(android.os.Bundle)
-	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -82,12 +77,6 @@ public class NetworkListFragment extends ListFragment implements OnItemClickList
 		
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.support.v4.app.ListFragment#onViewCreated(android.view.View,
-	 * android.os.Bundle)
-	 */
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
@@ -185,13 +174,7 @@ public class NetworkListFragment extends ListFragment implements OnItemClickList
 		getActivity().registerReceiver(wifibroadcastreceiver,
 				new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.support.v4.app.Fragment#onSaveInstanceState(android.os.Bundle)
-	 */
+	
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
@@ -199,31 +182,15 @@ public class NetworkListFragment extends ListFragment implements OnItemClickList
 			outState.putInt(STATE_ACTIVATED_POSITION, mActivatedPosition);
 		}
 	}
-
-	public void setActivateOnItemClick(boolean activateOnItemClick) {
-		getListView().setChoiceMode(
-				activateOnItemClick ? ListView.CHOICE_MODE_SINGLE
-						: ListView.CHOICE_MODE_NONE);
-	}
-
 	
-	public void setActivatedPosition(int position) {
-		if (position == ListView.INVALID_POSITION) {
-			getListView().setItemChecked(mActivatedPosition, false);
-		} else {
-			getListView().setItemChecked(position, true);
-		}
-
-		mActivatedPosition = position;
+	@Override
+	public void onDestroy() {
+		// Unregister since the activity is about to be closed.
+		getActivity().unregisterReceiver(wifibroadcastreceiver);
+		super.onDestroy();
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget
-	 * .AdapterView, android.view.View, int, long)
-	 */
+	@Override
 	public void onItemClick(AdapterView<?> listview, View view, int position,
 			long id) {
 
@@ -262,18 +229,6 @@ public class NetworkListFragment extends ListFragment implements OnItemClickList
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.support.v4.app.Fragment#onDestroy()
-	 */
-	@Override
-	public void onDestroy() {
-		// Unregister since the activity is about to be closed.
-		getActivity().unregisterReceiver(wifibroadcastreceiver);
-		super.onDestroy();
-	}
-
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch(requestCode){
@@ -297,5 +252,29 @@ public class NetworkListFragment extends ListFragment implements OnItemClickList
             break;
 		}
 	}
+
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
+	
+	public void setActivateOnItemClick(boolean activateOnItemClick) {
+		getListView().setChoiceMode(
+				activateOnItemClick ? ListView.CHOICE_MODE_SINGLE
+						: ListView.CHOICE_MODE_NONE);
+	}
+
+	
+	public void setActivatedPosition(int position) {
+		if (position == ListView.INVALID_POSITION) {
+			getListView().setItemChecked(mActivatedPosition, false);
+		} else {
+			getListView().setItemChecked(position, true);
+		}
+
+		mActivatedPosition = position;
+	}
+	
+	
+	
 
 }

@@ -125,37 +125,6 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		super.onNewIntent(intent);
 	}
 
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case android.R.id.home:
-			// This ID represents the Home or Up button. In the case of this
-			// activity, the Up button is shown. Use NavUtils to allow users
-			// to navigate up one level in the application structure. For
-			// more details, see the Navigation pattern on Android Design:
-			//
-			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
-			//
-			NavUtils.navigateUpFromSameTask(this);
-			return true;
-		case R.id.network_info:
-			NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();			
-			ndf.show( getFragmentManager( ), "networkInfo" );
-			return true;
-		case R.id.help:
-			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_electorate), getString(R.string.help_text_electorate) );
-			hdf.show( getFragmentManager( ), "help" );
-			return true;
-		case R.id.action_next:
-			next();
-			return true;
-		}
-		return super.onOptionsItemSelected(item); 
-	}
-
-
-
 	@Override
 	protected void onResume() {
 
@@ -177,8 +146,6 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		super.onResume();
 	}
 
-	
-
 	@Override
 	protected void onPause() {
 		active = false;
@@ -196,28 +163,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		super.onRestoreInstanceState(savedInstanceState);
 		poll = (Poll)savedInstanceState.getSerializable("poll");
 	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.electorate, menu);
-		return true;
-	}
-
-	/**
-	 * Set up the {@link android.app.ActionBar}.
-	 */
-	private void setupActionBar() {
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-	}
-
-	@Override
-	public void onClick(View view) {
-		if (view == btnNext){
-			next();
-		}	
-	}
-
+	
 	@Override
 	public void onBackPressed() {
 		//Show a dialog to ask confirmation to quit vote 
@@ -257,7 +203,62 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		dialogBack.show();
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			// This ID represents the Home or Up button. In the case of this
+			// activity, the Up button is shown. Use NavUtils to allow users
+			// to navigate up one level in the application structure. For
+			// more details, see the Navigation pattern on Android Design:
+			//
+			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
+			//
+			NavUtils.navigateUpFromSameTask(this);
+			return true;
+		case R.id.network_info:
+			NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();			
+			ndf.show( getFragmentManager( ), "networkInfo" );
+			return true;
+		case R.id.help:
+			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_electorate), getString(R.string.help_text_electorate) );
+			hdf.show( getFragmentManager( ), "help" );
+			return true;
+		case R.id.action_next:
+			next();
+			return true;
+		}
+		return super.onOptionsItemSelected(item); 
+	}
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.electorate, menu);
+		return true;
+	}
+
+	@Override
+	public void onClick(View view) {
+		if (view == btnNext){
+			next();
+		}	
+	}
+	
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
+
+	/**
+	 * Set up the {@link android.app.ActionBar}.
+	 */
+	private void setupActionBar() {
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+	}
+
+	/**
+	 * Method called when a modification has occured in the list of participants in the group
+	 */
 	private void updateFromNetwork(){
 		Map<String,Participant> newReceivedMapOfParticipants = AndroidApplication.getInstance().getNetworkInterface().getGroupParticipants();
 		for(String ip : newReceivedMapOfParticipants.keySet()){
@@ -291,6 +292,9 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		npa.notifyDataSetChanged();
 	}
 
+	/**
+	 * Method called to initialize a periodic send of the list of participants in the group 
+	 */
 	private void startPeriodicSend(){
 
 		if(resendElectorate!=null && !resendElectorate.isCancelled()){
@@ -316,6 +320,9 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
 	
+	/**
+	 * Method called when pushing on the Next button
+	 */
 	private void next() {
 		Map<String,Participant> finalParticipants = new TreeMap<String,Participant>(new UniqueIdComparator());
 		for(Participant p: participants.values()){

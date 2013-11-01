@@ -85,20 +85,18 @@ public class PollActivity extends Activity implements OnItemClickListener {
 
 	}
 
-	/**
-	 * Set up the {@link android.app.ActionBar}.
-	 */
-	private void setupActionBar() {
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+	@Override
+	protected void onResume() {
+		AndroidApplication.getInstance().setCurrentActivity(this);
+		super.onResume();
 	}
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.poll, menu);
 		return true;
 	}
-
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -148,12 +146,7 @@ public class PollActivity extends Activity implements OnItemClickListener {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
-	private void showNetworkInfoDialog(){
-		NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();			
-		ndf.show( getFragmentManager( ), "networkInfo" );
-	}
-
+	
 	@Override
 	public void onItemClick(AdapterView<?> listview, View view, int position,
 			long id) {
@@ -168,11 +161,25 @@ public class PollActivity extends Activity implements OnItemClickListener {
 		}
 
 	}
-
-	@Override
-	protected void onResume() {
-		AndroidApplication.getInstance().setCurrentActivity(this);
-		super.onResume();
+	
+	
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
+	
+	
+	/**
+	 * Set up the {@link android.app.ActionBar}.
+	 */
+	private void setupActionBar() {
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
+	/**
+	 * Shows the dialog containing the network informations 
+	 */
+	private void showNetworkInfoDialog(){
+		NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();			
+		ndf.show( getFragmentManager( ), "networkInfo" );
+	}
 }

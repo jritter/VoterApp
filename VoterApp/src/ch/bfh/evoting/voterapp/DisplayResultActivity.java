@@ -109,33 +109,39 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 		}
 
 	}
-
-	/**
-	 * Set up the {@link android.app.ActionBar}.
-	 */
-	private void setupActionBar() {
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+	
+	@Override
+	public void onBackPressed() {
+		if(!this.saveToDbNeeded){
+			super.onBackPressed();
+		} else {
+			Intent i = new Intent(this, MainActivity.class);
+			i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | 
+					Intent.FLAG_ACTIVITY_CLEAR_TASK |
+					Intent.FLAG_ACTIVITY_NEW_TASK);
+			startActivity(i);
+		}
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		AndroidApplication.getInstance().setVoteRunning(false);
+		AndroidApplication.getInstance().setCurrentActivity(this);
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		super.onSaveInstanceState(savedInstanceState);
+		savedInstanceState.putSerializable("poll", poll);
 	}
 
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		poll = (Poll)savedInstanceState.getSerializable("poll");
+	}
 
-		@Override
-		public void onBackPressed() {
-			if(!this.saveToDbNeeded){
-				super.onBackPressed();
-			} else {
-				Intent i = new Intent(this, MainActivity.class);
-				i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | 
-						Intent.FLAG_ACTIVITY_CLEAR_TASK |
-						Intent.FLAG_ACTIVITY_NEW_TASK);
-				startActivity(i);
-			}
-		}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
-	 */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -166,7 +172,6 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 		return true;
 	}
 
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -181,24 +186,6 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 		return true;
 	}
 	
-	protected void onResume() {
-		super.onResume();
-		AndroidApplication.getInstance().setVoteRunning(false);
-		AndroidApplication.getInstance().setCurrentActivity(this);
-	}
-	
-	@Override
-	public void onSaveInstanceState(Bundle savedInstanceState) {
-		super.onSaveInstanceState(savedInstanceState);
-		savedInstanceState.putSerializable("poll", poll);
-	}
-
-	@Override
-	public void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-		poll = (Poll)savedInstanceState.getSerializable("poll");
-	}
-
 	@Override
 	public void onClick(View view) {
 		if (view == btnRedo){
@@ -206,6 +193,21 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 		}
 	}
 	
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Set up the {@link android.app.ActionBar}.
+	 */
+	private void setupActionBar() {
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+	}
+	
+	/**
+	 * Method called when the admin want to repeat the poll directly after its finition
+	 * or if someone want to clone a poll
+	 */
 	private void redoVote () {
 		Poll newPoll = new Poll();
 		newPoll.setQuestion(poll.getQuestion());

@@ -88,14 +88,12 @@ public class ListTerminatedPollsActivity extends Activity {
 		});
 
 	}
-
-	/**
-	 * Set up the {@link android.app.ActionBar}.
-	 */
-	private void setupActionBar() {
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+	
+	@Override
+	protected void onResume() {
+		AndroidApplication.getInstance().setCurrentActivity(this);
+		super.onResume();
 	}
-
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -114,9 +112,7 @@ public class ListTerminatedPollsActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
-
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -124,13 +120,6 @@ public class ListTerminatedPollsActivity extends Activity {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget
-	 * .AdapterView, android.view.View, int, long)
-	 */
 	public void onItemClick(AdapterView<?> listview, View view, int position, long id) {
 
 		// extract the object assigned to the position which has been clicked
@@ -143,9 +132,15 @@ public class ListTerminatedPollsActivity extends Activity {
 		startActivity(intent);
 	}
 	
-	protected void onResume() {
-		AndroidApplication.getInstance().setCurrentActivity(this);
-		super.onResume();
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Set up the {@link android.app.ActionBar}.
+	 */
+	private void setupActionBar() {
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
-
+	
 }

@@ -122,13 +122,36 @@ public class CheckElectorateActivity extends ListActivity {
 
 	}
 	
-	/**
-	 * Set up the {@link android.app.ActionBar}.
-	 */
-	private void setupActionBar() {
+	@Override
+	protected void onResume() {
+		super.onResume();
+		AndroidApplication.getInstance().setVoteRunning(true);
+		AndroidApplication.getInstance().setCurrentActivity(this);
+	}
+	
+	@Override
+	public void onBackPressed() {
+		//Show a dialog to ask confirmation to quit vote 
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		// Add the buttons
+		builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialogBack.dismiss();
+				CheckElectorateActivity.super.onBackPressed();
+			}
+		});
+		builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialogBack.dismiss();
+			}
+		});
 
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+		builder.setTitle(R.string.dialog_title_back);
+		builder.setMessage(this.getString(R.string.dialog_back));
 
+		// Create the AlertDialog
+		dialogBack = builder.create();
+		dialogBack.show();
 	}
 	
 	@Override
@@ -163,35 +186,17 @@ public class CheckElectorateActivity extends ListActivity {
 		return super.onOptionsItemSelected(item);
 	}
 	
-	@Override
-	public void onBackPressed() {
-		//Show a dialog to ask confirmation to quit vote 
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		// Add the buttons
-		builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				dialogBack.dismiss();
-				CheckElectorateActivity.super.onBackPressed();
-			}
-		});
-		builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				dialogBack.dismiss();
-			}
-		});
-
-		builder.setTitle(R.string.dialog_title_back);
-		builder.setMessage(this.getString(R.string.dialog_back));
-
-		// Create the AlertDialog
-		dialogBack = builder.create();
-		dialogBack.show();
-	}
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
 	
-	protected void onResume() {
-		super.onResume();
-		AndroidApplication.getInstance().setVoteRunning(true);
-		AndroidApplication.getInstance().setCurrentActivity(this);
+	/**
+	 * Set up the {@link android.app.ActionBar}.
+	 */
+	private void setupActionBar() {
+
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+
 	}
 	
 }

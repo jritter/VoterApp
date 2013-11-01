@@ -62,6 +62,12 @@ public class ReviewPollVoterActivity extends Activity {
 	}
 	
 	@Override
+	protected void onResume() {
+		super.onResume();
+		AndroidApplication.getInstance().setCurrentActivity(this);
+	}
+	
+	@Override
 	protected void onDestroy() {
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(pollReceiver);
 		super.onDestroy();
@@ -108,12 +114,6 @@ public class ReviewPollVoterActivity extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-	
-	@Override
-	protected void onResume() {
-		super.onResume();
-		AndroidApplication.getInstance().setCurrentActivity(this);
 	}
 	
 }

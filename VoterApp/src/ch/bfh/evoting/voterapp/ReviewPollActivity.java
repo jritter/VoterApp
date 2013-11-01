@@ -59,6 +59,24 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 		}
 
 	}
+	
+	@Override
+	protected void onResume() {
+		AndroidApplication.getInstance().setCurrentActivity(this);
+		super.onResume();
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		super.onSaveInstanceState(savedInstanceState);
+		savedInstanceState.putSerializable("poll", poll);
+	}
+
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		poll = (Poll) savedInstanceState.getSerializable("poll");
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -67,13 +85,7 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 		return true;
 	}
 
-	/**
-	 * Set up the {@link android.app.ActionBar}.
-	 */
-	private void setupActionBar() {
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-	}
-
+	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -94,6 +106,31 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 		return super.onOptionsItemSelected(item);
 	}
 
+	@Override
+	public void onClick(View view) {
+		if (view == btnStartPollPeriod) {
+			startVotePeriod();
+		}
+	}
+
+	
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
+	
+	
+	/**
+	 * Set up the {@link android.app.ActionBar}.
+	 */
+	private void setupActionBar() {
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+	}
+	
+	/**
+	 * Indicate if the peer identified with the given string is contained in the list of participants
+	 * @param uniqueId identifier of the peer
+	 * @return true if it is contained in the list of participants, false otherwise
+	 */
 	private boolean isContainedInParticipants(String uniqueId) {
 		for (Participant p : poll.getParticipants().values()) {
 			if (p.getUniqueId().equals(uniqueId)) {
@@ -102,32 +139,10 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 		}
 		return false;
 	}
-
-	@Override
-	public void onClick(View view) {
-		if (view == btnStartPollPeriod) {
-			startVotePeriod();
-		}
-	}
-
-	@Override
-	protected void onResume() {
-		AndroidApplication.getInstance().setCurrentActivity(this);
-		super.onResume();
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle savedInstanceState) {
-		super.onSaveInstanceState(savedInstanceState);
-		savedInstanceState.putSerializable("poll", poll);
-	}
-
-	@Override
-	public void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-		poll = (Poll) savedInstanceState.getSerializable("poll");
-	}
-
+	
+	/**
+	 * Start the vote phase
+	 */
 	private void startVotePeriod() {
 		for (Participant p : poll.getParticipants().values()) {
 			if (!p.hasAcceptedReview()) {

@@ -41,8 +41,6 @@ public class AndroidApplication extends Application {
 	
 	private AlertDialog dialogNetworkLost;
 
-
-
 	/**
 	 * Return the single instance of this class
 	 * @return the single instance of this class
@@ -69,7 +67,19 @@ public class AndroidApplication extends Application {
 		LocalBroadcastManager.getInstance(this).registerReceiver(mAttackDetecter, new IntentFilter(BroadcastIntentTypes.attackDetected));
 		LocalBroadcastManager.getInstance(this).registerReceiver(startPollReceiver, new IntentFilter(BroadcastIntentTypes.electorate));
 	}
+	
+	@Override
+	public void onTerminate() {
+		if(this.ni!=null)
+			this.ni.disconnect();
+		super.onTerminate();
+	}
 
+
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
+	
 	/**
 	 * Initialize the Serialization method and the Network Component to use
 	 */
@@ -88,6 +98,10 @@ public class AndroidApplication extends Application {
 
 	}
 
+	/*--------------------------------------------------------------------------------------------
+	 * Getters/Setters
+	--------------------------------------------------------------------------------------------*/
+	
 	/**
 	 * Get the serialization helper
 	 * @return the serialization helper
@@ -124,7 +138,20 @@ public class AndroidApplication extends Application {
 	public boolean isVoteRunning(){
 		return voteRunning;
 	}
+	
+	public boolean isAdmin() {
+		return isAdmin;
+	}
 
+	public void setIsAdmin(boolean isAdmin) {
+		this.isAdmin = isAdmin;
+	}
+
+
+	/*--------------------------------------------------------------------------------------------
+	 * Broadcast receivers
+	--------------------------------------------------------------------------------------------*/
+	
 	/**
 	 * this broadcast receiver listens for information about the network group destruction
 	 */
@@ -215,21 +242,5 @@ public class AndroidApplication extends Application {
 			}
 		}
 	};
-
-
-	@Override
-	public void onTerminate() {
-		if(this.ni!=null)
-			this.ni.disconnect();
-		super.onTerminate();
-	}
-
-	public boolean isAdmin() {
-		return isAdmin;
-	}
-
-	public void setIsAdmin(boolean isAdmin) {
-		this.isAdmin = isAdmin;
-	}
 
 }

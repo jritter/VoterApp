@@ -239,15 +239,6 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 		super.onResume();
 	}
 
-	/**
-	 * Set up the {@link android.app.ActionBar}.
-	 */
-	private void setupActionBar() {
-
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-
-	}
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -300,6 +291,19 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
 	}
 
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Set up the {@link android.app.ActionBar}.
+	 */
+	private void setupActionBar() {
+
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+
+	}
+	
 	/**
 	 * This method is used to extract the name of the device owner
 	 * 
