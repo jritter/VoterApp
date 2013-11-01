@@ -5,6 +5,7 @@ import java.util.List;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import ch.bfh.evoting.voterapp.adapters.PollAdapter;
@@ -39,7 +41,32 @@ public class PollActivity extends Activity implements OnItemClickListener {
 	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 	    }
 		
-		setContentView(R.layout.activity_poll);
+		final FrameLayout overlayFramelayout = new FrameLayout(this);
+		FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+				FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+		layoutParams.setMargins(getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), 0, getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), 0);
+		overlayFramelayout.setLayoutParams(layoutParams);
+		
+		View view = getLayoutInflater().inflate(R.layout.activity_poll, overlayFramelayout,false);
+		overlayFramelayout.addView(view);
+		
+		final SharedPreferences settings = getSharedPreferences(AndroidApplication.PREFS_NAME, MODE_PRIVATE);
+		
+		if(settings.getBoolean("first_run", true)){
+			final View overlay_view = getLayoutInflater().inflate(R.layout.overlay_parent_button, null,false);
+			overlayFramelayout.addView(overlay_view);
+			
+			overlay_view.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					overlayFramelayout.removeView(overlay_view);
+					settings.edit().putBoolean("first_run", false).commit();					
+				}
+			});
+		}
+		setContentView(overlayFramelayout);
+		
 		// Show the Up button in the action bar.
 		setupActionBar();
 

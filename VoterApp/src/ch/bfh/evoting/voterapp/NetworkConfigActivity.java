@@ -29,6 +29,7 @@ import android.provider.ContactsContract;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -74,7 +75,33 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 		
 		final SharedPreferences settings = getSharedPreferences(AndroidApplication.PREFS_NAME, MODE_PRIVATE);
 		
-		if(settings.getBoolean("first_run_"+this.getClass().getSimpleName(), true)){
+		if(settings.getBoolean("first_run", true)){
+			//Show General Help Overlay
+			final View overlay_view = getLayoutInflater().inflate(R.layout.overlay_parent_button, null,false);
+			overlayFramelayout.addView(overlay_view);
+			overlay_view.setOnClickListener(new View.OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					overlayFramelayout.removeView(overlay_view);
+					settings.edit().putBoolean("first_run", false).commit();
+					//Show Help Overlay for this activity
+					if(settings.getBoolean("first_run_"+NetworkConfigActivity.this.getClass().getSimpleName(), true)){
+						final View overlay_view = getLayoutInflater().inflate(R.layout.overlay_network_config, null,false);
+						overlayFramelayout.addView(overlay_view);
+						overlay_view.setOnClickListener(new View.OnClickListener() {
+
+							@Override
+							public void onClick(View v) {
+								overlayFramelayout.removeView(overlay_view);
+								settings.edit().putBoolean("first_run_"+NetworkConfigActivity.this.getClass().getSimpleName(), false).commit();					
+							}
+						});
+					}
+				}
+			});
+		} else if(settings.getBoolean("first_run_"+this.getClass().getSimpleName(), true)){
+			//Show Help Overlay for this activity
 			final View overlay_view = getLayoutInflater().inflate(R.layout.overlay_network_config, null,false);
 			overlayFramelayout.addView(overlay_view);
 			overlay_view.setOnClickListener(new View.OnClickListener() {
@@ -358,6 +385,11 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 					+ "\" is not available, cannot connect.");
 			alertDialog.show();
 		}
+	}
+	
+	public String getIdentification(){
+		Log.d("NetworkConfigActivity", "identification is "+this.etIdentification.toString());
+		return this.etIdentification.getText().toString();
 	}
 
 }

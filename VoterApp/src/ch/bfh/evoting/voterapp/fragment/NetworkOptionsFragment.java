@@ -5,12 +5,15 @@ import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.NetworkConfigActivity;
 import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.network.wifi.AdhocWifiManager;
+import ch.bfh.evoting.voterapp.util.Utility;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
@@ -37,7 +40,8 @@ public class NetworkOptionsFragment extends Fragment {
 	private NetworkConfigActivity activity;
 
 	private ConnectNetworkDialogFragment dialogFragment;
-
+	private AlertDialog dialogNoIdentificationSet = null;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);	
@@ -78,13 +82,16 @@ public class NetworkOptionsFragment extends Fragment {
 
 			@Override
 			public void onClick(View v) {
+				//check if an identification is defined
+				if(!checkIdentification()) return;
 
-					dialogFragment = new ConnectNetworkDialogFragment(false);
+				dialogFragment = new ConnectNetworkDialogFragment(false);
 
-					dialogFragment.setTargetFragment(NetworkOptionsFragment.this, DIALOG_FRAGMENT);
-					dialogFragment.setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Dialog);
-					dialogFragment.show(getFragmentManager(), TAG);
+				dialogFragment.setTargetFragment(NetworkOptionsFragment.this, DIALOG_FRAGMENT);
+				dialogFragment.setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Dialog);
+				dialogFragment.show(getFragmentManager(), TAG);
 			}
+
 		});
 
 		if(btnScanQrCode!=null){
@@ -92,6 +99,9 @@ public class NetworkOptionsFragment extends Fragment {
 
 				@Override
 				public void onClick(View v) {
+					//check if an identification is defined
+					if(!checkIdentification()) return;
+
 					Intent intent = new Intent("com.google.zxing.client.android.SCAN");
 					intent.setPackage(activity.getApplication().getPackageName());
 					intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
@@ -106,6 +116,9 @@ public class NetworkOptionsFragment extends Fragment {
 
 				@Override
 				public void onClick(View v) {
+					//check if an identification is defined
+					if(!checkIdentification()) return;
+
 					// Create new fragment and transaction
 					Fragment nfcFragment = new NFCFragment();
 					FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -126,6 +139,9 @@ public class NetworkOptionsFragment extends Fragment {
 
 			@Override
 			public void onClick(View v) {
+				//check if an identification is defined
+				if(!checkIdentification()) return;
+
 				// Create new fragment and transaction
 				Fragment advancedNetworkFragment = new NetworkListFragment();
 				FragmentTransaction transaction = getFragmentManager().beginTransaction();
@@ -142,6 +158,41 @@ public class NetworkOptionsFragment extends Fragment {
 		});
 
 		return v;
+	}
+
+	private boolean checkIdentification() {
+		if(((NetworkConfigActivity)this.getActivity()).getIdentification().equals("")){
+			//show dialog
+			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+			
+			// Add the buttons
+			builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialogNoIdentificationSet.dismiss();
+					return;
+				}
+			});
+
+			builder.setTitle(R.string.dialog_title_no_identification);
+			builder.setMessage(R.string.dialog_no_identification);
+
+			
+			dialogNoIdentificationSet = builder.create();
+			dialogNoIdentificationSet.setOnShowListener(new DialogInterface.OnShowListener() {
+				@Override
+				public void onShow(DialogInterface dialog) {
+					Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+					dialogNoIdentificationSet.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
+							R.drawable.selectable_background_votebartheme);
+				}
+			});
+			
+			// Create the AlertDialog
+			dialogNoIdentificationSet.show();
+			
+			return false;
+		}
+		return true;
 	}
 
 	@Override

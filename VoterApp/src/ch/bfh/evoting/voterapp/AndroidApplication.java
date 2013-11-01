@@ -59,6 +59,7 @@ public class AndroidApplication extends Application {
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 		settings.edit().putBoolean("first_run_ReviewPollVoterActivity", true).commit();
 		settings.edit().putBoolean("first_run_NetworkConfigActivity", true).commit();
+		settings.edit().putBoolean("first_run", true).commit();
 
 
 		instance = this;

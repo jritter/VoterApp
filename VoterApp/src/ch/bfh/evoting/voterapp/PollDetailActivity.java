@@ -16,10 +16,14 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.database.DataSetObserver;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,6 +34,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -39,7 +44,7 @@ import android.widget.Toast;
  * Class displaying the activity that show the details of a poll
  *
  */
-public class PollDetailActivity extends Activity implements OnClickListener {
+public class PollDetailActivity extends Activity implements OnClickListener, TextWatcher {
 
 	private ListView lv;
 	private PollOptionAdapter adapter;
@@ -59,28 +64,31 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 	private AlertDialog dialogSave;
 	private AlertDialog dialogAddOption;
 
+	private boolean changesMade = false;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		if(getResources().getBoolean(R.bool.portrait_only)){
-	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-	    }
-		
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		}
+
 		setContentView(R.layout.activity_poll_detail);
+
 		// Show the Up button in the action bar.
 		setupActionBar();
-		
+
 		if(getResources().getBoolean(R.bool.display_bottom_bar) == false){
-	        findViewById(R.id.layout_bottom_bar).setVisibility(View.GONE);
-	    }
+			findViewById(R.id.layout_bottom_bar).setVisibility(View.GONE);
+		}
 
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		AndroidApplication.getInstance().setVoteRunning(false);
 		AndroidApplication.getInstance().setIsAdmin(true);
 
 		pollDbHelper = PollDbHelper.getInstance(this);
-		
+
 		if (getIntent().getIntExtra("pollid", -1) == -1 && savedPoll == null && poll==null){
 			// we didn't get a poll id, so let's create a new poll.
 			poll = new Poll();
@@ -102,8 +110,8 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 		btnStartPoll = (Button) findViewById(R.id.button_start_poll);
 		etOption = (EditText) findViewById(R.id.edittext_option);
 		etQuestion = (EditText) findViewById(R.id.edittext_question);
-
 		etQuestion.setText(poll.getQuestion());
+		etQuestion.addTextChangedListener(this);
 
 		btnAddOption.setOnClickListener(this);
 		btnStartPoll.setOnClickListener(this);
@@ -111,6 +119,15 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 		adapter = new PollOptionAdapter(this, R.id.listview_pollquestions, poll);
 
 		lv.setAdapter(adapter);
+		adapter.registerDataSetObserver(new DataSetObserver() {
+
+			@Override
+			public void onChanged() {
+				changesMade = true;
+				super.onChanged();
+			}
+			
+		});
 
 		cbEmptyVote = (CheckBox)findViewById(R.id.checkbox_emptyvote);
 		cbEmptyVote.setText(R.string.allow_empty_vote);
@@ -137,10 +154,12 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 		cbEmptyVote.setChecked(false);
 		for(Option o:poll.getOptions()){
 			if(o.getText().equals(getString(R.string.empty_vote))){
+				boolean backupChangesMade = changesMade;
 				cbEmptyVote.setChecked(true);
 				//toogle the checkbox to add the empty vote at the end of the list
 				cbEmptyVote.performClick();
 				cbEmptyVote.performClick();
+				changesMade = backupChangesMade;
 				break;
 			}
 		}
@@ -157,6 +176,8 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 				return false;
 			}
 		});
+		
+		
 
 	}
 
@@ -238,51 +259,49 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 			dialogAddOption.show();
 			return;
 		}
-		// This ID represents the Home or Up button. In the case of this
-		// activity, the Up button is shown. Use NavUtils to allow users
-		// to navigate up one level in the application structure. For
-		// more details, see the Navigation pattern on Android Design:
-		//
-		// http://developer.android.com/design/patterns/navigation.html#up-vs-back
-		//
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		// Add the buttons
-		builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				if (poll.getId()>-1){
-					updatePoll();
-				} else {
-					savePoll();
+
+		if(changesMade){
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			// Add the buttons
+			builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					if (poll.getId()>-1){
+						updatePoll();
+					} else {
+						savePoll();
+					}
+					dialogSave.dismiss();
+					NavUtils.navigateUpFromSameTask(PollDetailActivity.this);
 				}
-				dialogSave.dismiss();
-				NavUtils.navigateUpFromSameTask(PollDetailActivity.this);
-			}
-		});
-		builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int id) {
-				dialogSave.dismiss();
-				NavUtils.navigateUpFromSameTask(PollDetailActivity.this);
-			}
-		});
+			});
+			builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialogSave.dismiss();
+					NavUtils.navigateUpFromSameTask(PollDetailActivity.this);
+				}
+			});
 
-		builder.setTitle(R.string.dialog_title_save_poll);
-		builder.setMessage(R.string.dialog_save_poll);
+			builder.setTitle(R.string.dialog_title_save_poll);
+			builder.setMessage(R.string.dialog_save_poll);
 
-		// Create the AlertDialog
-		dialogSave = builder.create();
+			// Create the AlertDialog
+			dialogSave = builder.create();
 
-		dialogSave.setOnShowListener(new DialogInterface.OnShowListener() {
-			@Override
-			public void onShow(DialogInterface dialog) {
-				Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
-				dialogSave.getButton(AlertDialog.BUTTON_NEGATIVE).setBackgroundResource(
-						R.drawable.selectable_background_votebartheme);
-				dialogSave.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundResource(
-						R.drawable.selectable_background_votebartheme);
-			}
-		});
+			dialogSave.setOnShowListener(new DialogInterface.OnShowListener() {
+				@Override
+				public void onShow(DialogInterface dialog) {
+					Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+					dialogSave.getButton(AlertDialog.BUTTON_NEGATIVE).setBackgroundResource(
+							R.drawable.selectable_background_votebartheme);
+					dialogSave.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundResource(
+							R.drawable.selectable_background_votebartheme);
+				}
+			});
 
-		dialogSave.show();
+			dialogSave.show();
+		} else {
+			NavUtils.navigateUpFromSameTask(PollDetailActivity.this);
+		}
 	}
 
 	@Override
@@ -306,7 +325,7 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 			startVote();
 		}
 	}
-	
+
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
@@ -345,7 +364,7 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 	public void onBackPressed() {
 		askToSave();
 	}
-	
+
 	@Override
 	protected void onResume() {
 		AndroidApplication.getInstance().setCurrentActivity(this);
@@ -407,7 +426,7 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 		ndf.show( getFragmentManager( ), "networkInfo" );
 		return null;
 	}
-	
+
 	private void startVote() {
 		if(!etOption.getText().toString().equals("")){
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -471,5 +490,19 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 				return goToNetworkConfig();
 			}
 		});
+	}
+
+	@Override
+	public void afterTextChanged(Editable edit) {
+	}
+
+	@Override
+	public void beforeTextChanged(CharSequence s, int start, int count,
+			int after) {
+	}
+
+	@Override
+	public void onTextChanged(CharSequence s, int start, int before, int count) {
+			changesMade = true;
 	}
 }
