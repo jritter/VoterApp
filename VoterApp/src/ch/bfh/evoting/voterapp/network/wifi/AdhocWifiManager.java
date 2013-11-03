@@ -375,7 +375,7 @@ public class AdhocWifiManager {
 			Log.d(TAG, "given SSID " + ssid);
 			Log.d(TAG, "SSID from wifiman: " + wifi.getConnectionInfo().getSSID());
 			Log.d(TAG, "Equals: " + ssid.equals(wifi.getConnectionInfo().getSSID()));
-			
+
 			// check whether we have been successful
 			if (!(nInfo.getDetailedState() == NetworkInfo.DetailedState.CONNECTED
 					&& nInfo.getState() == NetworkInfo.State.CONNECTED && getBroadcastAddress() != null)) {
@@ -420,15 +420,20 @@ public class AdhocWifiManager {
 							}
 							int status = intent.getIntExtra("error", 0);
 							if(status==1){
-								Toast.makeText(context, context.getString(R.string.join_error_invalid_name), Toast.LENGTH_LONG).show();
+								for(int i=0; i < 2; i++)
+									Toast.makeText(context, context.getString(R.string.join_error_invalid_name), Toast.LENGTH_LONG).show();
 							} else if (status == 2){
-								Toast.makeText(context, context.getString(R.string.join_error_admin), Toast.LENGTH_LONG).show();
+								for(int i=0; i < 2; i++)
+									Toast.makeText(context, context.getString(R.string.join_error_admin), Toast.LENGTH_LONG).show();
 							} else if (status == 3){
-								Toast.makeText(context, context.getString(R.string.join_error_voter), Toast.LENGTH_LONG).show();
+								for(int i=0; i < 2; i++)
+									Toast.makeText(context, context.getString(R.string.join_error_voter), Toast.LENGTH_LONG).show();
 							} else if (status == 4){
-								Toast.makeText(context, context.getString(R.string.join_error_voter_network), Toast.LENGTH_LONG).show();
+								for(int i=0; i < 3; i++)
+									Toast.makeText(context, context.getString(R.string.join_error_voter_network), Toast.LENGTH_LONG).show();
 							} else {
-								Toast.makeText(context, context.getString(R.string.join_error), Toast.LENGTH_LONG).show();
+								for(int i=0; i < 2; i++)
+									Toast.makeText(context, context.getString(R.string.join_error), Toast.LENGTH_LONG).show();
 							}
 						}
 					}, new IntentFilter(BroadcastIntentTypes.networkConnectionFailed));

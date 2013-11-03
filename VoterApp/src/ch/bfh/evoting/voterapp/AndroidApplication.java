@@ -20,6 +20,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
+import android.widget.Toast;
 
 /**
  * Class representing the application. This class is used to do some initializations and to share data.
@@ -40,8 +41,6 @@ public class AndroidApplication extends Application {
 	
 	private AlertDialog dialogNetworkLost;
 
-
-
 	/**
 	 * Return the single instance of this class
 	 * @return the single instance of this class
@@ -58,6 +57,7 @@ public class AndroidApplication extends Application {
 		SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 		settings.edit().putBoolean("first_run_ReviewPollVoterActivity", true).commit();
 		settings.edit().putBoolean("first_run_NetworkConfigActivity", true).commit();
+		settings.edit().putBoolean("first_run", true).commit();
 
 
 		instance = this;
@@ -67,7 +67,19 @@ public class AndroidApplication extends Application {
 		LocalBroadcastManager.getInstance(this).registerReceiver(mAttackDetecter, new IntentFilter(BroadcastIntentTypes.attackDetected));
 		LocalBroadcastManager.getInstance(this).registerReceiver(startPollReceiver, new IntentFilter(BroadcastIntentTypes.electorate));
 	}
+	
+	@Override
+	public void onTerminate() {
+		if(this.ni!=null)
+			this.ni.disconnect();
+		super.onTerminate();
+	}
 
+
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
+	
 	/**
 	 * Initialize the Serialization method and the Network Component to use
 	 */
@@ -86,6 +98,10 @@ public class AndroidApplication extends Application {
 
 	}
 
+	/*--------------------------------------------------------------------------------------------
+	 * Getters/Setters
+	--------------------------------------------------------------------------------------------*/
+	
 	/**
 	 * Get the serialization helper
 	 * @return the serialization helper
@@ -122,7 +138,20 @@ public class AndroidApplication extends Application {
 	public boolean isVoteRunning(){
 		return voteRunning;
 	}
+	
+	public boolean isAdmin() {
+		return isAdmin;
+	}
 
+	public void setIsAdmin(boolean isAdmin) {
+		this.isAdmin = isAdmin;
+	}
+
+
+	/*--------------------------------------------------------------------------------------------
+	 * Broadcast receivers
+	--------------------------------------------------------------------------------------------*/
+	
 	/**
 	 * this broadcast receiver listens for information about the network group destruction
 	 */
@@ -131,6 +160,7 @@ public class AndroidApplication extends Application {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if(currentActivity!=null && ni.getNetworkName()!=null){
+				if(voteRunning){
 				AlertDialog.Builder builder = new AlertDialog.Builder(currentActivity);
 				// Add the buttons
 				builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
@@ -156,6 +186,10 @@ public class AndroidApplication extends Application {
 				
 				// Create the AlertDialog
 				dialogNetworkLost.show();
+				} else {
+					for(int i=0; i < 2; i++)
+						Toast.makeText(currentActivity, getResources().getString(R.string.toast_network_lost), Toast.LENGTH_SHORT).show();
+				}
 				ni.disconnect();
 			}
 		}
@@ -208,21 +242,5 @@ public class AndroidApplication extends Application {
 			}
 		}
 	};
-
-
-	@Override
-	public void onTerminate() {
-		if(this.ni!=null)
-			this.ni.disconnect();
-		super.onTerminate();
-	}
-
-	public boolean isAdmin() {
-		return isAdmin;
-	}
-
-	public void setIsAdmin(boolean isAdmin) {
-		this.isAdmin = isAdmin;
-	}
 
 }

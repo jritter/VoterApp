@@ -16,7 +16,4 @@ public class NFCFragment extends Fragment {
 				container, false);
 		return view;
 	}
-
-
-
 }

@@ -10,11 +10,13 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.FrameLayout;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
@@ -35,7 +37,32 @@ public class ListTerminatedPollsActivity extends Activity {
 	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 	    }
 		
-		setContentView(R.layout.activity_list_terminated_polls);
+		final FrameLayout overlayFramelayout = new FrameLayout(this);
+		FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+				FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+		layoutParams.setMargins(getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), 0, getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), 0);
+		overlayFramelayout.setLayoutParams(layoutParams);
+		
+		View view = getLayoutInflater().inflate(R.layout.activity_list_terminated_polls, overlayFramelayout,false);
+		overlayFramelayout.addView(view);
+		
+		final SharedPreferences settings = getSharedPreferences(AndroidApplication.PREFS_NAME, MODE_PRIVATE);
+		
+		if(settings.getBoolean("first_run", true)){
+			final View overlay_view = getLayoutInflater().inflate(R.layout.overlay_parent_button, null,false);
+			overlayFramelayout.addView(overlay_view);
+			
+			overlay_view.setOnClickListener(new View.OnClickListener() {
+				
+				@Override
+				public void onClick(View v) {
+					overlayFramelayout.removeView(overlay_view);
+					settings.edit().putBoolean("first_run", false).commit();					
+				}
+			});
+		}
+		setContentView(overlayFramelayout);
+
 		setupActionBar();
 		
 		AndroidApplication.getInstance().setCurrentActivity(this);
@@ -61,14 +88,12 @@ public class ListTerminatedPollsActivity extends Activity {
 		});
 
 	}
-
-	/**
-	 * Set up the {@link android.app.ActionBar}.
-	 */
-	private void setupActionBar() {
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+	
+	@Override
+	protected void onResume() {
+		AndroidApplication.getInstance().setCurrentActivity(this);
+		super.onResume();
 	}
-
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -87,9 +112,7 @@ public class ListTerminatedPollsActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
-
-
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -97,13 +120,6 @@ public class ListTerminatedPollsActivity extends Activity {
 		return true;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget
-	 * .AdapterView, android.view.View, int, long)
-	 */
 	public void onItemClick(AdapterView<?> listview, View view, int position, long id) {
 
 		// extract the object assigned to the position which has been clicked
@@ -116,9 +132,15 @@ public class ListTerminatedPollsActivity extends Activity {
 		startActivity(intent);
 	}
 	
-	protected void onResume() {
-		AndroidApplication.getInstance().setCurrentActivity(this);
-		super.onResume();
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Set up the {@link android.app.ActionBar}.
+	 */
+	private void setupActionBar() {
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
-
+	
 }

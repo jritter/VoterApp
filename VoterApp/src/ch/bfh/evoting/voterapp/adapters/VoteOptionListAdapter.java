@@ -81,9 +81,11 @@ public class VoteOptionListAdapter extends ArrayAdapter<Option> {
 				final VoteActivity activity = (VoteActivity)context;
 				
 				if(!activity.getScrolled()){
-					Toast.makeText(context, context.getString(R.string.scroll), Toast.LENGTH_SHORT).show();
+					for(int i=0; i < 2; i++)
+						Toast.makeText(context, context.getString(R.string.scroll), Toast.LENGTH_SHORT).show();
 				} else if (getSelectedPosition() == -1){
-					Toast.makeText(context, context.getString(R.string.choose_one_option), Toast.LENGTH_SHORT).show();
+					for(int i=0; i < 2; i++)
+						Toast.makeText(context, context.getString(R.string.choose_one_option), Toast.LENGTH_SHORT).show();
 				} else {
 					AlertDialog.Builder builder = new AlertDialog.Builder(context);
 					// Add the buttons

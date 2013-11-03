@@ -114,6 +114,11 @@ public class WaitForVotesFragment extends ListFragment {
 
 		return v;
 	}
+	
+	
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
 
 	/**
 	 * Update the state of the progress bar, change the image of the participants when they have voted
@@ -159,11 +164,4 @@ public class WaitForVotesFragment extends ListFragment {
 			LocalBroadcastManager.getInstance(this.getActivity()).unregisterReceiver(updateVoteReceiver);
 		}
 	}
-
-	@Override
-	public void onSaveInstanceState(Bundle savedInstanceState) {
-		super.onSaveInstanceState(savedInstanceState);
-		savedInstanceState.putSerializable("poll", poll);
-	}
-
 }

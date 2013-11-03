@@ -103,16 +103,17 @@
     <string name="not_included_title">Your are not in the electorate</string>
     <string name="not_included">You were not included in the electorate. So, you cannot participate to the vote. You will be redirected to the main screen.</string>
     <string name="dialog_title_network_lost">Group connection lost!</string>
-    <string name="dialog_network_lost">The network connection has been lost. The vote will be interrupted.</string>
+    <string name="dialog_network_lost">The group connection has been lost. The vote will be interrupted.</string>
     <string name="taost_password_letter">The password must start with a letter.</string>
     <string name="dialog_title_confirm_vote">Confirm your vote</string>
-    
+    <string name="toast_network_lost">You have been disconnected from the group.</string>
+    <string name="dialog_title_no_identification">No identification set</string>
+    <string name="dialog_no_identification">You did not enter an identification. Please first do that.</string>
     <string name="dialog_confirm_vote">
-        <![CDATA[
+	<![CDATA[
 			You have selected the following option:<br /><br /><b>%1$s</b><br /><br />Do you want to confirm your choice and send your vote?"
 		]]>
-    </string>  
-        
+    </string>
     <string name="toast_poll_saved">Vote has been saved.</string>
     <string name="toast_poll_updated">Vote has been updated.</string>
     <string name="toast_question_empty">Question cannot be empty.</string>
@@ -143,7 +144,8 @@
     <string name="overlay_network_option">... then choose a method to join the network where the vote session takes place.</string>
     <string name="overlay_review">Check the content...</string>
     <string name="overlay_review_ok">... and press the button if you agree with it.</string>
-
+    <string name="overlay_previous_screen">Use this button to return to previous screen.</string>
+    
     <!-- Activity titles -->
     <string name="voter_app_app_name">MobiVote</string>
     <string name="title_activity_network_config">Join Group</string>

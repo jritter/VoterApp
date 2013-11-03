@@ -215,29 +215,6 @@ public class NetworkInformationFragment extends Fragment implements
 		super.onDestroy();
 	}
 
-	private Bitmap qrCode2Bitmap(BitMatrix qrcode) {
-
-		final int WHITE = 0x00EAEAEA;
-		final int BLACK = 0xFF000000;
-
-		int width = qrcode.getWidth();
-		int height = qrcode.getHeight();
-		int[] pixels = new int[width * height];
-		for (int y = 0; y < height; y++) {
-			int offset = y * width;
-			for (int x = 0; x < width; x++) {
-				pixels[offset + x] = qrcode.get(x, y) ? BLACK : WHITE;
-			}
-		}
-
-		Bitmap bitmap = Bitmap.createBitmap(width, height,
-				Bitmap.Config.ARGB_8888);
-		bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
-		return bitmap;
-	}
-
-	
-
 	@Override
 	public void onClick(View view) {
 		if (view == btnWriteNfcTag) {
@@ -321,6 +298,31 @@ public class NetworkInformationFragment extends Fragment implements
 			}
 		}
 
+	}
+	
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
+	
+	private Bitmap qrCode2Bitmap(BitMatrix qrcode) {
+
+		final int WHITE = 0x00EAEAEA;
+		final int BLACK = 0xFF000000;
+
+		int width = qrcode.getWidth();
+		int height = qrcode.getHeight();
+		int[] pixels = new int[width * height];
+		for (int y = 0; y < height; y++) {
+			int offset = y * width;
+			for (int x = 0; x < width; x++) {
+				pixels[offset + x] = qrcode.get(x, y) ? BLACK : WHITE;
+			}
+		}
+
+		Bitmap bitmap = Bitmap.createBitmap(width, height,
+				Bitmap.Config.ARGB_8888);
+		bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+		return bitmap;
 	}
 
 }

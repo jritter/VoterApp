@@ -30,7 +30,8 @@
 	        android:id="@+id/textview_content"
 	        android:layout_width="0dip"
 	        android:layout_height="wrap_content"
-	        android:layout_margin="8dp"
+	        android:layout_marginLeft="8dp"
+	        android:layout_marginRight="8dp"
 	        android:text="@string/content"
 	        android:textSize="20sp"
 	        android:layout_weight="1" >

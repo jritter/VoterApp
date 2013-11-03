@@ -57,17 +57,16 @@ public class NetworkInformationActivity extends Activity implements OnClickListe
 	}
 
 	@Override
+	protected void onResume() {
+		AndroidApplication.getInstance().setCurrentActivity(this);
+		super.onResume();
+	}
+	
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.network_information, menu);
 		return true;
-	}
-
-	/**
-	 * Set up the {@link android.app.ActionBar}.
-	 */
-	private void setupActionBar() {
-		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
 	@Override
@@ -193,9 +192,15 @@ public class NetworkInformationActivity extends Activity implements OnClickListe
 		}
 	}
 	
-	protected void onResume() {
-		AndroidApplication.getInstance().setCurrentActivity(this);
-		super.onResume();
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Set up the {@link android.app.ActionBar}.
+	 */
+	private void setupActionBar() {
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 	
 }

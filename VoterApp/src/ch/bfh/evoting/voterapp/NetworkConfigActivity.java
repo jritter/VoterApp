@@ -29,6 +29,7 @@ import android.provider.ContactsContract;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -64,12 +65,43 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 		}
 		
 		final FrameLayout overlayFramelayout = new FrameLayout(this);
-		View view = getLayoutInflater().inflate(R.layout.activity_network_config, null,false);
+		FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
+				FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+		layoutParams.setMargins(getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), 0, getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), 0);
+		overlayFramelayout.setLayoutParams(layoutParams);
+		
+		View view = getLayoutInflater().inflate(R.layout.activity_network_config, overlayFramelayout,false);
 		overlayFramelayout.addView(view);
 		
 		final SharedPreferences settings = getSharedPreferences(AndroidApplication.PREFS_NAME, MODE_PRIVATE);
 		
-		if(settings.getBoolean("first_run_"+this.getClass().getSimpleName(), true)){
+		if(settings.getBoolean("first_run", true)){
+			//Show General Help Overlay
+			final View overlay_view = getLayoutInflater().inflate(R.layout.overlay_parent_button, null,false);
+			overlayFramelayout.addView(overlay_view);
+			overlay_view.setOnClickListener(new View.OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					overlayFramelayout.removeView(overlay_view);
+					settings.edit().putBoolean("first_run", false).commit();
+					//Show Help Overlay for this activity
+					if(settings.getBoolean("first_run_"+NetworkConfigActivity.this.getClass().getSimpleName(), true)){
+						final View overlay_view = getLayoutInflater().inflate(R.layout.overlay_network_config, null,false);
+						overlayFramelayout.addView(overlay_view);
+						overlay_view.setOnClickListener(new View.OnClickListener() {
+
+							@Override
+							public void onClick(View v) {
+								overlayFramelayout.removeView(overlay_view);
+								settings.edit().putBoolean("first_run_"+NetworkConfigActivity.this.getClass().getSimpleName(), false).commit();					
+							}
+						});
+					}
+				}
+			});
+		} else if(settings.getBoolean("first_run_"+this.getClass().getSimpleName(), true)){
+			//Show Help Overlay for this activity
 			final View overlay_view = getLayoutInflater().inflate(R.layout.overlay_network_config, null,false);
 			overlayFramelayout.addView(overlay_view);
 			overlay_view.setOnClickListener(new View.OnClickListener() {
@@ -207,15 +239,6 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 		super.onResume();
 	}
 
-	/**
-	 * Set up the {@link android.app.ActionBar}.
-	 */
-	private void setupActionBar() {
-
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-
-	}
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -268,6 +291,19 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
 	}
 
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
+	
+	/**
+	 * Set up the {@link android.app.ActionBar}.
+	 */
+	private void setupActionBar() {
+
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+
+	}
+	
 	/**
 	 * This method is used to extract the name of the device owner
 	 * 
@@ -353,6 +389,11 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 					+ "\" is not available, cannot connect.");
 			alertDialog.show();
 		}
+	}
+	
+	public String getIdentification(){
+		Log.d("NetworkConfigActivity", "identification is "+this.etIdentification.toString());
+		return this.etIdentification.getText().toString();
 	}
 
 }

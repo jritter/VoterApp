@@ -41,6 +41,8 @@ public class VoteActivity extends Activity {
 
 	//TODO remove static when no more needed
 	static private Poll poll;
+	static private Context ctx;
+
 	private VoteOptionListAdapter volAdapter;
 	private boolean scrolled = false;
 	private boolean demoScrollDone = false;
@@ -49,8 +51,6 @@ public class VoteActivity extends Activity {
 	private BroadcastReceiver stopReceiver;
 
 	private AlertDialog dialogBack;
-
-	static Context ctx;
 
 
 	@Override
@@ -171,8 +171,25 @@ public class VoteActivity extends Activity {
 
 		this.startService(new Intent(this, VoteService.class));
 	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		AndroidApplication.getInstance().setCurrentActivity(this);
+	}
 
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+		super.onSaveInstanceState(savedInstanceState);
+		savedInstanceState.putSerializable("poll", poll);
+	}
 
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		poll = (Poll)savedInstanceState.getSerializable("poll");
+	}
+	
 	@Override
 	public void onBackPressed() {
 		//Show a dialog to ask confirmation to quit vote 
@@ -210,6 +227,24 @@ public class VoteActivity extends Activity {
 		
 		dialogBack.show();
 	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+
+		if (item.getItemId() == R.id.help){
+			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_vote), getString(R.string.help_text_vote) );
+			hdf.show( getFragmentManager( ), "help" );
+			return true;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.vote, menu);
+		return true;
+	}
 
 	/**
 	 * Method called when cast button is clicked
@@ -241,46 +276,13 @@ public class VoteActivity extends Activity {
 		}
 	}
 
+	/**
+	 * Indicate if the user has scrolled over all possible options
+	 * @return true if user has scrolled, false otherwise
+	 */
 	public boolean getScrolled(){
 		return scrolled;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
-	 */
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-
-		if (item.getItemId() == R.id.help){
-			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_vote), getString(R.string.help_text_vote) );
-			hdf.show( getFragmentManager( ), "help" );
-			return true;
-		}
-		return true;
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.vote, menu);
-		return true;
-	}
-
-
-	@Override
-	public void onSaveInstanceState(Bundle savedInstanceState) {
-		super.onSaveInstanceState(savedInstanceState);
-		savedInstanceState.putSerializable("poll", poll);
-	}
-
-	@Override
-	public void onRestoreInstanceState(Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-		poll = (Poll)savedInstanceState.getSerializable("poll");
-	}
-
 
 	//TODO remove: only for simulation
 	public static class VoteService extends Service{
@@ -368,11 +370,4 @@ public class VoteActivity extends Activity {
 		}
 
 	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		AndroidApplication.getInstance().setCurrentActivity(this);
-	}
-
 }
