@@ -20,12 +20,15 @@ import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -111,7 +114,10 @@ public class PollDetailActivity extends Activity implements OnClickListener {
 		adapter = new PollOptionAdapter(this, R.id.listview_pollquestions, poll);
 
 		lv.setAdapter(adapter);
-
+		
+		lv.setEmptyView(findViewById(R.id.textview_empty));
+		
+		
 		cbEmptyVote = (CheckBox)findViewById(R.id.checkbox_emptyvote);
 		cbEmptyVote.setText(R.string.allow_empty_vote);
 		cbEmptyVote.setOnClickListener(new OnClickListener() {

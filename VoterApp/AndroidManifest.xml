@@ -59,12 +59,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.bfh.evoting.voterapp.MainActivity" />
         </activity>
-       
+        
         <activity
             android:name="ch.bfh.evoting.voterapp.PollDetailActivity"
             android:label="@string/title_activity_poll_detail"
             android:parentActivityName="ch.bfh.evoting.voterapp.PollActivity"
-            android:windowSoftInputMode="stateHidden"
+            android:windowSoftInputMode="stateHidden|adjustResize"
             android:launchMode="singleTop" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

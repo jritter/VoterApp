@@ -70,6 +70,7 @@
     <string name="enable_nfc_question">In order to use this feature, NFC must be enabled. Enable now?</string>
     <string name="archived_votes">Archived Votes</string>
     <string name="result_chart">Result Chart</string>
+    <string name="no_options">There are currently no Options</string>
 
     <!-- Action bar titles -->
     <string name="action_rescan_wifi">Rescan Wifi Networks</string>

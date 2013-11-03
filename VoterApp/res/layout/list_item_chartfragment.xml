@@ -8,6 +8,7 @@
         android:name="ch.bfh.evoting.voterapp.fragment.ResultChartFragment"
         android:layout_width="match_parent"
         android:layout_height="180dp"
-        android:layout_margin="@dimen/margin" />
+        android:layout_margin="@dimen/margin"
+        android:tag="resultChart" />
 
 </LinearLayout>
