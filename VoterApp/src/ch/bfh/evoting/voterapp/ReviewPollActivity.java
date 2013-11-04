@@ -6,8 +6,11 @@ import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.PollReviewFragment;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.support.v4.app.NavUtils;
@@ -31,6 +34,10 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 
 	private Button btnStartPollPeriod;
 
+	private String sender;
+
+	private PollReviewFragment fragment;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -52,11 +59,25 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 		btnStartPollPeriod = (Button) findViewById(R.id.button_start_poll_period);
 		btnStartPollPeriod.setOnClickListener(this);
 
-		Intent intent = getIntent();
-		Poll intentPoll = (Poll) intent.getSerializableExtra("poll");
+		if(savedInstanceState!=null){
+			poll = (Poll) savedInstanceState.getSerializable("poll");
+			sender = savedInstanceState.getString("sender");
+		}
+		
+		Poll intentPoll = (Poll) getIntent().getSerializableExtra("poll");
 		if (intentPoll != null) {
 			poll = intentPoll;
+			sender = getIntent().getStringExtra("sender");
 		}
+		
+		FragmentManager fm = getFragmentManager();
+		fragment = new PollReviewFragment();
+		Bundle bundle = new Bundle();
+		bundle.putSerializable("poll", poll);
+		bundle.putString("sender", sender);
+		fragment.setArguments(bundle);
+
+		fm.beginTransaction().replace(R.id.fragment_container, fragment, "review").commit();
 
 	}
 	
@@ -70,12 +91,14 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 	public void onSaveInstanceState(Bundle savedInstanceState) {
 		super.onSaveInstanceState(savedInstanceState);
 		savedInstanceState.putSerializable("poll", poll);
+		savedInstanceState.putString("sender", sender);
 	}
 
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
 		poll = (Poll) savedInstanceState.getSerializable("poll");
+		sender = savedInstanceState.getString("sender");
 	}
 
 	@Override

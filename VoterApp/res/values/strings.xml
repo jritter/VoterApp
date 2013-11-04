@@ -70,6 +70,7 @@
     <string name="enable_nfc_question">In order to use this feature, NFC must be enabled. Enable now?</string>
     <string name="archived_votes">Archived Votes</string>
     <string name="result_chart">Result Chart</string>
+    <string name="notification">A vote is currently running. Tap to bring in front.</string>
 
     <!-- Action bar titles -->
     <string name="action_rescan_wifi">Rescan Wifi Networks</string>
@@ -136,7 +137,10 @@
     <string name="dialog_back_admin">By going back, you won\'t be able to administrate the vote. You will have to start the procedure from the beginning. Do you really want that?</string>
     <string name="dialog_back_result">By going back, you won\'t be able to see result of the vote. Do you really want that?</string>
     <string name="dialog_title_result_chart">Result Chart</string>
-
+    <string name="toast_wifi_is_not_connected">You are not currently connected to a wireless network. Please choose another option.</string>
+    <string name="toast_wifi_is_disabled">Wifi is currently disabled. Please enable it first.</string>
+    
+    
     <!-- Help overlays -->
     <string name="overlay_close">Touch the screen to close this help</string>
     <string name="overlay_identification">Put your identification here...</string>

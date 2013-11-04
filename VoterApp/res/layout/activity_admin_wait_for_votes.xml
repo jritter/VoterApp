@@ -16,14 +16,20 @@
         android:text="@string/wait_votes_admin"
         android:textAppearance="?android:attr/textAppearanceLarge" />
     
-    <fragment
+    <!-- <fragment
         android:id="@+id/fragment_wait_for_votes"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         class="ch.bfh.evoting.voterapp.fragment.WaitForVotesFragment" >
         
-    </fragment>
+    </fragment>-->
+    <RelativeLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+    </RelativeLayout>
 
     <LinearLayout
          android:id="@+id/layout_bottom_bar"

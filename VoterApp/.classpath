@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="libs/log4j-1.2.15.jar"/>
 	<classpathentry kind="lib" path="libs/android-logging-log4j-1.0.3.jar"/>
 	<classpathentry kind="lib" path="libs/gradle-wrapper.jar"/>
+	<classpathentry kind="lib" path="libs/android-support-v4.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

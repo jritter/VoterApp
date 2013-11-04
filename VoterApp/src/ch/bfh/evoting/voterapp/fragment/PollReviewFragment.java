@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ListFragment;
+import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -30,7 +30,7 @@ import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
  * Fragment displaying the review of a poll
  * 
  */
-public class PollReviewFragment extends ListFragment {
+public class PollReviewFragment extends Fragment {
 
 	private Poll poll;
 
@@ -40,15 +40,14 @@ public class PollReviewFragment extends ListFragment {
 
 	private BroadcastReceiver startVoteReceiver;
 
+	private String sender;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if(savedInstanceState !=null){
-			Poll intentPoll = (Poll)savedInstanceState.getSerializable("poll");
-			if(intentPoll!=null){
-				this.poll = intentPoll;
-			}
-		}
+		this.poll = (Poll)this.getArguments().getSerializable("poll");
+		this.sender = this.getArguments().getString("sender");
+		
 	}
 
 	@Override
@@ -60,11 +59,8 @@ public class PollReviewFragment extends ListFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		Poll intentPoll = (Poll)getActivity().getIntent().getSerializableExtra("poll");
-		if(intentPoll!=null){
-			this.poll = intentPoll;
-		}
-		String sender = getActivity().getIntent().getStringExtra("sender");
+		Log.e("PollReviewFragment", "poll is "+poll);
+		
 		poll.getParticipants().get(sender).setHasAcceptedReview(true);
 
 		// Inflate the layout for this fragment
@@ -149,6 +145,13 @@ public class PollReviewFragment extends ListFragment {
 
 		return v;
 	}
+	
+	
+
+	@Override
+	public void onPause() {
+		super.onPause();
+	}
 
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
@@ -163,16 +166,11 @@ public class PollReviewFragment extends ListFragment {
 		super.onDestroy();
 	}
 
-	@Override
-	public void onSaveInstanceState(Bundle savedInstanceState) {
-		super.onSaveInstanceState(savedInstanceState);
-		savedInstanceState.putSerializable("poll", poll);
-	}
-	
+
 	/*--------------------------------------------------------------------------------------------
 	 * Helper Methods
 	--------------------------------------------------------------------------------------------*/
-	
+
 	/**
 	 * Indicate if the peer identified with the given string is contained in the list of participants
 	 * @param uniqueId identifier of the peer

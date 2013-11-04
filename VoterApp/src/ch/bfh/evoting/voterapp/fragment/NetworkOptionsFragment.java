@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 /**
  * Fragment displaying the review of a poll
@@ -59,10 +60,8 @@ public class NetworkOptionsFragment extends Fragment {
 		// Inflate the layout for this fragment
 		View v = inflater.inflate(R.layout.fragment_network_options, container, false);
 
-		WifiManager wm = (WifiManager) getActivity().getSystemService(NetworkConfigActivity.WIFI_SERVICE);
-		WifiInfo wifiInfo = wm.getConnectionInfo();
 		Button btnUseActualNetwork = (Button)v.findViewById(R.id.button_use_actual_ssid);
-		btnUseActualNetwork.setText(getString(R.string.button_use_actual_ssid, wifiInfo.getSSID()));
+		btnUseActualNetwork.setText(getString(R.string.button_use_actual_ssid, AndroidApplication.getInstance().getNetworkMonitor().getConnectedSSID()));
 		Button btnScanQrCode = (Button)v.findViewById(R.id.button_capture_qrcode);
 		Button btnScanNFC = (Button)v.findViewById(R.id.button_scan_nfc);
 		Button btnAdvancedConfig = (Button)v.findViewById(R.id.button_advanced_network_config);
@@ -84,6 +83,12 @@ public class NetworkOptionsFragment extends Fragment {
 			public void onClick(View v) {
 				//check if an identification is defined
 				if(!checkIdentification()) return;
+				
+				if(!AndroidApplication.getInstance().getNetworkMonitor().isConnected()){
+					for(int i=0; i<2; i++)
+						Toast.makeText(NetworkOptionsFragment.this.getActivity(), getString(R.string.toast_wifi_is_not_connected), Toast.LENGTH_SHORT).show();
+					return;
+				}
 
 				dialogFragment = new ConnectNetworkDialogFragment(false);
 
@@ -101,6 +106,11 @@ public class NetworkOptionsFragment extends Fragment {
 				public void onClick(View v) {
 					//check if an identification is defined
 					if(!checkIdentification()) return;
+					if(!AndroidApplication.getInstance().getNetworkMonitor().isWifiEnabled()){
+						for(int i=0; i<2; i++)
+							Toast.makeText(NetworkOptionsFragment.this.getActivity(), getString(R.string.toast_wifi_is_disabled), Toast.LENGTH_SHORT).show();
+						return;
+					}
 
 					Intent intent = new Intent("com.google.zxing.client.android.SCAN");
 					intent.setPackage(activity.getApplication().getPackageName());
@@ -118,6 +128,11 @@ public class NetworkOptionsFragment extends Fragment {
 				public void onClick(View v) {
 					//check if an identification is defined
 					if(!checkIdentification()) return;
+					if(!AndroidApplication.getInstance().getNetworkMonitor().isWifiEnabled()){
+						for(int i=0; i<2; i++)
+							Toast.makeText(NetworkOptionsFragment.this.getActivity(), getString(R.string.toast_wifi_is_disabled), Toast.LENGTH_SHORT).show();
+						return;
+					}
 
 					// Create new fragment and transaction
 					Fragment nfcFragment = new NFCFragment();
@@ -141,6 +156,11 @@ public class NetworkOptionsFragment extends Fragment {
 			public void onClick(View v) {
 				//check if an identification is defined
 				if(!checkIdentification()) return;
+				if(!AndroidApplication.getInstance().getNetworkMonitor().isWifiEnabled()){
+					for(int i=0; i<2; i++)
+						Toast.makeText(NetworkOptionsFragment.this.getActivity(), getString(R.string.toast_wifi_is_disabled), Toast.LENGTH_SHORT).show();
+					return;
+				}
 
 				// Create new fragment and transaction
 				Fragment advancedNetworkFragment = new NetworkListFragment();

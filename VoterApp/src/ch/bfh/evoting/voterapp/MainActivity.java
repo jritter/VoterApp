@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.Toast;
 
 /**
  * First activity, displaying the buttons for the different actions
@@ -61,7 +62,11 @@ public class MainActivity extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View view) {
 		if (view == btnSetupNetwork) {
-
+			if(!AndroidApplication.getInstance().getNetworkMonitor().isWifiEnabled()){
+				for(int i=0; i<2; i++)
+					Toast.makeText(this, getString(R.string.toast_wifi_is_disabled), Toast.LENGTH_SHORT).show();
+				return;
+			}
 			this.waitForNetworkInterface(new Callable<Void>() {
 				public Void call() {
 					return goToNetworkConfig();

@@ -137,7 +137,7 @@ public class CheckElectorateActivity extends ListActivity {
 		builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				dialogBack.dismiss();
-				CheckElectorateActivity.super.onBackPressed();
+				startActivity(new Intent(CheckElectorateActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
 			}
 		});
 		builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {

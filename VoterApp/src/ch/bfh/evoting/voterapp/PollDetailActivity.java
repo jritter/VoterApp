@@ -232,6 +232,11 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 		}
 
 		if (view == btnStartPoll){
+			if(!AndroidApplication.getInstance().getNetworkMonitor().isWifiEnabled()){
+				for(int i=0; i<2; i++)
+					Toast.makeText(this, getString(R.string.toast_wifi_is_disabled), Toast.LENGTH_SHORT).show();
+				return;
+			}
 			startVote();
 		}
 	}

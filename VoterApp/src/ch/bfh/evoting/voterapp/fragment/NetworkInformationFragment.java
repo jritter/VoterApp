@@ -191,6 +191,11 @@ public class NetworkInformationFragment extends Fragment implements
 		TextView tv_group_password = (TextView) v
 				.findViewById(R.id.textview_group_password);
 		tv_group_password.setText(groupPassword);
+		
+		TextView tv_identification = (TextView) v
+				.findViewById(R.id.textview_identification);
+		SharedPreferences preferences = getActivity().getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
+		tv_identification.setText(preferences.getString("identification", ""));
 
 		WifiAPManager wifiapman = new WifiAPManager();
 		WifiManager wifiman = (WifiManager) this.getActivity()
@@ -202,8 +207,6 @@ public class NetworkInformationFragment extends Fragment implements
 		} else {
 			TextView tv_network_key = (TextView) v
 					.findViewById(R.id.textview_network_key);
-			SharedPreferences preferences = this.getActivity()
-					.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
 			tv_network_key.setText(preferences.getString("wlan_key", ""));
 		}
 

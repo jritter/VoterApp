@@ -59,22 +59,22 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		if(getResources().getBoolean(R.bool.portrait_only)){
-	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		}
-		
+
 		final FrameLayout overlayFramelayout = new FrameLayout(this);
 		FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
 				FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
 		layoutParams.setMargins(getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), 0, getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), 0);
 		overlayFramelayout.setLayoutParams(layoutParams);
-		
+
 		View view = getLayoutInflater().inflate(R.layout.activity_network_config, overlayFramelayout,false);
 		overlayFramelayout.addView(view);
-		
+
 		final SharedPreferences settings = getSharedPreferences(AndroidApplication.PREFS_NAME, MODE_PRIVATE);
-		
+
 		if(settings.getBoolean("first_run", true)){
 			//Show General Help Overlay
 			final View overlay_view = getLayoutInflater().inflate(R.layout.overlay_parent_button, null,false);
@@ -289,12 +289,13 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 
 	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
+	
 	}
 
 	/*--------------------------------------------------------------------------------------------
 	 * Helper Methods
 	--------------------------------------------------------------------------------------------*/
-	
+
 	/**
 	 * Set up the {@link android.app.ActionBar}.
 	 */
@@ -303,7 +304,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 	}
-	
+
 	/**
 	 * This method is used to extract the name of the device owner
 	 * 
@@ -378,6 +379,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 		// display a message if the connection was not successful
 		if (!connectedSuccessful) {
 			AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+			//TODO use android strings
 			alertDialog.setTitle("InstaCircle - Network not found");
 			alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
 					new DialogInterface.OnClickListener() {
@@ -390,7 +392,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 			alertDialog.show();
 		}
 	}
-	
+
 	public String getIdentification(){
 		Log.d("NetworkConfigActivity", "identification is "+this.etIdentification.toString());
 		return this.etIdentification.getText().toString();

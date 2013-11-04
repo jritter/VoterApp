@@ -1,11 +1,16 @@
 package ch.bfh.evoting.voterapp;
 
+import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.PollReviewFragment;
+import ch.bfh.evoting.voterapp.fragment.WaitForVotesFragment;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.Utility;
 import android.os.Bundle;
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.app.ListActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,11 +27,12 @@ import android.widget.Button;
  * @author Philémon von Bergen
  *
  */
-public class AdminWaitForVotesActivity extends ListActivity implements OnClickListener {
+public class AdminWaitForVotesActivity extends Activity implements OnClickListener {
 
 	private Button btnStopPoll;
 	private AlertDialog dialogBack;
 	private AlertDialog stopPollDialog;
+	private Poll poll;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +53,22 @@ public class AdminWaitForVotesActivity extends ListActivity implements OnClickLi
 
 		btnStopPoll = (Button) findViewById(R.id.button_stop_poll);
 		btnStopPoll.setOnClickListener(this);
+		
+		if(savedInstanceState!=null){
+			poll = (Poll) savedInstanceState.getSerializable("poll");
+		}
+		Poll intentPoll = (Poll)this.getIntent().getSerializableExtra("poll");
+		if(intentPoll!=null){
+			poll = intentPoll;
+		}
+
+		FragmentManager fm = getFragmentManager();
+		WaitForVotesFragment fragment = new WaitForVotesFragment();
+		Bundle bundle = new Bundle();
+		bundle.putSerializable("poll", poll);
+		fragment.setArguments(bundle);
+
+		fm.beginTransaction().replace(R.id.fragment_container, fragment, "wait").commit();
 	}
 	
 	@Override
@@ -56,6 +78,12 @@ public class AdminWaitForVotesActivity extends ListActivity implements OnClickLi
 	}
 
 	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putSerializable("poll", poll);
+	}
+	
+	@Override
 	public void onBackPressed() {
 		//Show a dialog to ask confirmation to quit vote 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -63,7 +91,7 @@ public class AdminWaitForVotesActivity extends ListActivity implements OnClickLi
 		builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				dialogBack.dismiss();
-				AdminWaitForVotesActivity.super.onBackPressed();
+				startActivity(new Intent(AdminWaitForVotesActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
 			}
 		});
 		builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
