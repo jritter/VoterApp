@@ -1,9 +1,13 @@
 package ch.bfh.evoting.voterapp;
 
+import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.WaitForVotesFragment;
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ListActivity;
+import android.app.FragmentManager;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.Menu;
@@ -14,9 +18,10 @@ import android.view.MenuItem;
  * @author Philémon von Bergen
  *
  */
-public class WaitForVotesActivity extends ListActivity {
+public class WaitForVotesActivity extends Activity {
 
 	private AlertDialog dialogBack;
+	private Poll poll;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -29,12 +34,34 @@ public class WaitForVotesActivity extends ListActivity {
 		AndroidApplication.getInstance().setCurrentActivity(this);
 
 		setContentView(R.layout.activity_wait_for_votes);
+		
+		if(savedInstanceState!=null){
+			poll = (Poll) savedInstanceState.getSerializable("poll");
+		}
+		Poll intentPoll = (Poll)this.getIntent().getSerializableExtra("poll");
+		if(intentPoll!=null){
+			poll = intentPoll;
+		}
+		
+		FragmentManager fm = getFragmentManager();
+		WaitForVotesFragment fragment = new WaitForVotesFragment();
+		Bundle bundle = new Bundle();
+		bundle.putSerializable("poll", poll);
+		fragment.setArguments(bundle);
+
+		fm.beginTransaction().replace(R.id.fragment_container, fragment, "wait").commit();
 	}
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
 		AndroidApplication.getInstance().setCurrentActivity(this);
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putSerializable("poll", poll);
 	}
 
 	@Override
@@ -45,7 +72,7 @@ public class WaitForVotesActivity extends ListActivity {
 		builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				dialogBack.dismiss();
-				WaitForVotesActivity.super.onBackPressed();
+				startActivity(new Intent(WaitForVotesActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
 			}
 		});
 		builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {

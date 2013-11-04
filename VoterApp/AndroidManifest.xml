@@ -30,17 +30,6 @@
 
         <!-- TODO remove when no more needed -->
         <service android:name="ch.bfh.evoting.voterapp.VoteActivity$VoteService" />
-        <!--
-        <service android:name="ch.bfh.evoting.instacirclelib.service.ProcessUnicastMessageIntentService" />
-        <service android:name="ch.bfh.evoting.instacirclelib.service.ProcessBroadcastMessageIntentService" />
-        <service android:name="ch.bfh.evoting.instacirclelib.service.SendBroadcastIntentService" />
-        <service android:name="ch.bfh.evoting.instacirclelib.service.SendUnicastIntentService" />
-        <service
-            android:name="ch.bfh.evoting.instacirclelib.service.NetworkService"
-            android:enabled="true"
-            android:exported="true" >
-        </service>
-        -->
 
         <activity
             android:name="ch.bfh.evoting.voterapp.MainActivity"
@@ -59,13 +48,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.bfh.evoting.voterapp.MainActivity" />
         </activity>
-        
         <activity
             android:name="ch.bfh.evoting.voterapp.PollDetailActivity"
             android:label="@string/title_activity_poll_detail"
+            android:launchMode="singleTop"
             android:parentActivityName="ch.bfh.evoting.voterapp.PollActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize"
-            android:launchMode="singleTop" >
+            android:windowSoftInputMode="stateHidden|adjustResize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.bfh.evoting.voterapp.PollActivity" />
@@ -87,7 +75,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.bfh.evoting.voterapp.PollDetailActivity" />
         </activity>
-        
         <activity
             android:name="ch.bfh.evoting.voterapp.ElectorateActivity"
             android:label="@string/title_activity_electorate"
@@ -99,7 +86,6 @@
         <activity
             android:name="ch.bfh.evoting.voterapp.ReviewPollActivity"
             android:label="@string/title_activity_review_poll"
-            android:noHistory="true"
             android:parentActivityName="ch.bfh.evoting.voterapp.NetworkInformationActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -107,8 +93,7 @@
         </activity>
         <activity
             android:name="ch.bfh.evoting.voterapp.AdminWaitForVotesActivity"
-            android:label="@string/title_activity_wait_for_votes_admin"
-            android:noHistory="true" >
+            android:label="@string/title_activity_wait_for_votes_admin" >
         </activity>
         <activity
             android:name="ch.bfh.evoting.voterapp.ListTerminatedPollsActivity"
@@ -121,7 +106,6 @@
         <activity
             android:name="ch.bfh.evoting.voterapp.CheckElectorateActivity"
             android:label="@string/title_activity_check_electorate"
-            android:noHistory="true"
             android:parentActivityName="ch.bfh.evoting.voterapp.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -129,19 +113,17 @@
         </activity>
         <activity
             android:name="ch.bfh.evoting.voterapp.ReviewPollVoterActivity"
-            android:label="@string/title_activity_review_poll"
-            android:noHistory="true" >
+            android:label="@string/title_activity_review_poll" >
         </activity>
         <activity
             android:name="ch.bfh.evoting.voterapp.VoteActivity"
-            android:label="@string/title_activity_vote"
-            android:noHistory="true" >
+            android:label="@string/title_activity_vote" >
         </activity>
         <activity
             android:name="ch.bfh.evoting.voterapp.WaitForVotesActivity"
-            android:label="@string/title_activity_wait_for_votes"
-            android:noHistory="true" >
+            android:label="@string/title_activity_wait_for_votes" >
         </activity>
+<!--               android:noHistory="true" > -->
         <activity
             android:name="ch.bfh.evoting.voterapp.network.wifi.CreateNetworkActivity"
             android:label="@string/title_activity_create_network"
@@ -150,7 +132,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.bfh.evoting.voterapp.NetworkConfigActivity" />
         </activity>
-        
         <activity
             android:name="com.google.zxing.client.android.CaptureActivity"
             android:configChanges="orientation|keyboardHidden"

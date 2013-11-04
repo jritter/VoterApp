@@ -49,9 +49,7 @@ public class WaitForVotesFragment extends ListFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);	
-		if(savedInstanceState!=null){
-			poll = (Poll)savedInstanceState.getSerializable("poll");
-		}
+		this.poll = (Poll)this.getArguments().getSerializable("poll");
 	}
 
 	@Override

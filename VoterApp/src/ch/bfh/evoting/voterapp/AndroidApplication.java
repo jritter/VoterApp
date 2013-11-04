@@ -5,6 +5,7 @@ import org.apache.log4j.Level;
 
 import ch.bfh.evoting.voterapp.network.AllJoynNetworkInterface;
 import ch.bfh.evoting.voterapp.network.NetworkInterface;
+import ch.bfh.evoting.voterapp.network.NetworkMonitor;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.JavaSerialization;
 import ch.bfh.evoting.voterapp.util.SerializationUtil;
@@ -12,12 +13,15 @@ import ch.bfh.evoting.voterapp.util.Utility;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
@@ -40,6 +44,7 @@ public class AndroidApplication extends Application {
 	private boolean voteRunning;
 	
 	private AlertDialog dialogNetworkLost;
+	private NetworkMonitor networkMonitor;
 
 	/**
 	 * Return the single instance of this class
@@ -54,15 +59,27 @@ public class AndroidApplication extends Application {
 		super.onCreate();
 
 		//TODO remove when not used anymore
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-		settings.edit().putBoolean("first_run_ReviewPollVoterActivity", true).commit();
-		settings.edit().putBoolean("first_run_NetworkConfigActivity", true).commit();
-		settings.edit().putBoolean("first_run", true).commit();
+//		SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+//		settings.edit().putBoolean("first_run_ReviewPollVoterActivity", true).commit();
+//		settings.edit().putBoolean("first_run_NetworkConfigActivity", true).commit();
+//		settings.edit().putBoolean("first_run", true).commit();
 
+		WifiManager wm = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+		if(!wm.isWifiEnabled()){
+			wm.setWifiEnabled(true);
+		}
 
 		instance = this;
 		instance.initializeInstance();
 		Utility.initialiseLogging();
+		
+		//wifi event listener
+		IntentFilter filters = new IntentFilter();
+		filters.addAction("android.net.wifi.STATE_CHANGED");
+		filters.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+		networkMonitor = new NetworkMonitor(this);
+		this.registerReceiver(networkMonitor, filters);
+		
 		LocalBroadcastManager.getInstance(this).registerReceiver(mGroupEventReceiver, new IntentFilter(BroadcastIntentTypes.networkGroupDestroyedEvent));
 		LocalBroadcastManager.getInstance(this).registerReceiver(mAttackDetecter, new IntentFilter(BroadcastIntentTypes.attackDetected));
 		LocalBroadcastManager.getInstance(this).registerReceiver(startPollReceiver, new IntentFilter(BroadcastIntentTypes.electorate));
@@ -72,6 +89,9 @@ public class AndroidApplication extends Application {
 	public void onTerminate() {
 		if(this.ni!=null)
 			this.ni.disconnect();
+		this.unregisterReceiver(networkMonitor);
+		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		notificationManager.cancel("mobivote", 1);
 		super.onTerminate();
 	}
 
@@ -118,31 +138,90 @@ public class AndroidApplication extends Application {
 		return ni;
 	}
 
+	/**
+	 * Get the network monitor receiving wifi events
+	 * @return the network monitor receiving wifi events
+	 */
+	public NetworkMonitor getNetworkMonitor(){
+		return this.networkMonitor;
+	}
+	
+	/**
+	 * Get the activity that is currently running
+	 * @return the activity that is currently running, null if none is running
+	 */
 	public Activity getCurrentActivity(){
 		return currentActivity;
 	}
 
+	/**
+	 * Set the activity that is currently running
+	 * @param currentActivity the activity that is currently running
+	 */
 	public void setCurrentActivity(Activity currentActivity){
 		this.currentActivity = currentActivity;
+		
+		if(isVoteRunning()){
+			// Create a pending intent which will be invoked after tapping on the
+			// Android notification
+			Intent notificationIntent = new Intent(this,
+					currentActivity.getClass());
+			notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+			PendingIntent pendingNotificationIntent = PendingIntent.getActivity(
+					this, 0, notificationIntent, 0);
+
+			// Setting up the notification which is being displayed
+			Notification.Builder notificationBuilder = new Notification.Builder(
+					this);
+			notificationBuilder.setContentTitle(getResources().getString(
+					R.string.app_name));
+			notificationBuilder
+					.setContentText(getResources().getString(R.string.notification));
+			notificationBuilder
+					.setSmallIcon(R.drawable.ic_launcher);
+			notificationBuilder.setContentIntent(pendingNotificationIntent);
+			notificationBuilder.setOngoing(true);
+			@SuppressWarnings("deprecation")
+			Notification notification = notificationBuilder.getNotification();
+
+			NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+			notificationManager.notify("mobivote", 1, notification);
+		} else {
+			NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+			notificationManager.cancel("mobivote", 1);
+		}
 	}
 
-	public void unregisterCurrentActivity(Activity activity){
-		if (currentActivity != null && currentActivity.equals(activity))
-			this.setCurrentActivity(null);
-	}
-
+	/**
+	 * Set a flag indicating that a vote session is running
+	 * @param running true if a vote session is running, false otherwise
+	 */
 	public void setVoteRunning(boolean running){
 		this.voteRunning = running;
 	}
 
+	/**
+	 * Indicate if a vote session is running
+	 * @return true if yes, false otherwise
+	 */
 	public boolean isVoteRunning(){
 		return voteRunning;
 	}
 	
+	/**
+	 * Indicate if this user is the administrator of the vote
+	 * @return true if yes, false otherwise
+	 */
 	public boolean isAdmin() {
 		return isAdmin;
 	}
 
+	/**
+	 * Set if this user is the administrator of the vote 
+	 * @param isAdmin true if this user is the administrator of the vote, false otherwise
+	 */
 	public void setIsAdmin(boolean isAdmin) {
 		this.isAdmin = isAdmin;
 	}
@@ -225,7 +304,7 @@ public class AndroidApplication extends Application {
 			}
 		}
 	};
-
+	
 	/**
 	 * this broadcast receiver listen for broadcasts containing the electorate. So, if the user is member
 	 * of a session, when the admin sends the electorate, the user is redirected to the correct activity, wherever

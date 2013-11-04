@@ -5,15 +5,16 @@
     android:background="@color/background_overlay"
     android:orientation="vertical" >
 
-     <ImageView
+    <ImageView
         android:id="@+id/imageView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="0dp"
         android:layout_marginTop="0dp"
+        android:contentDescription="@string/help"
         android:src="@drawable/arrow_up_right" />
-   
-      <TextView
+
+    <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -25,15 +26,15 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@android:color/white" />
 
-      <TextView
+    <TextView
         android:id="@+id/textView3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
         android:layout_alignParentBottom="true"
+        android:layout_marginBottom="24dp"
         android:gravity="center_vertical|center_horizontal"
         android:text="@string/overlay_close"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@android:color/white" />
-      
+
 </RelativeLayout>

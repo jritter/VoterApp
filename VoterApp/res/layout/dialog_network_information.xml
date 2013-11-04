@@ -10,13 +10,13 @@
         android:layout_margin="@dimen/dialog_title_margin"
         android:text="@string/network_info" >
     </TextView>
-    
+
     <View
         android:id="@+id/separator_identification"
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:layout_below="@+id/title"
         android:layout_alignParentLeft="true"
+        android:layout_below="@+id/title"
         android:background="@color/theme_color" />
 
     <fragment
@@ -29,7 +29,5 @@
         android:layout_margin="@dimen/margin"
         class="ch.bfh.evoting.voterapp.fragment.NetworkInformationFragment"
         android:tag="networkInformation" />
-
-    
 
 </RelativeLayout>

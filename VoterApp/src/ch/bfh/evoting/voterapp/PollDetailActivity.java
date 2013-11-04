@@ -16,7 +16,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.DataSetObserver;
 import android.os.AsyncTask;
@@ -37,7 +36,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -238,6 +236,11 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 		}
 
 		if (view == btnStartPoll){
+			if(!AndroidApplication.getInstance().getNetworkMonitor().isWifiEnabled()){
+				for(int i=0; i<2; i++)
+					Toast.makeText(this, getString(R.string.toast_wifi_is_disabled), Toast.LENGTH_SHORT).show();
+				return;
+			}
 			startVote();
 		}
 	}

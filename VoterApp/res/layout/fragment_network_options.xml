@@ -42,5 +42,5 @@
             android:minHeight="80dip"
             android:text="@string/advance_network_config" />
     </LinearLayout>
-    
+
 </ScrollView>

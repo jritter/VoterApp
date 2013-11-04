@@ -82,11 +82,27 @@
             android:text="@string/group_password_desc"
             style="?android:attr/listSeparatorTextViewStyle" >
         </TextView>
-
-
-
+        
         <TextView
             android:id="@+id/textview_group_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textStyle="" >
+        </TextView>
+        
+        <TextView
+            android:id="@+id/textview_identification_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/identification"
+            style="?android:attr/listSeparatorTextViewStyle" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/textview_identification"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
