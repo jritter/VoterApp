@@ -61,4 +61,14 @@ public class ResultChartFragment extends Fragment {
 		return v;
 	}
 
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		try {
+	        getFragmentManager().beginTransaction().remove(this).commit();
+	    } catch (IllegalStateException e) {
+	       
+	    }
+	}
+
 }

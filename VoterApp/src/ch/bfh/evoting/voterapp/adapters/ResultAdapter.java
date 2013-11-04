@@ -20,7 +20,7 @@ import android.widget.TextView;
 import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Poll;
-import ch.bfh.evoting.voterapp.fragment.ResultChartDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.ResultChartFragment;
 import ch.bfh.evoting.voterapp.util.OptionsComparator;
 import ch.bfh.evoting.voterapp.util.ResultChartItem;
 import ch.bfh.evoting.voterapp.util.Separator;
@@ -137,14 +137,12 @@ public class ResultAdapter extends BaseAdapter {
 		} else if (this.getItem(position) instanceof ResultChartItem) {
 
 			fm = ((Activity) context).getFragmentManager();
-			resultChartFragment = fm.findFragmentByTag("resultChart");
-			if (resultChartFragment != null){
-				ft = fm.beginTransaction();
-				ft.remove(resultChartFragment);
-				ft.commit();
-			}
 			view = inflater.inflate(R.layout.list_item_chartfragment, parent,
 					false);
+			ResultChartFragment resultChartFragment = new ResultChartFragment();
+			ft = fm.beginTransaction();
+			ft.add(R.id.fragment_result_chart, resultChartFragment);
+			ft.commit();
 		} else {
 			view = inflater.inflate(R.layout.list_item_string, parent, false);
 			TextView tvSeparator = (TextView) view
