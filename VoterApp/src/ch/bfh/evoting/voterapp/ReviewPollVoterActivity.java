@@ -11,14 +11,12 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
-import ch.bfh.evoting.voterapp.fragment.NetworkOptionsFragment;
 import ch.bfh.evoting.voterapp.fragment.PollReviewFragment;
 
 /**

@@ -2,7 +2,7 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical" >
-    
+
     <fragment
         android:id="@+id/fragment_result_chart"
         android:name="ch.bfh.evoting.voterapp.fragment.ResultChartFragment"

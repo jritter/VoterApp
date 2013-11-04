@@ -2,9 +2,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:layout_marginLeft="@dimen/activity_horizontal_margin"
     android:layout_marginRight="@dimen/activity_horizontal_margin"
-    android:layout_marginLeft="@dimen/activity_horizontal_margin" >
+    android:orientation="vertical" >
 
     <TextView
         android:id="@+id/textview_wait_votes"
@@ -16,14 +16,18 @@
         android:text="@string/wait_votes"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <!-- <fragment
+    <!--
+         <fragment
         android:id="@+id/fragment_wait_for_votes"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        class="ch.bfh.evoting.voterapp.fragment.WaitForVotesFragment" ></fragment> -->
-	<RelativeLayout
+        class="ch.bfh.evoting.voterapp.fragment.WaitForVotesFragment" ></fragment>
+    -->
+
+    <RelativeLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
     </RelativeLayout>
+
 </LinearLayout>

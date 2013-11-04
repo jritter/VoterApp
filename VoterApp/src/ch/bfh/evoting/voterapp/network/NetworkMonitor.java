@@ -1,7 +1,5 @@
 package ch.bfh.evoting.voterapp.network;
 
-import ch.bfh.evoting.voterapp.AndroidApplication;
-import ch.bfh.evoting.voterapp.NetworkConfigActivity;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,8 +9,12 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 
+/**
+ * Broadcast receiver listening for events concerning the wifi network
+ * @author Philémon von Bergen
+ *
+ */
 public class NetworkMonitor extends BroadcastReceiver {
 
 	private Context context;
@@ -22,6 +24,10 @@ public class NetworkMonitor extends BroadcastReceiver {
 	private WifiManager wifi;
 	private ConnectivityManager connManager;
 
+	/**
+	 * Create an object
+	 * @param context android apllication context
+	 */
 	public NetworkMonitor(Context context){
 		this.context=context;
 		wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
@@ -34,6 +40,9 @@ public class NetworkMonitor extends BroadcastReceiver {
 		checkConnectivity();
 	}
 	
+	/**
+	 * Helper method checking the state of the connectivity
+	 */
 	private void checkConnectivity(){
 				
 	    if (wifi.isWifiEnabled()==true) {
@@ -57,16 +66,27 @@ public class NetworkMonitor extends BroadcastReceiver {
 	    }
 	}
 	
+	/**
+	 * Helper method called when connectivity has been lost
+	 */
 	private void onLosingConnection() {
 		Intent intent = new Intent(BroadcastIntentTypes.networkGroupDestroyedEvent);
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 	}
 	
+	/**
+	 * Indicate if wifi is enabled
+	 * @return true if yes, false otherwise
+	 */
 	public boolean isWifiEnabled(){
 		checkConnectivity();
 		return wifiEnabled;
 	}
 	
+	/**
+	 * Indicate if the device is connected to a network
+	 * @return true if yes, false otherwise
+	 */
 	public boolean isConnected(){
 		/*WifiManager wm = (WifiManager) getActivity().getSystemService(NetworkConfigActivity.WIFI_SERVICE);
 		WifiInfo wifiInfo = wm.getConnectionInfo().g;*/
@@ -74,6 +94,10 @@ public class NetworkMonitor extends BroadcastReceiver {
 		return connected;
 	}
 	
+	/**
+	 * Get the currently connected SSID
+	 * @return the currently connected SSID
+	 */
 	public String getConnectedSSID(){
 		checkConnectivity();
 		return ssid;

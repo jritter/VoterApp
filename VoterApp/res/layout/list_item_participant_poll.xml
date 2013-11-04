@@ -1,5 +1,3 @@
-
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -52,14 +50,14 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:indeterminate="true" />
-        
+
         <ImageButton
-	        android:id="@+id/button_validate_review"
-	        style="@style/AcceptReviewButton"
-	        android:layout_width="48dp"
-	        android:layout_height="48dp"
-	        android:contentDescription="@string/accepted"
-	        android:src="@drawable/ic_action_accept" />
+            android:id="@+id/button_validate_review"
+            style="@style/AcceptReviewButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:contentDescription="@string/accepted"
+            android:src="@drawable/ic_action_accept" />
     </LinearLayout>
 
 </LinearLayout>

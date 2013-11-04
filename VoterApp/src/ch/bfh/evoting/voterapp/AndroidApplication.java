@@ -21,9 +21,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.net.NetworkInfo;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
@@ -62,7 +59,7 @@ public class AndroidApplication extends Application {
 		super.onCreate();
 
 		//TODO remove when not used anymore
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+//		SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 //		settings.edit().putBoolean("first_run_ReviewPollVoterActivity", true).commit();
 //		settings.edit().putBoolean("first_run_NetworkConfigActivity", true).commit();
 //		settings.edit().putBoolean("first_run", true).commit();
@@ -141,14 +138,26 @@ public class AndroidApplication extends Application {
 		return ni;
 	}
 
+	/**
+	 * Get the network monitor receiving wifi events
+	 * @return the network monitor receiving wifi events
+	 */
 	public NetworkMonitor getNetworkMonitor(){
 		return this.networkMonitor;
 	}
 	
+	/**
+	 * Get the activity that is currently running
+	 * @return the activity that is currently running, null if none is running
+	 */
 	public Activity getCurrentActivity(){
 		return currentActivity;
 	}
 
+	/**
+	 * Set the activity that is currently running
+	 * @param currentActivity the activity that is currently running
+	 */
 	public void setCurrentActivity(Activity currentActivity){
 		this.currentActivity = currentActivity;
 		
@@ -173,6 +182,7 @@ public class AndroidApplication extends Application {
 					.setSmallIcon(R.drawable.ic_launcher);
 			notificationBuilder.setContentIntent(pendingNotificationIntent);
 			notificationBuilder.setOngoing(true);
+			@SuppressWarnings("deprecation")
 			Notification notification = notificationBuilder.getNotification();
 
 			NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -184,23 +194,34 @@ public class AndroidApplication extends Application {
 		}
 	}
 
-	public void unregisterCurrentActivity(Activity activity){
-		if (currentActivity != null && currentActivity.equals(activity))
-			this.setCurrentActivity(null);
-	}
-
+	/**
+	 * Set a flag indicating that a vote session is running
+	 * @param running true if a vote session is running, false otherwise
+	 */
 	public void setVoteRunning(boolean running){
 		this.voteRunning = running;
 	}
 
+	/**
+	 * Indicate if a vote session is running
+	 * @return true if yes, false otherwise
+	 */
 	public boolean isVoteRunning(){
 		return voteRunning;
 	}
 	
+	/**
+	 * Indicate if this user is the administrator of the vote
+	 * @return true if yes, false otherwise
+	 */
 	public boolean isAdmin() {
 		return isAdmin;
 	}
 
+	/**
+	 * Set if this user is the administrator of the vote 
+	 * @param isAdmin true if this user is the administrator of the vote, false otherwise
+	 */
 	public void setIsAdmin(boolean isAdmin) {
 		this.isAdmin = isAdmin;
 	}
@@ -284,65 +305,6 @@ public class AndroidApplication extends Application {
 		}
 	};
 	
-//	/**
-//	 * this broadcast receiver listens for information about an attack
-//	 */
-//	private BroadcastReceiver networkMonitor = new BroadcastReceiver() {
-//		
-//		private boolean wifiEnabled;
-//		private boolean connected;
-//		private String ssid;
-//		private boolean connectivityChecked = false;
-//		
-//		@Override
-//		public void onReceive(Context context, Intent intent) {
-//			checkConnectivity();
-//			connectivityChecked =true;
-//		}
-//		
-//		private void checkConnectivity(){
-//			WifiManager wifi = (WifiManager) AndroidApplication.this.getSystemService(Context.WIFI_SERVICE);
-//		    if (wifi.isWifiEnabled()==true) {
-//		      wifiEnabled = true;
-//		    } else {
-//		    	wifiEnabled = false;
-//		    }
-//		    if(WifiInfo.getDetailedStateOf(wifi.getConnectionInfo().getSupplicantState())==NetworkInfo.DetailedState.CONNECTED){
-//		    	connected = true;
-//		    	ssid = wifi.getConnectionInfo().getSSID();
-//			} else {
-//				connected = false;
-//				ssid = "";
-//			}
-//		    if(wifi.getWifiState() == WifiManager.WIFI_STATE_DISABLING){
-//		    	this.onLosingConnection();
-//		    }
-//		    if(WifiInfo.getDetailedStateOf(wifi.getConnectionInfo().getSupplicantState())==NetworkInfo.DetailedState.DISCONNECTING){
-//		    	this.onLosingConnection();
-//		    }
-//		}
-//		
-//		private void onLosingConnection() {
-//			Intent intent = new Intent(BroadcastIntentTypes.networkGroupDestroyedEvent);
-//			LocalBroadcastManager.getInstance(AndroidApplication.this).sendBroadcast(intent);
-//		}
-//		
-//		public boolean isWifiEnabled(){
-//			if(!connectivityChecked) checkConnectivity();
-//			return wifiEnabled;
-//		}
-//		
-//		public boolean isConnected(){
-//			if(!connectivityChecked) checkConnectivity();
-//			return connected;
-//		}
-//		
-//		public String getConnectedSSID(){
-//			if(!connectivityChecked) checkConnectivity();
-//			return ssid;
-//		}
-//	};
-
 	/**
 	 * this broadcast receiver listen for broadcasts containing the electorate. So, if the user is member
 	 * of a session, when the admin sends the electorate, the user is redirected to the correct activity, wherever

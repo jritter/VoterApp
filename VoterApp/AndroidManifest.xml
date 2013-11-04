@@ -30,23 +30,6 @@
 
         <!-- TODO remove when no more needed -->
         <service android:name="ch.bfh.evoting.voterapp.VoteActivity$VoteService" />
-        <!--
-        <service android:name="ch.bfh.evoting.instacirclelib.service.ProcessUnicastMessageIntentService" />
-        <service android:name="ch.bfh.evoting.instacirclelib.service.ProcessBroadcastMessageIntentService" />
-        <service android:name="ch.bfh.evoting.instacirclelib.service.SendBroadcastIntentService" />
-        <service android:name="ch.bfh.evoting.instacirclelib.service.SendUnicastIntentService" />
-        <service
-            android:name="ch.bfh.evoting.instacirclelib.service.NetworkService"
-            android:enabled="true"
-            android:exported="true" >
-        </service>
-        -->
-        <!-- <receiver android:name="ch.bfh.evoting.voterapp.network.NetworkMonitor" >
-            <intent-filter>
-                <action android:name="android.net.wifi.STATE_CHANGE" />
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-        </receiver>  -->
 
         <activity
             android:name="ch.bfh.evoting.voterapp.MainActivity"
