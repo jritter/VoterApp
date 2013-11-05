@@ -27,7 +27,7 @@ import android.widget.Button;
  * @author Philémon von Bergen
  *
  */
-public class AdminWaitForVotesActivity extends Activity implements OnClickListener {
+public class WaitForVotesAdminActivity extends Activity implements OnClickListener {
 
 	private Button btnStopPoll;
 	private AlertDialog dialogBack;
@@ -96,7 +96,7 @@ public class AdminWaitForVotesActivity extends Activity implements OnClickListen
 		builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				dialogBack.dismiss();
-				startActivity(new Intent(AdminWaitForVotesActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+				startActivity(new Intent(WaitForVotesAdminActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
 			}
 		});
 		builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -137,7 +137,7 @@ public class AdminWaitForVotesActivity extends Activity implements OnClickListen
 		switch (item.getItemId()) {
 
 		case R.id.help:
-			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_wait), getString(R.string.help_text_wait) );
+			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_wait), getString(R.string.help_text_wait_admin) );
 			hdf.show( getFragmentManager( ), "help" );
 			return true;
 		case R.id.action_finish_vote:
@@ -166,7 +166,7 @@ public class AdminWaitForVotesActivity extends Activity implements OnClickListen
 		builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				Intent i = new Intent(BroadcastIntentTypes.stopVote);
-				LocalBroadcastManager.getInstance(AdminWaitForVotesActivity.this).sendBroadcast(i);
+				LocalBroadcastManager.getInstance(WaitForVotesAdminActivity.this).sendBroadcast(i);
 
 				//Send stop signal over the network
 				VoteMessage vm = new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_STOP_POLL, null);

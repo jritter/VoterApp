@@ -84,7 +84,7 @@
                 android:value="ch.bfh.evoting.voterapp.PollDetailActivity" />
         </activity>
         <activity
-            android:name="ch.bfh.evoting.voterapp.ReviewPollActivity"
+            android:name="ch.bfh.evoting.voterapp.ReviewPollAdminActivity"
             android:label="@string/title_activity_review_poll"
             android:parentActivityName="ch.bfh.evoting.voterapp.NetworkInformationActivity" >
             <meta-data
@@ -92,7 +92,7 @@
                 android:value="ch.bfh.evoting.voterapp.ElectorateActivity" />
         </activity>
         <activity
-            android:name="ch.bfh.evoting.voterapp.AdminWaitForVotesActivity"
+            android:name="ch.bfh.evoting.voterapp.WaitForVotesAdminActivity"
             android:label="@string/title_activity_wait_for_votes_admin" >
         </activity>
         <activity
@@ -120,7 +120,7 @@
             android:label="@string/title_activity_vote" >
         </activity>
         <activity
-            android:name="ch.bfh.evoting.voterapp.WaitForVotesActivity"
+            android:name="ch.bfh.evoting.voterapp.WaitForVotesVoterActivity"
             android:label="@string/title_activity_wait_for_votes" >
         </activity>
 <!--               android:noHistory="true" > -->

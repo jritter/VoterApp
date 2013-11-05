@@ -7,7 +7,10 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.TextView;
 
 public class HelpDialogFragment extends DialogFragment {
@@ -31,9 +34,14 @@ public class HelpDialogFragment extends DialogFragment {
 		View view = getActivity().getLayoutInflater().inflate(R.layout.dialog_help, null);
 		TextView tv_subtitle = (TextView)view.findViewById(R.id.subtitle);
 		tv_subtitle.setText(getArguments( ).getString( "subtitle" ));
-		TextView tv_text = (TextView)view.findViewById(R.id.text);
-		tv_text.setText(getArguments( ).getString( "text" ));
-
+//		TextView tv_text = (TextView)view.findViewById(R.id.text);
+//		tv_text.setText(Html.fromHtml(getArguments( ).getString( "text" )));
+//		tv_text.setMovementMethod(LinkMovementMethod.getInstance());
+		WebView webView = (WebView) view.findViewById(R.id.help_webview);
+		webView.loadDataWithBaseURL(null, getArguments( ).getString( "text" ), "text/html", "utf-8", null);
+		webView.setBackgroundColor(0x00000000);
+		webView.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
+		
 		AlertDialog.Builder builder = new AlertDialog.Builder( getActivity( ) )
 		.setView(view)
 		.setIcon( android.R.drawable.ic_dialog_info )

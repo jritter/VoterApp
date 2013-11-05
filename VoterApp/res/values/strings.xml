@@ -72,10 +72,10 @@
     <string name="result_chart">Result Chart</string>
     <string name="no_options">There are currently no Options</string>
     <string name="notification">A vote is currently running. Tap to bring in front.</string>
-	<string name="network_not_found">Network not found</string>
-	<string name="network_not_found_text">The network \"%1$s\" is not available, cannot connect.</string>
+    <string name="network_not_found">Network not found</string>
+    <string name="network_not_found_text">The network \"%1$s\" is not available, cannot connect.</string>
 
-	<!-- Action bar titles -->
+    <!-- Action bar titles -->
     <string name="action_rescan_wifi">Rescan Wifi Networks</string>
     <string name="validate_review">I agree</string>
     <string name="delete_poll">Delete vote</string>
@@ -113,7 +113,7 @@
     <string name="dialog_title_no_identification">No identification set</string>
     <string name="dialog_no_identification">You did not enter an identification. Please first do that.</string>
     <string name="dialog_confirm_vote">
-	<![CDATA[
+<![CDATA[
 			You have selected the following option:<br /><br /><b>%1$s</b><br /><br />Do you want to confirm your choice and send your vote?"
 		]]>
     </string>
@@ -142,8 +142,7 @@
     <string name="dialog_title_result_chart">Result Chart</string>
     <string name="toast_wifi_is_not_connected">You are not currently connected to a wireless network. Please choose another option.</string>
     <string name="toast_wifi_is_disabled">Wifi is currently disabled. Please enable it first.</string>
-    
-    
+
     <!-- Help overlays -->
     <string name="overlay_close">Touch the screen to close this help</string>
     <string name="overlay_identification">Put your identification here...</string>
@@ -151,7 +150,7 @@
     <string name="overlay_review">Check the content...</string>
     <string name="overlay_review_ok">... and press the button if you agree with it.</string>
     <string name="overlay_previous_screen">Use this button to return to previous screen.</string>
-    
+
     <!-- Activity titles -->
     <string name="voter_app_app_name">MobiVote</string>
     <string name="title_activity_network_config">Join Group</string>
@@ -210,7 +209,7 @@
     <string name="description_qrcode">QR Code</string>
 
     <!-- Help dialog titles -->
-    <string name="help_title_main">Help for home screen</string>
+    <string name="help_title_main">Welcome on the home screen of MobiVote</string>
     <string name="help_title_electorate">Help for electorate selection</string>
     <string name="help_title_review">Help for vote review</string>
     <string name="help_title_network_info">Help for network information</string>
@@ -219,29 +218,104 @@
     <string name="help_title_display_results">Help for results</string>
     <string name="help_title_archive">Help for archive</string>
     <string name="help_title_network_config">Help for network configuration</string>
-    <string name="help_title_main">Help for home screen</string>
-    <string name="help_title_network_config">Help for network configuration</string>
     <string name="help_title_poll">Help for vote creation</string>
     <string name="help_title_poll_details">Help for vote details</string>
-    <string name="help_title_electorate">Help for electorate selection</string>
-    <string name="help_title_review">Help for vote review</string>
-    <string name="help_title_wait">Help for vote state</string>
 
     <!-- Help dialog texts -->
-    <string name="help_text_main">The home screen allows you to... and so on. The home screen allows you to... and so on. The home screen allows you to... and so on. The home screen allows you to... and so on. The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.The home screen allows you to... and so on.</string>
-    <string name="help_text_electorate">electorate selection</string>
-    <string name="help_text_review">vote review</string>
-    <string name="help_text_network_info">network information</string>
-    <string name="help_text_vote">vote</string>
-    <string name="help_text_wait">vote state</string>
-    <string name="help_text_display_results">display resutls</string>
-    <string name="help_text_archive">archive</string>
-    <string name="help_text_network_config">network configuration</string>
-    <string name="help_text_network_config">network configuration</string>
-    <string name="help_text_poll">vote creation</string>
-    <string name="help_text_poll_details">vote details</string>
-    <string name="help_text_electorate">electorate selection</string>
-    <string name="help_text_review">vote review</string>
-    <string name="help_text_wait">vote state</string>
+    <string name="help_text_main">
+<![CDATA[
+			This app allows you to set up a vote between people using their smartphone. The vote session takes place over a wifi network.
+			<br /><br />
+			From this screen, you have three options.
+			<ul>
+			<li><b>Join electorate:</b> join a vote initiated by another person.</li>
+			<li><b>Votes:</b> set up your own vote.</li>
+			<li><b>Vote archive:</b> consult old votes to which you participated.</li>
+			</ul>
+			<br />
+			<b>About this app</b>
+			<br />This app was created in a Master thesis of a student of the Bern University of Applies Sciences (BFH) affiliated to a research group on e-voting<br/> (see the <a href="http://e-voting.bfh.ch">website</a>).
+		]]>
+    </string>
+    <string name="help_text_poll">
+<![CDATA[
+			<b>In this screen you can create your own votes</b>. All the votes you have created (but which you didn\'t run) appear on this screen.
+			<b>This allows you to prepare a vote that will be run later</b>.
+			<br/><br/>
+			<ul>
+			<li>By clicking on one of the available polls, you will enter in the edition screen, where you will be able to modify the vote or to run it.</li>
+			<li>With the button at the bottom of the list of available votes, you can define a new vote.</li>
+			<li>The garbage icon allows you to delete a poll.</li>
+			</ul>
+		]]>
+    </string>
+    <string name="help_text_poll_details">
+<![CDATA[
+			<b>In this screen you can define the parameters of the vote.</b>
+			<ul>
+			<li><b>Question:</b> this is the question to which the voter will have to answer to.</li>
+			<li><b>Options:</b> this is the list of answers out of which the voters will have to choose one. You can add an option by entering a text in the field at the bottom of the screen and validating in with the + button. You can remove an option by clicking on the corresponding garbage icon.</li>
+			<li><b>Allow empty votes:</b> this checkbox adds or remove an option from the list which represent the "No opinon" vote</li>
+			<li><b>Start vote:</b> when you have finished defining the vote, you can either press on the "Start vote" button (at the bottom of the screen for phone, at the upper right corner on tablets) or go back using the button in the upper left corner, and saving it. When you save it, you will be able to access it again later in order to modify and run it.</li>
+			</ul>
+		]]>
+    </string>
+    <string name="help_text_network_config">
+<![CDATA[
+			
+		]]>
+    </string>
+    <string name="help_text_network_info">
+<![CDATA[
+			
+		]]>
+    </string>
+    <string name="help_text_electorate_admin">
+<![CDATA[
+			In this screen, you, as creator of the vote (also called administrator), <b>have to select the people that will have the right to vote</b>.  
+			<br/><br/>
+			This screen shows you all the participant that are connected to the network session. With the checkboxes on the right, you can select the participant to whom you want to give the right to vote.
+		]]>
+    </string>
+    <string name="help_text_review_admin">
+<![CDATA[
+			
+		]]>
+    </string>
+    <string name="help_text_electorate_voter">
+<![CDATA[
+			
+		]]>
+    </string>
+    <string name="help_text_review_voter">
+<![CDATA[
+			
+		]]>
+    </string>
+    <string name="help_text_vote">
+<![CDATA[
+			
+		]]>
+    </string>
+    <string name="help_text_wait_admin">
+<![CDATA[
+			
+		]]>
+    </string>
+    <string name="help_text_wait_voter">
+<![CDATA[
+			
+		]]>
+    </string>
+    <string name="help_text_display_results">
+<![CDATA[
+			
+		]]>
+    </string>
+    <string name="help_text_archive">
+<![CDATA[
+			
+		]]>
+    </string>
 
 </resources>

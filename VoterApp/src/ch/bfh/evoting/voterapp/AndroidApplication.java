@@ -13,6 +13,8 @@ import ch.bfh.evoting.voterapp.util.Utility;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
+import android.app.KeyguardManager;
+import android.app.KeyguardManager.KeyguardLock;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -24,7 +26,10 @@ import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.support.v4.content.LocalBroadcastManager;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 /**
@@ -46,6 +51,8 @@ public class AndroidApplication extends Application {
 	
 	private AlertDialog dialogNetworkLost;
 	private NetworkMonitor networkMonitor;
+	private WakeLock wl;
+	private KeyguardLock kl;
 
 	/**
 	 * Return the single instance of this class
@@ -58,6 +65,15 @@ public class AndroidApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+//		PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+//        wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK
+//                | PowerManager.ACQUIRE_CAUSES_WAKEUP
+//                | PowerManager.ON_AFTER_RELEASE, "INFO");
+//        wl.acquire();
+//
+//        KeyguardManager km = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
+//        kl = km.newKeyguardLock("name");
+//        kl.disableKeyguard();
 
 		//TODO remove when not used anymore
 //		SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -334,6 +350,8 @@ public class AndroidApplication extends Application {
 		private String connectedSSID = "";
 
 		public void onActivityCreated(Activity activity, Bundle bundle) {
+			activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+			activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		}
 
 		public void onActivityDestroyed(Activity activity) {

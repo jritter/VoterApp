@@ -273,12 +273,12 @@ public class VoteActivity extends Activity {
 		//Start activity waiting for other participants to vote
 		//If is admin, returns to admin app wait activity
 		if(AndroidApplication.getInstance().isAdmin()){
-			Intent i = new Intent(this, AdminWaitForVotesActivity.class);
+			Intent i = new Intent(this, WaitForVotesAdminActivity.class);
 			i.putExtra("poll", (Serializable)poll);
 			i.putExtra("votes", VoteService.getInstance().getVotes());
 			startActivity(i);
 		} else {
-			Intent intent = new Intent(this, WaitForVotesActivity.class);
+			Intent intent = new Intent(this, WaitForVotesVoterActivity.class);
 			intent.putExtra("poll", (Serializable)poll);
 			intent.putExtra("votes", VoteService.getInstance().getVotes());
 			startActivity(intent);

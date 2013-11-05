@@ -27,7 +27,7 @@ import android.widget.Toast;
  * @author Philémon von Bergen
  * 
  */
-public class ReviewPollActivity extends Activity implements OnClickListener {
+public class ReviewPollAdminActivity extends Activity implements OnClickListener {
 
 	private Poll poll;
 
@@ -119,7 +119,7 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 		case R.id.help:
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance(
 					getString(R.string.help_title_review),
-					getString(R.string.help_text_review));
+					getString(R.string.help_text_review_admin));
 			hdf.show(getFragmentManager(), "help");
 			return true;
 		case R.id.action_start_voteperiod:
@@ -187,7 +187,7 @@ public class ReviewPollActivity extends Activity implements OnClickListener {
 			intent.putExtra("poll", (Serializable) poll);
 			startActivity(intent);
 		} else {
-			Intent intent = new Intent(this, AdminWaitForVotesActivity.class);
+			Intent intent = new Intent(this, WaitForVotesAdminActivity.class);
 			intent.putExtra("poll", (Serializable) poll);
 			startActivity(intent);
 		}

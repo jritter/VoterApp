@@ -18,7 +18,7 @@ import android.view.MenuItem;
  * @author Philémon von Bergen
  *
  */
-public class WaitForVotesActivity extends Activity {
+public class WaitForVotesVoterActivity extends Activity {
 
 	private AlertDialog dialogBack;
 	private Poll poll;
@@ -72,7 +72,7 @@ public class WaitForVotesActivity extends Activity {
 		builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
 				dialogBack.dismiss();
-				startActivity(new Intent(WaitForVotesActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+				startActivity(new Intent(WaitForVotesVoterActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
 			}
 		});
 		builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -93,7 +93,7 @@ public class WaitForVotesActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 
 		if (item.getItemId() == R.id.help){
-			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_wait), getString(R.string.help_text_wait) );
+			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_wait), getString(R.string.help_text_wait_voter) );
 	        hdf.show( getFragmentManager( ), "help" );
 	        return true;
 		}

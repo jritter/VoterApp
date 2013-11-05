@@ -183,7 +183,7 @@ public class CheckElectorateActivity extends ListActivity {
 			ndf.show( getFragmentManager( ), "networkInfo" );
 			return true;
 		case R.id.help:
-			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_electorate), getString(R.string.help_text_electorate) );
+			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_electorate), getString(R.string.help_text_electorate_voter) );
 			hdf.show( getFragmentManager( ), "help" );
 			return true;
 		}

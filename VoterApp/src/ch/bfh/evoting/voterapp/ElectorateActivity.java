@@ -221,7 +221,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 			ndf.show( getFragmentManager( ), "networkInfo" );
 			return true;
 		case R.id.help:
-			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_electorate), getString(R.string.help_text_electorate) );
+			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_electorate), getString(R.string.help_text_electorate_admin) );
 			hdf.show( getFragmentManager( ), "help" );
 			return true;
 		case R.id.action_next:
@@ -349,7 +349,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		VoteMessage vm = new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_POLL_TO_REVIEW, (Serializable)poll);
 		AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);
 
-		Intent intent = new Intent(this, ReviewPollActivity.class);
+		Intent intent = new Intent(this, ReviewPollAdminActivity.class);
 		intent.putExtra("poll", (Serializable)poll);
 		intent.putExtra("sender", AndroidApplication.getInstance().getNetworkInterface().getMyUniqueId());
 		startActivity(intent);
