@@ -132,7 +132,11 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 	
 	@Override
 	public void onSaveInstanceState(Bundle savedInstanceState) {
+		try{
 		super.onSaveInstanceState(savedInstanceState);
+		} catch (IllegalStateException e){
+			e.printStackTrace();
+		}
 		savedInstanceState.putSerializable("poll", poll);
 	}
 

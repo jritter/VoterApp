@@ -7,7 +7,7 @@ import java.util.Map;
 
 import ch.bfh.evoting.voterapp.DisplayResultActivity;
 import ch.bfh.evoting.voterapp.R;
-import ch.bfh.evoting.voterapp.VoteActivity.VoteService;
+import ch.bfh.evoting.voterapp.VoteService;
 import ch.bfh.evoting.voterapp.adapters.WaitParticipantListAdapter;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Participant;

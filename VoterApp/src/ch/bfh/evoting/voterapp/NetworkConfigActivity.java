@@ -379,16 +379,14 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 		// display a message if the connection was not successful
 		if (!connectedSuccessful) {
 			AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-			//TODO use android strings
-			alertDialog.setTitle("InstaCircle - Network not found");
-			alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+			alertDialog.setTitle(R.string.network_not_found);
+			alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.ok),
 					new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
 				}
 			});
-			alertDialog.setMessage("The network \"" + config[0]
-					+ "\" is not available, cannot connect.");
+			alertDialog.setMessage(getString(R.string.network_not_found_text, config[0]));
 			alertDialog.show();
 		}
 	}

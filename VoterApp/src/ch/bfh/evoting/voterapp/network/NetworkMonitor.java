@@ -44,7 +44,7 @@ public class NetworkMonitor extends BroadcastReceiver {
 	 * Helper method checking the state of the connectivity
 	 */
 	private void checkConnectivity(){
-				
+		String backupSSID = this.ssid;
 	    if (wifi.isWifiEnabled()==true) {
 	      wifiEnabled = true;
 	    } else {
@@ -63,6 +63,10 @@ public class NetworkMonitor extends BroadcastReceiver {
 	    }
 	    if(WifiInfo.getDetailedStateOf(wifi.getConnectionInfo().getSupplicantState())==NetworkInfo.DetailedState.DISCONNECTING){
 	    	this.onLosingConnection();
+	    }
+	    if(!this.ssid.equals(backupSSID)){
+	    	Intent intent = new Intent(BroadcastIntentTypes.networkSSIDUpdate);
+			LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 	    }
 	}
 	
@@ -88,8 +92,6 @@ public class NetworkMonitor extends BroadcastReceiver {
 	 * @return true if yes, false otherwise
 	 */
 	public boolean isConnected(){
-		/*WifiManager wm = (WifiManager) getActivity().getSystemService(NetworkConfigActivity.WIFI_SERVICE);
-		WifiInfo wifiInfo = wm.getConnectionInfo().g;*/
 		checkConnectivity();
 		return connected;
 	}

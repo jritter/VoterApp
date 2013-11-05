@@ -18,6 +18,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
@@ -28,6 +29,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 	private String groupName;
 	private String groupPassword;
 	private String saltShortDigest;
+	private boolean feedbackReceived;
 
 	public AllJoynNetworkInterface(Context context) {
 		super(context);
@@ -108,16 +110,24 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 		Message msg1 = mBusHandler.obtainMessage(BusHandler.LEAVE_GROUP, this.groupName);
 		mBusHandler.sendMessage(msg1);
 
-		if(AndroidApplication.getInstance().isAdmin()){
-			Message msg2 = mBusHandler.obtainMessage(BusHandler.DESTROY_GROUP, this.groupName);
-			mBusHandler.sendMessage(msg2);
-		}
+		Message msg2 = mBusHandler.obtainMessage(BusHandler.DESTROY_GROUP, this.groupName);
+		mBusHandler.sendMessage(msg2);
+
 		this.groupName = null;
 
 	}
 
 	@Override
 	public void joinGroup(String groupName) {
+
+		connectionTimeOut(10000);
+
+		//Close previous connections
+		String oldNetworkName = this.groupName;
+		if(oldNetworkName!=null && oldNetworkName!=""){
+			disconnect();
+		}
+
 		if(AndroidApplication.getInstance().isAdmin()){
 			//Generate group name
 			int groupNumber = 1;
@@ -129,16 +139,13 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 			//generate group password
 			this.groupPassword = generatePassword();
 		}
-		String oldNetworkName = this.groupName;
+		
 		this.groupName = groupName;
+
 
 		boolean apOn = new WifiAPManager().isWifiAPEnabled((WifiManager) context.getSystemService(Context.WIFI_SERVICE));
 
 		if(AndroidApplication.getInstance().isAdmin() || apOn){
-			if(oldNetworkName!=null && oldNetworkName!=""){
-				Message msg1 = mBusHandler.obtainMessage(BusHandler.DESTROY_GROUP, oldNetworkName);
-				mBusHandler.sendMessage(msg1);
-			}
 			Message msg2 = mBusHandler.obtainMessage(BusHandler.CREATE_GROUP);
 			Bundle data = new Bundle();
 			data.putString("groupName", this.groupName);
@@ -156,17 +163,17 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 		}		
 
 	}
-	
+
 	@Override
 	public void lockGroup(){
-		 Message msg = mBusHandler.obtainMessage(BusHandler.LOCK_GROUP, groupName);
-	     mBusHandler.sendMessage(msg);
+		Message msg = mBusHandler.obtainMessage(BusHandler.LOCK_GROUP, groupName);
+		mBusHandler.sendMessage(msg);
 	}
-	
+
 	@Override
 	public void unlockGroup(){
-		 Message msg = mBusHandler.obtainMessage(BusHandler.UNLOCK_GROUP, groupName);
-	     mBusHandler.sendMessage(msg);
+		Message msg = mBusHandler.obtainMessage(BusHandler.UNLOCK_GROUP, groupName);
+		mBusHandler.sendMessage(msg);
 	}
 
 	@Override
@@ -219,6 +226,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 	private BroadcastReceiver mNetworkConectionFailedReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			feedbackReceived = true;
 			groupName = null;
 		}
 	};
@@ -242,4 +250,16 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 		return sb.toString();
 	}
 
+	public void connectionTimeOut(long time){
+		new Handler().postDelayed(new Runnable() {
+
+			public void run() {  
+				if(!mBusHandler.getConnected() && !feedbackReceived){
+					disconnect();
+					LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent("networkConnectionFailed"));
+				}
+				feedbackReceived = false;
+			}
+		}, time); 
+	}
 }

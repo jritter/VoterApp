@@ -16,7 +16,6 @@ import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Application.ActivityLifecycleCallbacks;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -26,7 +25,6 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -182,7 +180,7 @@ public class AndroidApplication extends Application {
 			Notification.Builder notificationBuilder = new Notification.Builder(
 					this);
 			notificationBuilder.setContentTitle(getResources().getString(
-					R.string.app_name));
+					R.string.voter_app_app_name));
 			notificationBuilder
 					.setContentText(getResources().getString(R.string.notification));
 			notificationBuilder

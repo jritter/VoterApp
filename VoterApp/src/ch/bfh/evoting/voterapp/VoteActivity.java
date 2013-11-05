@@ -2,9 +2,11 @@ package ch.bfh.evoting.voterapp;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import ch.bfh.evoting.voterapp.adapters.VoteOptionListAdapter;
 import ch.bfh.evoting.voterapp.entities.Option;
+import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
@@ -12,11 +14,9 @@ import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.Utility;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.SystemClock;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -39,9 +39,7 @@ import android.widget.TextView;
  */
 public class VoteActivity extends Activity {
 
-	//TODO remove static when no more needed
-	static private Poll poll;
-	static private Context ctx;
+	private Poll poll;
 
 	private VoteOptionListAdapter volAdapter;
 	private boolean scrolled = false;
@@ -51,22 +49,21 @@ public class VoteActivity extends Activity {
 	private BroadcastReceiver stopReceiver;
 
 	private AlertDialog dialogBack;
+	private BroadcastReceiver updateVoteReceiver;
 
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		if(getResources().getBoolean(R.bool.portrait_only)){
-	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-	    }
-		
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		}
+
 		AndroidApplication.getInstance().setCurrentActivity(this);
 
 		setContentView(R.layout.activity_vote);
-
-		ctx=this;
-
+		
 		lvChoices = (ListView)findViewById(R.id.listview_choices);
 
 		//Get the data in the intent
@@ -111,7 +108,7 @@ public class VoteActivity extends Activity {
 
 					//animate scroll
 					new AsyncTask<Object, Object, Object>(){
-		
+
 						@Override
 						protected Object doInBackground(Object... params) {
 							SystemClock.sleep(500);
@@ -124,7 +121,7 @@ public class VoteActivity extends Activity {
 							demoScrollDone = true;
 							return null;
 						}
-		
+
 					}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
 				} else {
@@ -164,14 +161,26 @@ public class VoteActivity extends Activity {
 				i.putExtra("saveToDb", true);
 				startActivity(i);
 				LocalBroadcastManager.getInstance(VoteActivity.this).unregisterReceiver(this);
+				LocalBroadcastManager.getInstance(VoteActivity.this).unregisterReceiver(updateVoteReceiver);
 			}
 		};
 		LocalBroadcastManager.getInstance(this).registerReceiver(stopReceiver, new IntentFilter(BroadcastIntentTypes.stopVote));
 
+		//Register a BroadcastReceiver on new incoming vote events
+		//TODO see if needed after simulation
+		updateVoteReceiver = new BroadcastReceiver(){
+			@SuppressWarnings("unchecked")
+			@Override
+			public void onReceive(Context arg0, Intent intent) {
+				poll.setOptions((List<Option>)intent.getSerializableExtra("options"));
+				poll.setParticipants((Map<String,Participant>)intent.getSerializableExtra("participants"));
+			}
+		};
+		LocalBroadcastManager.getInstance(this).registerReceiver(updateVoteReceiver, new IntentFilter(BroadcastIntentTypes.newIncomingVote));
 
-		this.startService(new Intent(this, VoteService.class));
+		this.startService(new Intent(this, VoteService.class).putExtra("poll", poll));
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -189,7 +198,7 @@ public class VoteActivity extends Activity {
 		super.onRestoreInstanceState(savedInstanceState);
 		poll = (Poll)savedInstanceState.getSerializable("poll");
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		//Show a dialog to ask confirmation to quit vote 
@@ -212,7 +221,7 @@ public class VoteActivity extends Activity {
 
 		// Create the AlertDialog
 		dialogBack = builder.create();
-		
+
 		dialogBack.setOnShowListener(new DialogInterface.OnShowListener() {
 			@Override
 			public void onShow(DialogInterface dialog) {
@@ -221,13 +230,13 @@ public class VoteActivity extends Activity {
 						R.drawable.selectable_background_votebartheme);
 				dialogBack.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundResource(
 						R.drawable.selectable_background_votebartheme);
-				
+
 			}
 		});
-		
+
 		dialogBack.show();
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -284,90 +293,5 @@ public class VoteActivity extends Activity {
 		return scrolled;
 	}
 
-	//TODO remove: only for simulation
-	public static class VoteService extends Service{
 
-
-		boolean doWork = true;
-		BroadcastReceiver voteReceiver;
-		AsyncTask<Object, Object, Object> sendVotesTask;
-		private int votesReceived = 0;
-		private static VoteService instance;
-
-		@Override
-		public void onCreate() {
-			instance = this;
-			super.onCreate();
-		}
-
-		@Override
-		public void onDestroy() {
-			Log.e("VoteService", "Destroyed");
-			reset();
-			super.onDestroy();
-		}
-
-		private void reset(){
-			LocalBroadcastManager.getInstance(ctx).unregisterReceiver(voteReceiver);
-			votesReceived = 0;
-			doWork=false;
-			if(sendVotesTask!=null)
-				sendVotesTask.cancel(true);
-		}
-
-		@Override
-		public int onStartCommand(Intent intent, int flags, int startId) {
-
-			voteReceiver = new BroadcastReceiver(){
-
-				@Override
-				public void onReceive(Context arg0, Intent intent) {
-					Option vote = (Option)intent.getSerializableExtra("vote");
-					for(Option op : poll.getOptions()){
-						if(op.equals(vote)){
-							op.setVotes(op.getVotes()+1);
-						}
-					}
-					String voter = intent.getStringExtra("voter");
-					if(poll.getParticipants().containsKey(voter)){
-						votesReceived++;
-						poll.getParticipants().get(voter).setHasVoted(true);
-					}
-
-					sendVotesTask = new AsyncTask<Object, Object, Object>(){
-
-						@Override
-						protected Object doInBackground(Object... arg0) {
-							while(doWork){
-								Intent i = new Intent(BroadcastIntentTypes.newIncomingVote);
-								i.putExtra("votes", votesReceived);
-								i.putExtra("options", (Serializable)poll.getOptions());
-								i.putExtra("participants", (Serializable)poll.getParticipants());
-								LocalBroadcastManager.getInstance(ctx).sendBroadcast(i);
-								SystemClock.sleep(1000);
-							}
-							return null;
-						}
-
-					}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-				}
-			};
-			LocalBroadcastManager.getInstance(ctx).registerReceiver(voteReceiver, new IntentFilter(BroadcastIntentTypes.newVote));
-			return super.onStartCommand(intent, flags, startId);
-		}
-
-		@Override
-		public IBinder onBind(Intent arg0) {
-			return null;
-		}
-
-		public static VoteService getInstance(){
-			return instance;
-		}
-
-		public int getVotes(){
-			return this.votesReceived;
-		}
-
-	}
 }

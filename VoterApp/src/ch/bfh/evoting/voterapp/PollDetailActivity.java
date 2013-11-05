@@ -2,25 +2,32 @@ package ch.bfh.evoting.voterapp;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import ch.bfh.evoting.voterapp.adapters.PollOptionAdapter;
 import ch.bfh.evoting.voterapp.db.PollDbHelper;
 import ch.bfh.evoting.voterapp.entities.DatabaseException;
 import ch.bfh.evoting.voterapp.entities.Option;
+import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
+import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.Utility;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.database.DataSetObserver;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -121,8 +128,8 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 
 		lv.setAdapter(adapter);
 		lv.setEmptyView(findViewById(R.id.textview_empty));
-		
-		
+
+
 		adapter.registerDataSetObserver(new DataSetObserver() {
 
 			@Override
@@ -130,7 +137,7 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 				changesMade = true;
 				super.onChanged();
 			}
-			
+
 		});
 
 		cbEmptyVote = (CheckBox)findViewById(R.id.checkbox_emptyvote);
@@ -180,9 +187,6 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 				return false;
 			}
 		});
-		
-		
-
 	}
 
 	@Override
@@ -204,12 +208,12 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 
 		savedPoll = (Poll)savedInstanceState.getSerializable("poll");
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		askToSave();
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu items for use in the action bar
@@ -217,7 +221,7 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 		inflater.inflate(R.menu.poll_detail, menu);
 		return super.onCreateOptionsMenu(menu);
 	}
-	
+
 	@Override
 	public void onClick(View view) {	
 		if (view == btnAddOption){ 
@@ -280,13 +284,13 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 
 	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
-			changesMade = true;
+		changesMade = true;
 	}
-	
+
 	/*--------------------------------------------------------------------------------------------
 	 * Helper Methods
 	--------------------------------------------------------------------------------------------*/
-	
+
 	/**
 	 * Set up the {@link android.app.ActionBar}.
 	 */

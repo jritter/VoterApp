@@ -258,6 +258,12 @@ public class AdhocWifiManager {
 					.getNetworkId());
 			editor.commit();
 			SSID = config.SSID.replace("\"", "");
+			
+			Log.d(TAG, "SSID to connect to: " +config.SSID+ " . Currently connected SSID: "+ wifi.getConnectionInfo().getSSID());
+			if(config.SSID.equals(wifi.getConnectionInfo().getSSID())){
+				success = true;
+				return null;
+			}
 
 			// handle the strange habit with the double quotes...
 			config.SSID = "\"" + config.SSID + "\"";

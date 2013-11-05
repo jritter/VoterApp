@@ -5,6 +5,7 @@ import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.NetworkConfigActivity;
 import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.network.wifi.AdhocWifiManager;
+import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.Utility;
 
 import android.app.Activity;
@@ -12,15 +13,18 @@ import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +46,8 @@ public class NetworkOptionsFragment extends Fragment {
 
 	private ConnectNetworkDialogFragment dialogFragment;
 	private AlertDialog dialogNoIdentificationSet = null;
-	
+	private BroadcastReceiver ssidChangeReceiver;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);	
@@ -60,8 +65,10 @@ public class NetworkOptionsFragment extends Fragment {
 		// Inflate the layout for this fragment
 		View v = inflater.inflate(R.layout.fragment_network_options, container, false);
 
-		Button btnUseActualNetwork = (Button)v.findViewById(R.id.button_use_actual_ssid);
-		btnUseActualNetwork.setText(getString(R.string.button_use_actual_ssid, AndroidApplication.getInstance().getNetworkMonitor().getConnectedSSID()));
+		final Button btnUseActualNetwork = (Button)v.findViewById(R.id.button_use_actual_ssid);
+		String ssid = AndroidApplication.getInstance().getNetworkMonitor().getConnectedSSID();
+		ssid = ssid.replace("\"", "");
+		btnUseActualNetwork.setText(getString(R.string.button_use_actual_ssid, ssid));
 		Button btnScanQrCode = (Button)v.findViewById(R.id.button_capture_qrcode);
 		Button btnScanNFC = (Button)v.findViewById(R.id.button_scan_nfc);
 		Button btnAdvancedConfig = (Button)v.findViewById(R.id.button_advanced_network_config);
@@ -83,7 +90,7 @@ public class NetworkOptionsFragment extends Fragment {
 			public void onClick(View v) {
 				//check if an identification is defined
 				if(!checkIdentification()) return;
-				
+
 				if(!AndroidApplication.getInstance().getNetworkMonitor().isConnected()){
 					for(int i=0; i<2; i++)
 						Toast.makeText(NetworkOptionsFragment.this.getActivity(), getString(R.string.toast_wifi_is_not_connected), Toast.LENGTH_SHORT).show();
@@ -177,14 +184,26 @@ public class NetworkOptionsFragment extends Fragment {
 			}
 		});
 
+		//broadcast receiving SSID changes updates and changes the text on the first button
+		ssidChangeReceiver = new BroadcastReceiver() {
+
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				String ssid = AndroidApplication.getInstance().getNetworkMonitor().getConnectedSSID();
+				ssid = ssid.replace("\"", "");
+				btnUseActualNetwork.setText(getString(R.string.button_use_actual_ssid, ssid));
+			}
+		};
+		LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(ssidChangeReceiver, new IntentFilter(BroadcastIntentTypes.networkSSIDUpdate));
+
 		return v;
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 	}
-	
+
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch(requestCode){
@@ -211,7 +230,7 @@ public class NetworkOptionsFragment extends Fragment {
 			activity.onActivityResult(requestCode, resultCode, data);
 		}
 	}
-	
+
 	/*--------------------------------------------------------------------------------------------
 	 * Helper Methods
 	--------------------------------------------------------------------------------------------*/
@@ -224,7 +243,7 @@ public class NetworkOptionsFragment extends Fragment {
 		if(((NetworkConfigActivity)this.getActivity()).getIdentification().equals("")){
 			//show dialog
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-			
+
 			// Add the buttons
 			builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int id) {
@@ -236,7 +255,7 @@ public class NetworkOptionsFragment extends Fragment {
 			builder.setTitle(R.string.dialog_title_no_identification);
 			builder.setMessage(R.string.dialog_no_identification);
 
-			
+
 			dialogNoIdentificationSet = builder.create();
 			dialogNoIdentificationSet.setOnShowListener(new DialogInterface.OnShowListener() {
 				@Override
@@ -246,10 +265,10 @@ public class NetworkOptionsFragment extends Fragment {
 							R.drawable.selectable_background_votebartheme);
 				}
 			});
-			
+
 			// Create the AlertDialog
 			dialogNoIdentificationSet.show();
-			
+
 			return false;
 		}
 		return true;

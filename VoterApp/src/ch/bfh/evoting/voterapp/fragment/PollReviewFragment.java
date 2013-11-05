@@ -61,7 +61,8 @@ public class PollReviewFragment extends Fragment {
 
 		Log.e("PollReviewFragment", "poll is "+poll);
 		
-		poll.getParticipants().get(sender).setHasAcceptedReview(true);
+		if(poll.getParticipants().containsKey(sender))
+			poll.getParticipants().get(sender).setHasAcceptedReview(true);
 
 		// Inflate the layout for this fragment
 		View v = inflater.inflate(R.layout.fragment_poll_review, container,
@@ -94,8 +95,7 @@ public class PollReviewFragment extends Fragment {
 						// Add the buttons
 						builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-								AndroidApplication.getInstance().getNetworkInterface().disconnect();
-								startActivity(new Intent(PollReviewFragment.this.getActivity(), MainActivity.class));
+								startActivity(new Intent(PollReviewFragment.this.getActivity(), MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
 							}
 						});
 

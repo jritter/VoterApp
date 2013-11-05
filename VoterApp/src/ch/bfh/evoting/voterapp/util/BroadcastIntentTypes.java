@@ -1,5 +1,7 @@
 package ch.bfh.evoting.voterapp.util;
 
+import android.content.Intent;
+
 /**
  * Class listing local broadcast intent types that are sent in the application
  * @author Philémon von Bergen
@@ -89,5 +91,12 @@ public class BroadcastIntentTypes {
 	 * 		2: message sent from someone on behalf of another peer
 	 */
 	public static final String attackDetected = "attackDetected";
+	
+	/**
+	 * Intent type sent when wifi connected to a new network
+	 * Extras:
+	 * - nothing
+	 * */
+	public static final String networkSSIDUpdate = "networkSSIDUpdate";
 	
 }

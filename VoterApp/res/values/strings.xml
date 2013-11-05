@@ -72,8 +72,10 @@
     <string name="result_chart">Result Chart</string>
     <string name="no_options">There are currently no Options</string>
     <string name="notification">A vote is currently running. Tap to bring in front.</string>
+	<string name="network_not_found">Network not found</string>
+	<string name="network_not_found_text">The network \"%1$s\" is not available, cannot connect.</string>
 
-    <!-- Action bar titles -->
+	<!-- Action bar titles -->
     <string name="action_rescan_wifi">Rescan Wifi Networks</string>
     <string name="validate_review">I agree</string>
     <string name="delete_poll">Delete vote</string>
@@ -155,7 +157,6 @@
     <string name="title_activity_network_config">Join Group</string>
     <string name="title_activity_check_electorate">Check electorate</string>
     <string name="title_activity_review_poll">Review vote</string>
-    <string name="app_name">VotingLib</string>
     <string name="title_activity_wait_for_votes">Waiting...</string>
     <string name="title_activity_vote">Vote</string>
     <string name="title_activity_list_terminated_polls">Vote Archive</string>

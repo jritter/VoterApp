@@ -8,6 +8,8 @@ import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.Utility;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
@@ -35,29 +37,34 @@ public class AdminWaitForVotesActivity extends Activity implements OnClickListen
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		if(getResources().getBoolean(R.bool.portrait_only)){
-	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-	    }
-		
-		setContentView(R.layout.activity_admin_wait_for_votes);
-		
-		if(getResources().getBoolean(R.bool.display_bottom_bar) == false){
-	        findViewById(R.id.layout_bottom_bar).setVisibility(View.GONE);
-	    }
-		
-		AndroidApplication.getInstance().setCurrentActivity(this);
 
+		if(getResources().getBoolean(R.bool.portrait_only)){
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		}
+
+		setContentView(R.layout.activity_admin_wait_for_votes);
+
+		if(getResources().getBoolean(R.bool.display_bottom_bar) == false){
+			findViewById(R.id.layout_bottom_bar).setVisibility(View.GONE);
+		}
+
+		AndroidApplication.getInstance().setCurrentActivity(this);
 
 		btnStopPoll = (Button) findViewById(R.id.button_stop_poll);
 		btnStopPoll.setOnClickListener(this);
-		
+
 		if(savedInstanceState!=null){
 			poll = (Poll) savedInstanceState.getSerializable("poll");
 		}
 		Poll intentPoll = (Poll)this.getIntent().getSerializableExtra("poll");
 		if(intentPoll!=null){
 			poll = intentPoll;
+		}
+
+		//If participant was not included in the electorate, the VoteActivity was not displayed
+		// and thus VoteService was not started, so we start it here
+		if(!isVoteServiceRunning()){
+			this.startService(new Intent(this, VoteService.class).putExtra("poll", poll));
 		}
 
 		FragmentManager fm = getFragmentManager();
@@ -68,7 +75,7 @@ public class AdminWaitForVotesActivity extends Activity implements OnClickListen
 
 		fm.beginTransaction().replace(R.id.fragment_container, fragment, "wait").commit();
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -80,7 +87,7 @@ public class AdminWaitForVotesActivity extends Activity implements OnClickListen
 		super.onSaveInstanceState(outState);
 		outState.putSerializable("poll", poll);
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		//Show a dialog to ask confirmation to quit vote 
@@ -103,7 +110,7 @@ public class AdminWaitForVotesActivity extends Activity implements OnClickListen
 
 		// Create the AlertDialog
 		dialogBack = builder.create();
-		
+
 		dialogBack.setOnShowListener(new DialogInterface.OnShowListener() {
 			@Override
 			public void onShow(DialogInterface dialog) {
@@ -114,7 +121,7 @@ public class AdminWaitForVotesActivity extends Activity implements OnClickListen
 						R.drawable.selectable_background_votebartheme);
 			}
 		});
-		
+
 		dialogBack.show();
 	}
 
@@ -147,8 +154,8 @@ public class AdminWaitForVotesActivity extends Activity implements OnClickListen
 		}
 
 	}
-	
-	
+
+
 	/*--------------------------------------------------------------------------------------------
 	 * Helper Methods
 	--------------------------------------------------------------------------------------------*/
@@ -177,7 +184,7 @@ public class AdminWaitForVotesActivity extends Activity implements OnClickListen
 
 		// Create the AlertDialog
 		stopPollDialog = builder.create();
-		
+
 		stopPollDialog.setOnShowListener(new DialogInterface.OnShowListener() {
 			@Override
 			public void onShow(DialogInterface dialog) {
@@ -188,7 +195,21 @@ public class AdminWaitForVotesActivity extends Activity implements OnClickListen
 						R.drawable.selectable_background_votebartheme);
 			}
 		});
-		
+
 		stopPollDialog.show();
+	}
+
+	/**
+	 * Helper method checking if the vote service is running
+	 * @return true if the service is running, false otherwise
+	 */
+	private boolean isVoteServiceRunning() {
+		ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+			if (VoteService.class.getName().equals(service.service.getClassName())) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
