@@ -187,6 +187,11 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 		} else {
 			menu.findItem(R.id.action_redo_vote).setTitle(R.string.clone_poll);
 		}
+		
+		if(getResources().getBoolean(R.bool.display_bottom_bar)){
+			menu.findItem(R.id.action_redo_vote).setVisible(false);
+	    }
+		
 		return true;
 	}
 	

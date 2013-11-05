@@ -129,6 +129,11 @@ public class WaitForVotesAdminActivity extends Activity implements OnClickListen
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.admin_wait_for_votes, menu);
+		
+		if(getResources().getBoolean(R.bool.display_bottom_bar)){
+			menu.findItem(R.id.action_finish_vote).setVisible(false);
+	    }
+		
 		return true;
 	}
 

@@ -248,7 +248,8 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if(item.getItemId()==android.R.id.home){
+		switch (item.getItemId()) {
+		case android.R.id.home:
 			// This ID represents the Home or Up button. In the case of this
 			// activity, the Up button is shown. Use NavUtils to allow users
 			// to navigate up one level in the application structure. For
@@ -259,11 +260,11 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 			//			NavUtils.navigateUpFromSameTask(this);
 			super.onBackPressed();
 			return true;
-		}else if(item.getItemId()==R.id.network_info){
+		case R.id.network_info:
 			NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();			
 			ndf.show( getFragmentManager( ), "networkInfo" );
 			return true;
-		} else if (item.getItemId()==R.id.help){
+		case R.id.help:
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance(
 					getString(R.string.help_title_network_config),
 					getString(R.string.help_text_network_config));

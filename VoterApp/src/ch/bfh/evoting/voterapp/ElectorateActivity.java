@@ -235,6 +235,11 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.electorate, menu);
+
+		if(getResources().getBoolean(R.bool.display_bottom_bar)){
+			menu.findItem(R.id.action_next).setVisible(false);
+	    }
+		
 		return true;
 	}
 

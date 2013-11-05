@@ -207,8 +207,12 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu items for use in the action bar
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.poll_detail, menu);
+		getMenuInflater().inflate(R.menu.poll_detail, menu);
+		
+		if(getResources().getBoolean(R.bool.display_bottom_bar)){
+			menu.findItem(R.id.action_start_vote).setVisible(false);
+	    }
+		
 		return super.onCreateOptionsMenu(menu);
 	}
 

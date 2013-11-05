@@ -66,6 +66,12 @@ public class NetworkInformationActivity extends Activity implements OnClickListe
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.network_information, menu);
+		
+		if(getResources().getBoolean(R.bool.display_bottom_bar)){
+			menu.findItem(R.id.action_modify_network).setVisible(false);
+			menu.findItem(R.id.action_next).setVisible(false);
+	    }
+		
 		return true;
 	}
 

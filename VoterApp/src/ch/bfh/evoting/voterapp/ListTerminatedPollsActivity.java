@@ -98,7 +98,8 @@ public class ListTerminatedPollsActivity extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if(item.getItemId() == android.R.id.home){
+		switch (item.getItemId()) {
+		case android.R.id.home:
 			Intent i = new Intent(this, MainActivity.class);
 			i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | 
                     Intent.FLAG_ACTIVITY_CLEAR_TASK |
@@ -106,7 +107,7 @@ public class ListTerminatedPollsActivity extends Activity {
 
 			startActivity(i);
 			return true;
-		} else if (item.getItemId() == R.id.help){
+		case R.id.help:
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_archive), getString(R.string.help_text_archive) );
 			hdf.show( getFragmentManager( ), "help" );
 			return true;

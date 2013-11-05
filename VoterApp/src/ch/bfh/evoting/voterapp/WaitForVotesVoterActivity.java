@@ -91,8 +91,9 @@ public class WaitForVotesVoterActivity extends Activity {
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-
-		if (item.getItemId() == R.id.help){
+		
+		switch (item.getItemId()) {
+		case R.id.help:
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_wait), getString(R.string.help_text_wait_voter) );
 	        hdf.show( getFragmentManager( ), "help" );
 	        return true;

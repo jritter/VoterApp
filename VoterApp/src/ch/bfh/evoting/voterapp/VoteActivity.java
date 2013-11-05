@@ -240,7 +240,8 @@ public class VoteActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 
-		if (item.getItemId() == R.id.help){
+		switch (item.getItemId()) {
+		case R.id.help:
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_vote), getString(R.string.help_text_vote) );
 			hdf.show( getFragmentManager( ), "help" );
 			return true;
