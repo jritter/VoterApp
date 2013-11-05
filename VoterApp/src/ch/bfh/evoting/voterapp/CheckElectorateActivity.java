@@ -10,13 +10,17 @@ import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
+import ch.bfh.evoting.voterapp.network.NetworkMonitor;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Application.ActivityLifecycleCallbacks;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.BroadcastReceiver;
@@ -36,34 +40,34 @@ public class CheckElectorateActivity extends ListActivity {
 
 	private BroadcastReceiver networkParticipantUpdater;
 	private BroadcastReceiver electorateReceiver;
-	
+
 	private Dialog dialogBack = null;
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		if(getResources().getBoolean(R.bool.portrait_only)){
-	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-	    }
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		}
 		else {
 			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		}
-		
+
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		AndroidApplication.getInstance().setVoteRunning(true);
 
 		setContentView(R.layout.activity_check_electorate);
 
 		setupActionBar();
-		
+
 		Map<String, Participant> participants = new TreeMap<String, Participant>();
-		
+
 		if(this.getIntent().getSerializableExtra("participants") == null){
-		participants = AndroidApplication.getInstance().getNetworkInterface().getGroupParticipants();
-		if(participants.size()==0)
-			participants.put("",new Participant("Please wait...", "", false, false));
+			participants = AndroidApplication.getInstance().getNetworkInterface().getGroupParticipants();
+			if(participants.size()==0)
+				participants.put("",new Participant("Please wait...", "", false, false));
 		} else {
 			participants = (Map<String,Participant>)this.getIntent().getSerializableExtra("participants");
 		}
@@ -121,14 +125,14 @@ public class CheckElectorateActivity extends ListActivity {
 		}, new IntentFilter(BroadcastIntentTypes.pollToReview));
 
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
 		AndroidApplication.getInstance().setVoteRunning(true);
 		AndroidApplication.getInstance().setCurrentActivity(this);
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		//Show a dialog to ask confirmation to quit vote 
@@ -153,14 +157,14 @@ public class CheckElectorateActivity extends ListActivity {
 		dialogBack = builder.create();
 		dialogBack.show();
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.check_electorate, menu);
 		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -180,16 +184,16 @@ public class CheckElectorateActivity extends ListActivity {
 			return true;
 		case R.id.help:
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_electorate), getString(R.string.help_text_electorate) );
-	        hdf.show( getFragmentManager( ), "help" );
-	        return true;
+			hdf.show( getFragmentManager( ), "help" );
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 	/*--------------------------------------------------------------------------------------------
 	 * Helper Methods
 	--------------------------------------------------------------------------------------------*/
-	
+
 	/**
 	 * Set up the {@link android.app.ActionBar}.
 	 */
@@ -198,5 +202,4 @@ public class CheckElectorateActivity extends ListActivity {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
 	}
-	
 }

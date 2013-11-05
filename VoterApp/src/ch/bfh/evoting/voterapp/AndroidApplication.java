@@ -16,6 +16,7 @@ import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Application.ActivityLifecycleCallbacks;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -23,7 +24,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.widget.Toast;
 
 /**
@@ -64,6 +67,7 @@ public class AndroidApplication extends Application {
 //		settings.edit().putBoolean("first_run_NetworkConfigActivity", true).commit();
 //		settings.edit().putBoolean("first_run", true).commit();
 
+		
 		WifiManager wm = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
 		if(!wm.isWifiEnabled()){
 			wm.setWifiEnabled(true);
@@ -79,6 +83,8 @@ public class AndroidApplication extends Application {
 		filters.addAction("android.net.conn.CONNECTIVITY_CHANGE");
 		networkMonitor = new NetworkMonitor(this);
 		this.registerReceiver(networkMonitor, filters);
+		registerActivityLifecycleCallbacks(new AndroidApplicationActivityLifecycleCallbacks());
+
 		
 		LocalBroadcastManager.getInstance(this).registerReceiver(mGroupEventReceiver, new IntentFilter(BroadcastIntentTypes.networkGroupDestroyedEvent));
 		LocalBroadcastManager.getInstance(this).registerReceiver(mAttackDetecter, new IntentFilter(BroadcastIntentTypes.attackDetected));
@@ -95,6 +101,7 @@ public class AndroidApplication extends Application {
 		super.onTerminate();
 	}
 
+	
 
 	/*--------------------------------------------------------------------------------------------
 	 * Helper Methods
@@ -238,6 +245,7 @@ public class AndroidApplication extends Application {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			if(ni==null) return;
 			if(currentActivity!=null && ni.getNetworkName()!=null){
 				if(voteRunning){
 				AlertDialog.Builder builder = new AlertDialog.Builder(currentActivity);
@@ -321,5 +329,38 @@ public class AndroidApplication extends Application {
 			}
 		}
 	};
+	
+	
+	private class AndroidApplicationActivityLifecycleCallbacks implements ActivityLifecycleCallbacks {
+
+		private String connectedSSID = "";
+
+		public void onActivityCreated(Activity activity, Bundle bundle) {
+		}
+
+		public void onActivityDestroyed(Activity activity) {
+		}
+
+		public void onActivityPaused(Activity activity) {
+			this.connectedSSID = networkMonitor.getConnectedSSID();
+		}
+
+		public void onActivityResumed(Activity activity) {
+			if(this.connectedSSID == null) return;
+			if(!this.connectedSSID.equals(networkMonitor.getConnectedSSID())){
+				Intent intent = new Intent(BroadcastIntentTypes.networkGroupDestroyedEvent);
+				LocalBroadcastManager.getInstance(AndroidApplication.this).sendBroadcast(intent);
+			}
+		}
+
+		public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+		}
+
+		public void onActivityStarted(Activity activity) {
+		}
+
+		public void onActivityStopped(Activity activity) {
+		}
+	}
 
 }
