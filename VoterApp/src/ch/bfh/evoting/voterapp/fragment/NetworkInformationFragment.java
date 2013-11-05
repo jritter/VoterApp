@@ -74,7 +74,7 @@ public class NetworkInformationFragment extends Fragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
-		View v = inflater.inflate(R.layout.fragment_network_information,
+		final View v = inflater.inflate(R.layout.fragment_network_information,
 				container, false);
 
 		btnWriteNfcTag = (Button) v.findViewById(R.id.button_write_nfc_tag);
@@ -133,12 +133,12 @@ public class NetworkInformationFragment extends Fragment implements
 								params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
 								ivQrCode.setLayoutParams(params);
 
-								params = NetworkInformationFragment.this
-										.getView().getRootView()
+								params = /*NetworkInformationFragment.this
+										.getView()*/v.getRootView()
 										.getLayoutParams();
 								params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-								NetworkInformationFragment.this.getView()
-										.getRootView().setLayoutParams(params);
+								/*NetworkInformationFragment.this.getView()*/
+										v.getRootView().setLayoutParams(params);
 
 							} catch (WriterException e) {
 								Log.d(this.getClass().getSimpleName(),
