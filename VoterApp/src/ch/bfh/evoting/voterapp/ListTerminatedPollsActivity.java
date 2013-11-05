@@ -73,6 +73,7 @@ public class ListTerminatedPollsActivity extends Activity {
 
 		lvPolls = (ListView) findViewById(R.id.listview_polls);
 		lvPolls.setAdapter(new PollArchiveAdapter(this, R.layout.list_item_poll, polls));
+		lvPolls.setEmptyView(findViewById(R.id.textview_empty));
 
 		//create a listener on each line
 		final Context ctx = this;

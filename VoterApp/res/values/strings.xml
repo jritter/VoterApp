@@ -70,7 +70,9 @@
     <string name="enable_nfc_question">In order to use this feature, NFC must be enabled. Enable now?</string>
     <string name="archived_votes">Archived Votes</string>
     <string name="result_chart">Result Chart</string>
-    <string name="no_options">There are currently no Options</string>
+    <string name="no_options">There are currently no options</string>
+    <string name="no_votes">There are currently no votes</string>
+    <string name="no_archived_votes">There are currently no archived votes</string>
     <string name="notification">A vote is currently running. Tap to bring in front.</string>
     <string name="network_not_found">Network not found</string>
     <string name="network_not_found_text">The network \"%1$s\" is not available, cannot connect.</string>

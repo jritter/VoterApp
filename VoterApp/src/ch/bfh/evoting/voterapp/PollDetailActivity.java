@@ -2,43 +2,25 @@ package ch.bfh.evoting.voterapp;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.concurrent.Callable;
 
-import ch.bfh.evoting.voterapp.adapters.PollOptionAdapter;
-import ch.bfh.evoting.voterapp.db.PollDbHelper;
-import ch.bfh.evoting.voterapp.entities.DatabaseException;
-import ch.bfh.evoting.voterapp.entities.Option;
-import ch.bfh.evoting.voterapp.entities.Participant;
-import ch.bfh.evoting.voterapp.entities.Poll;
-import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
-import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
-import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
-import ch.bfh.evoting.voterapp.util.Utility;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.database.DataSetObserver;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -48,6 +30,14 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+import ch.bfh.evoting.voterapp.adapters.PollOptionAdapter;
+import ch.bfh.evoting.voterapp.db.PollDbHelper;
+import ch.bfh.evoting.voterapp.entities.DatabaseException;
+import ch.bfh.evoting.voterapp.entities.Option;
+import ch.bfh.evoting.voterapp.entities.Poll;
+import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
+import ch.bfh.evoting.voterapp.util.Utility;
 /**
  * Class displaying the activity that show the details of a poll
  *

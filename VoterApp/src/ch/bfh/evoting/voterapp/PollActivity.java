@@ -10,10 +10,13 @@ import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
@@ -25,48 +28,61 @@ import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
 
 /**
  * Class displaying all the available polls
- *
+ * 
  */
-public class PollActivity extends Activity implements OnItemClickListener {
+public class PollActivity extends Activity implements OnClickListener,
+		OnItemClickListener {
 
 	private ListView lvPolls;
 
 	private PollDbHelper pollDbHelper;
 
+	private Button btnCreateVote;
+	private Button btnCreateVoteEmpty;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		if(getResources().getBoolean(R.bool.portrait_only)){
-	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-	    }
-		
+
+		if (getResources().getBoolean(R.bool.portrait_only)) {
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		}
+
 		final FrameLayout overlayFramelayout = new FrameLayout(this);
 		FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-				FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
-		layoutParams.setMargins(getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), 0, getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), 0);
+				FrameLayout.LayoutParams.MATCH_PARENT,
+				FrameLayout.LayoutParams.WRAP_CONTENT);
+		layoutParams.setMargins(
+				getResources().getDimensionPixelSize(
+						R.dimen.activity_horizontal_margin),
+				0,
+				getResources().getDimensionPixelSize(
+						R.dimen.activity_horizontal_margin), 0);
 		overlayFramelayout.setLayoutParams(layoutParams);
-		
-		View view = getLayoutInflater().inflate(R.layout.activity_poll, overlayFramelayout,false);
+
+		View view = getLayoutInflater().inflate(R.layout.activity_poll,
+				overlayFramelayout, false);
 		overlayFramelayout.addView(view);
-		
-		final SharedPreferences settings = getSharedPreferences(AndroidApplication.PREFS_NAME, MODE_PRIVATE);
-		
-		if(settings.getBoolean("first_run", true)){
-			final View overlay_view = getLayoutInflater().inflate(R.layout.overlay_parent_button, null,false);
+
+		final SharedPreferences settings = getSharedPreferences(
+				AndroidApplication.PREFS_NAME, MODE_PRIVATE);
+
+		if (settings.getBoolean("first_run", true)) {
+			final View overlay_view = getLayoutInflater().inflate(
+					R.layout.overlay_parent_button, null, false);
 			overlayFramelayout.addView(overlay_view);
-			
+
 			overlay_view.setOnClickListener(new View.OnClickListener() {
-				
+
 				@Override
 				public void onClick(View v) {
 					overlayFramelayout.removeView(overlay_view);
-					settings.edit().putBoolean("first_run", false).commit();					
+					settings.edit().putBoolean("first_run", false).commit();
 				}
 			});
 		}
 		setContentView(overlayFramelayout);
-		
+
 		// Show the Up button in the action bar.
 		setupActionBar();
 
@@ -77,10 +93,18 @@ public class PollActivity extends Activity implements OnItemClickListener {
 
 		lvPolls = (ListView) findViewById(R.id.listview_polls);
 		List<Poll> polls = pollDbHelper.getAllOpenPolls();
-		Poll poll = new Poll();
-		poll.setQuestion(getString(R.string.action_create_poll));
-		polls.add(poll);
+
+		View footer = LayoutInflater.from(this).inflate(
+				R.layout.footer_create_vote, null);
+		btnCreateVote = (Button) footer.findViewById(R.id.button_create_vote);
+		btnCreateVote.setOnClickListener(this);
+		
+		btnCreateVoteEmpty = (Button) findViewById(R.id.button_create_vote);
+		btnCreateVoteEmpty.setOnClickListener(this);
+
+		lvPolls.addFooterView(footer);
 		lvPolls.setAdapter(new PollAdapter(this, R.layout.list_item_poll, polls));
+		lvPolls.setEmptyView(findViewById(R.id.layout_empty));
 		lvPolls.setOnItemClickListener(this);
 
 	}
@@ -90,7 +114,7 @@ public class PollActivity extends Activity implements OnItemClickListener {
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		super.onResume();
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -113,19 +137,21 @@ public class PollActivity extends Activity implements OnItemClickListener {
 			return true;
 		case R.id.action_network_info:
 
-			//Network interface can be null since it is created in an async task, so we wait until the task is completed
-			if(AndroidApplication.getInstance().getNetworkInterface()==null){
+			// Network interface can be null since it is created in an async
+			// task, so we wait until the task is completed
+			if (AndroidApplication.getInstance().getNetworkInterface() == null) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(this);
 				builder.setMessage(R.string.dialog_wait_wifi);
 				final AlertDialog waitDialog = builder.create();
 				waitDialog.show();
 
-				new AsyncTask<Object, Object, Object>(){
+				new AsyncTask<Object, Object, Object>() {
 
 					@Override
 					protected Object doInBackground(Object... params) {
-						while(AndroidApplication.getInstance().getNetworkInterface()==null){
-							//wait
+						while (AndroidApplication.getInstance()
+								.getNetworkInterface() == null) {
+							// wait
 						}
 						waitDialog.dismiss();
 						showNetworkInfoDialog();
@@ -140,34 +166,37 @@ public class PollActivity extends Activity implements OnItemClickListener {
 
 			return true;
 		case R.id.help:
-			HelpDialogFragment hdf = HelpDialogFragment.newInstance( getString(R.string.help_title_poll), getString(R.string.help_text_poll) );
-			hdf.show( getFragmentManager( ), "help" );
+			HelpDialogFragment hdf = HelpDialogFragment.newInstance(
+					getString(R.string.help_title_poll),
+					getString(R.string.help_text_poll));
+			hdf.show(getFragmentManager(), "help");
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 	@Override
 	public void onItemClick(AdapterView<?> listview, View view, int position,
 			long id) {
 
-		if (listview.getAdapter().getCount() - 1 == position) {
-			Intent intent = new Intent(this, PollDetailActivity.class);
-			startActivity(intent);
-		} else {
-			Intent intent = new Intent(this, PollDetailActivity.class);
-			intent.putExtra("pollid", view.getId());
-			startActivity(intent);
-		}
+		Intent intent = new Intent(this, PollDetailActivity.class);
+		intent.putExtra("pollid", view.getId());
+		startActivity(intent);
 
 	}
 	
-	
+	@Override
+	public void onClick(View view) {
+		if (view == btnCreateVote || view == btnCreateVoteEmpty) {
+			Intent intent = new Intent(this, PollDetailActivity.class);
+			startActivity(intent);
+		}
+	}
+
 	/*--------------------------------------------------------------------------------------------
 	 * Helper Methods
 	--------------------------------------------------------------------------------------------*/
-	
-	
+
 	/**
 	 * Set up the {@link android.app.ActionBar}.
 	 */
@@ -176,10 +205,10 @@ public class PollActivity extends Activity implements OnItemClickListener {
 	}
 
 	/**
-	 * Shows the dialog containing the network informations 
+	 * Shows the dialog containing the network informations
 	 */
-	private void showNetworkInfoDialog(){
-		NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();			
-		ndf.show( getFragmentManager( ), "networkInfo" );
+	private void showNetworkInfoDialog() {
+		NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();
+		ndf.show(getFragmentManager(), "networkInfo");
 	}
 }
