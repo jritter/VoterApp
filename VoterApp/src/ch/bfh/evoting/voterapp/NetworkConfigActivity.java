@@ -8,9 +8,11 @@ import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkOptionsFragment;
 import ch.bfh.evoting.voterapp.network.wifi.AdhocWifiManager;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
+import ch.bfh.evoting.voterapp.util.Utility;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,10 +20,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.nfc.NfcAdapter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -43,6 +47,10 @@ import android.widget.FrameLayout;
  * 
  */
 public class NetworkConfigActivity extends Activity implements TextWatcher{
+	
+	private NfcAdapter nfcAdapter;
+	private boolean nfcAvailable;
+	private PendingIntent pendingIntent;
 
 	private WifiManager wifi;
 	private AdhocWifiManager adhoc;
@@ -185,6 +193,26 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 			}
 
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+		
+		// Is NFC available on this device?
+		nfcAvailable = this.getPackageManager().hasSystemFeature(
+				PackageManager.FEATURE_NFC);
+
+		if (nfcAvailable) {
+
+			nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+
+			if (nfcAdapter.isEnabled()) {
+
+				// Setting up a pending intent that is invoked when an NFC tag
+				// is tapped on the back
+				pendingIntent = PendingIntent.getActivity(this, 0, new Intent(
+						this, getClass())
+						.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+			} else {
+				nfcAvailable = false;
+			}
+		}
 
 	}
 
@@ -195,6 +223,13 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 		if(serializedPoll!=null){
 			poll = serializedPoll;
 		}
+		
+		if (intent.getParcelableExtra(NfcAdapter.EXTRA_TAG) != null){
+			Intent broadcastIntent = new Intent(BroadcastIntentTypes.nfcTagTapped);
+			broadcastIntent.putExtra(NfcAdapter.EXTRA_TAG, intent.getParcelableExtra(NfcAdapter.EXTRA_TAG));
+			LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
+		}
+		
 		super.onNewIntent(intent);
 	}
 
@@ -214,6 +249,11 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 	protected void onPause() {
 		active = false;
 		rescanWifiTask.cancel(true);
+		
+		if (nfcAvailable) {
+			nfcAdapter.disableForegroundDispatch(this);
+		}
+		
 		super.onPause();
 	}
 
@@ -236,6 +276,18 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 			}
 
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+		
+		if (nfcAdapter != null && nfcAdapter.isEnabled()) {
+			nfcAvailable = true;
+		}
+
+		// make sure that this activity is the first one which can handle the
+		// NFC tags
+		if (nfcAvailable) {
+			nfcAdapter.enableForegroundDispatch(this, pendingIntent,
+					Utility.getNFCIntentFilters(), null);
+		}
+		
 		super.onResume();
 	}
 
@@ -292,6 +344,8 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
 	
 	}
+	
+	
 
 	/*--------------------------------------------------------------------------------------------
 	 * Helper Methods

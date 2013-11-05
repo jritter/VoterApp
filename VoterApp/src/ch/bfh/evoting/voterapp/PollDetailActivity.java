@@ -6,18 +6,21 @@ import java.util.concurrent.Callable;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.database.DataSetObserver;
+import android.nfc.NfcAdapter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -37,12 +40,17 @@ import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
+import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.Utility;
 /**
  * Class displaying the activity that show the details of a poll
  *
  */
 public class PollDetailActivity extends Activity implements OnClickListener, TextWatcher {
+	
+	private NfcAdapter nfcAdapter;
+	private boolean nfcAvailable;
+	private PendingIntent pendingIntent;
 
 	private ListView lv;
 	private PollOptionAdapter adapter;
@@ -177,12 +185,52 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 				return false;
 			}
 		});
+		
+		// Is NFC available on this device?
+		nfcAvailable = this.getPackageManager().hasSystemFeature(
+				PackageManager.FEATURE_NFC);
+
+		if (nfcAvailable) {
+
+			nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+
+			if (nfcAdapter.isEnabled()) {
+
+				// Setting up a pending intent that is invoked when an NFC tag
+				// is tapped on the back
+				pendingIntent = PendingIntent.getActivity(this, 0, new Intent(
+						this, getClass())
+						.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+			} else {
+				nfcAvailable = false;
+			}
+		}
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if (nfcAvailable) {
+			nfcAdapter.disableForegroundDispatch(this);
+		}
 	}
 
 	@Override
 	protected void onResume() {
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		AndroidApplication.getInstance().setVoteRunning(false);
+		
+		if (nfcAdapter != null && nfcAdapter.isEnabled()) {
+			nfcAvailable = true;
+		}
+
+		// make sure that this activity is the first one which can handle the
+		// NFC tags
+		if (nfcAvailable) {
+			nfcAdapter.enableForegroundDispatch(this, pendingIntent,
+					Utility.getNFCIntentFilters(), null);
+		}
+		
 		super.onResume();
 	}
 
@@ -279,6 +327,18 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
 		changesMade = true;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Activity#onNewIntent(android.content.Intent)
+	 */
+	@Override
+	public void onNewIntent(Intent intent) {
+		Intent broadcastIntent = new Intent(BroadcastIntentTypes.nfcTagTapped);
+		broadcastIntent.putExtra(NfcAdapter.EXTRA_TAG, intent.getParcelableExtra(NfcAdapter.EXTRA_TAG));
+		LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
 	}
 
 	/*--------------------------------------------------------------------------------------------

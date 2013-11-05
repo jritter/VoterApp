@@ -6,6 +6,8 @@ import ch.bfh.evoting.voterapp.AndroidApplication;
 import de.mindpipe.android.logging.log4j.LogConfigurator;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.IntentFilter;
+import android.nfc.NfcAdapter;
 import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -102,5 +104,12 @@ public class Utility {
 	    } catch (Exception e) {
 	        // Ignore any exceptions, either it works or it doesn't
 	    }
+	}
+	
+	public static IntentFilter[] getNFCIntentFilters() {
+		IntentFilter nfcIntentFilter = new IntentFilter();
+		nfcIntentFilter.addAction(NfcAdapter.ACTION_NDEF_DISCOVERED);
+		nfcIntentFilter.addAction(NfcAdapter.ACTION_TAG_DISCOVERED);
+		return new IntentFilter[] { nfcIntentFilter };
 	}
 }

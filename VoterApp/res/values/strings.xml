@@ -222,6 +222,15 @@
     <string name="help_title_network_config">Help for network configuration</string>
     <string name="help_title_poll">Help for vote creation</string>
     <string name="help_title_poll_details">Help for vote details</string>
+    
+    <!-- NFC Strings -->
+    <string name="nfc_success">Success</string>
+    <string name="nfc_write_success">NFC tag written successfully</string>
+    <string name="nfc_write_failed">NFC tag write failed</string>
+    <string name="nfc_readonly">This NFC tag is read only</string>
+    <string name="nfc_not_enough_space">This NFC tag doesn\'t have enough free space</string>
+    <string name="nfc_unable_format_ndef">Unable to format NFC tag to NDEF</string>
+    <string name="nfc_no_ndef_support">This NFC tag doesn\'t appear to support NDEF format</string>
 
     <!-- Help dialog texts -->
     <string name="help_text_main">

@@ -6,12 +6,18 @@ import ch.bfh.evoting.voterapp.adapters.PollArchiveAdapter;
 import ch.bfh.evoting.voterapp.db.PollDbHelper;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
+import ch.bfh.evoting.voterapp.util.Utility;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,6 +33,10 @@ import android.widget.ListView;
  */
 public class ListTerminatedPollsActivity extends Activity {
 
+	private NfcAdapter nfcAdapter;
+	private boolean nfcAvailable;
+	private PendingIntent pendingIntent;
+	
 	private ListView lvPolls;
 
 	@Override
@@ -87,12 +97,51 @@ public class ListTerminatedPollsActivity extends Activity {
 				startActivity(intent);
 			}                 
 		});
+		
+		// Is NFC available on this device?
+		nfcAvailable = this.getPackageManager().hasSystemFeature(
+				PackageManager.FEATURE_NFC);
 
+		if (nfcAvailable) {
+
+			nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+
+			if (nfcAdapter.isEnabled()) {
+
+				// Setting up a pending intent that is invoked when an NFC tag
+				// is tapped on the back
+				pendingIntent = PendingIntent.getActivity(this, 0, new Intent(
+						this, getClass())
+						.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+			} else {
+				nfcAvailable = false;
+			}
+		}
+
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if (nfcAvailable) {
+			nfcAdapter.disableForegroundDispatch(this);
+		}
 	}
 	
 	@Override
 	protected void onResume() {
 		AndroidApplication.getInstance().setCurrentActivity(this);
+		
+		if (nfcAdapter != null && nfcAdapter.isEnabled()) {
+			nfcAvailable = true;
+		}
+
+		// make sure that this activity is the first one which can handle the
+		// NFC tags
+		if (nfcAvailable) {
+			nfcAdapter.enableForegroundDispatch(this, pendingIntent,
+					Utility.getNFCIntentFilters(), null);
+		}
 		super.onResume();
 	}
 
@@ -132,6 +181,18 @@ public class ListTerminatedPollsActivity extends Activity {
 		intent.putExtra("poll", poll);
 		intent.putExtra("saveToDb", false);
 		startActivity(intent);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Activity#onNewIntent(android.content.Intent)
+	 */
+	@Override
+	public void onNewIntent(Intent intent) {
+		Intent broadcastIntent = new Intent(BroadcastIntentTypes.nfcTagTapped);
+		broadcastIntent.putExtra(NfcAdapter.EXTRA_TAG, intent.getParcelableExtra(NfcAdapter.EXTRA_TAG));
+		LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
 	}
 	
 	/*--------------------------------------------------------------------------------------------
