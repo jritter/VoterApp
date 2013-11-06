@@ -262,7 +262,13 @@
     </string>
     <string name="help_text_network_config">
 <![CDATA[
-			
+			<b>In this screen you have to configure the way to connect to the vote session.</b>
+			<br/><br/>
+			In a first time, yopu have to indicate which wireless network you want to use. In a second time you have to indicate the group credentials.
+			<ul>
+			<li><b>If you are administrator of the vote</b>, you only have to indicate the wireless network you want to use.
+			<li><b>If you simply want to join an existing session<b/>
+			</ul>
 		]]>
     </string>
     <string name="help_text_network_info">
