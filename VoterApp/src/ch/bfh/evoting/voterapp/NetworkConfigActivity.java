@@ -1,29 +1,17 @@
 package ch.bfh.evoting.voterapp;
 
 
-import ch.bfh.evoting.voterapp.AndroidApplication;
-import ch.bfh.evoting.voterapp.entities.Poll;
-import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
-import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
-import ch.bfh.evoting.voterapp.fragment.NetworkOptionsFragment;
-import ch.bfh.evoting.voterapp.network.wifi.AdhocWifiManager;
-import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
-import ch.bfh.evoting.voterapp.util.Utility;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.nfc.NfcAdapter;
 import android.os.AsyncTask;
@@ -39,6 +27,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import ch.bfh.evoting.voterapp.entities.Poll;
+import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.NetworkOptionsFragment;
+import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
+import ch.bfh.evoting.voterapp.util.Utility;
 
 /**
  * Activity displaying the available networks
@@ -53,7 +47,6 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 	private PendingIntent pendingIntent;
 
 	private WifiManager wifi;
-	private AdhocWifiManager adhoc;
 
 	private SharedPreferences preferences;
 	private EditText etIdentification;
@@ -177,7 +170,6 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 				new IntentFilter(BroadcastIntentTypes.networkConnectionSuccessful));
 
 		wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-		adhoc = new AdhocWifiManager(wifi);
 
 		active = true;
 		rescanWifiTask = new AsyncTask<Object, Object, Object>() {
@@ -395,54 +387,11 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 				AndroidApplication.getInstance().getNetworkInterface().setGroupPassword(config[2]);
 
 				// connect to the network
-				connect(config);
+				AndroidApplication.getInstance().connect(config, this);
 
 			} else if (resultCode == RESULT_CANCELED) {
 				// Handle cancel
 			}
-		}
-	}
-
-	/**
-	 * This method initiates the connect process
-	 * 
-	 * @param config
-	 *            an array containing the SSID and the password of the network
-	 */
-	private void connect(String[] config) {
-		boolean connectedSuccessful = false;
-		// check whether the network is already known, i.e. the password is
-		// already stored in the device
-		for (WifiConfiguration configuredNetwork : wifi.getConfiguredNetworks()) {
-			if (configuredNetwork.SSID.equals("\"".concat(config[0]).concat(
-					"\""))) {
-				connectedSuccessful = true;
-				adhoc.connectToNetwork(configuredNetwork.networkId, this);
-				break;
-			}
-		}
-		if (!connectedSuccessful) {
-			for (ScanResult result : wifi.getScanResults()) {
-				if (result.SSID.equals(config[0])) {
-					connectedSuccessful = true;
-					adhoc.connectToNetwork(config[0], config[1], this);
-					break;
-				}
-			}
-		}
-
-		// display a message if the connection was not successful
-		if (!connectedSuccessful) {
-			AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-			alertDialog.setTitle(R.string.network_not_found);
-			alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.ok),
-					new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					dialog.dismiss();
-				}
-			});
-			alertDialog.setMessage(getString(R.string.network_not_found_text, config[0]));
-			alertDialog.show();
 		}
 	}
 

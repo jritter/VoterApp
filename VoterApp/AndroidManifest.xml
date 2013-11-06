@@ -39,6 +39,11 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="application/ch.bfh.evoting.voterapp" />
+            </intent-filter>
         </activity>
         <activity
             android:name="ch.bfh.evoting.voterapp.PollActivity"

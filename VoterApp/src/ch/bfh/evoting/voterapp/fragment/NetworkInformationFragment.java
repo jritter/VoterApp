@@ -187,45 +187,48 @@ public class NetworkInformationFragment extends Fragment implements
 					.findViewById(R.id.textview_network_key);
 			tv_network_key.setText(preferences.getString("wlan_key", ""));
 		}
-		
-		//broadcast receiving the poll review acceptations
-				nfcTagTappedReceiver = new BroadcastReceiver() {
 
-					@Override
-					public void onReceive(Context context, Intent intent) {
-						if (writeNfcEnabled){
-							
-							String content = ssid + "||"
-									+ groupName + "||" + groupPassword;
-							
-							// create a new NdefRecord
-							NdefRecord record = createMimeRecord(
-									"application/ch.bfh.instacircle", content.getBytes());
+		// broadcast receiving the poll review acceptations
+		nfcTagTappedReceiver = new BroadcastReceiver() {
 
-							// create a new Android Application Record
-							NdefRecord aar = NdefRecord
-									.createApplicationRecord(context.getPackageName());
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				if (writeNfcEnabled) {
 
-							// create a ndef message
-							NdefMessage message = new NdefMessage(new NdefRecord[] { record,
-									aar });
+					String content = ssid + "||" + groupName + "||"
+							+ groupPassword;
 
-							// extract tag from the intent
-							Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+					// create a new NdefRecord
+					NdefRecord record = createMimeRecord(
+							"application/ch.bfh.evoting.voterapp",
+							content.getBytes());
 
-							// write the tag
-							writeTag(tag, message);
+					// create a new Android Application Record
+					NdefRecord aar = NdefRecord.createApplicationRecord(context
+							.getPackageName());
 
-							// close the dialog
-							writeNfcEnabled = false;
-							writeNfcTagDialog.dismiss();
-							
-							writeNfcTagDialog.dismiss();
-							writeNfcEnabled = false;
-						}
-					}
-				};
-				LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(nfcTagTappedReceiver, new IntentFilter(BroadcastIntentTypes.nfcTagTapped));
+					// create a ndef message
+					NdefMessage message = new NdefMessage(new NdefRecord[] {
+							record, aar });
+
+					// extract tag from the intent
+					Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+
+					// write the tag
+					writeTag(tag, message);
+
+					// close the dialog
+					writeNfcEnabled = false;
+					writeNfcTagDialog.dismiss();
+
+					writeNfcTagDialog.dismiss();
+					writeNfcEnabled = false;
+				}
+			}
+		};
+		LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(
+				nfcTagTappedReceiver,
+				new IntentFilter(BroadcastIntentTypes.nfcTagTapped));
 
 		return v;
 	}
@@ -318,6 +321,12 @@ public class NetworkInformationFragment extends Fragment implements
 			}
 		}
 
+	}
+	
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		LocalBroadcastManager.getInstance(this.getActivity()).unregisterReceiver(nfcTagTappedReceiver);
 	}
 	
 	/*--------------------------------------------------------------------------------------------
