@@ -2,10 +2,14 @@ package ch.bfh.evoting.voterapp;
 
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,8 +17,14 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
+import ch.bfh.evoting.voterapp.util.Utility;
 
 public class NetworkInformationActivity extends Activity implements OnClickListener {
+	
+	private NfcAdapter nfcAdapter;
+	private boolean nfcAvailable;
+	private PendingIntent pendingIntent;
 	
 	private Button btnNext;
 	private Button btnRecreateNetwork;
@@ -54,11 +64,51 @@ public class NetworkInformationActivity extends Activity implements OnClickListe
 
 		btnNext = (Button) findViewById(R.id.button_next);
 		btnNext.setOnClickListener(this);
+		
+		// Is NFC available on this device?
+		nfcAvailable = this.getPackageManager().hasSystemFeature(
+				PackageManager.FEATURE_NFC);
+
+		if (nfcAvailable) {
+
+			nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+
+			if (nfcAdapter.isEnabled()) {
+
+				// Setting up a pending intent that is invoked when an NFC tag
+				// is tapped on the back
+				pendingIntent = PendingIntent.getActivity(this, 0, new Intent(
+						this, getClass())
+						.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+			} else {
+				nfcAvailable = false;
+			}
+		}
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if (nfcAvailable) {
+			nfcAdapter.disableForegroundDispatch(this);
+		}
 	}
 
 	@Override
 	protected void onResume() {
 		AndroidApplication.getInstance().setCurrentActivity(this);
+		
+		if (nfcAdapter != null && nfcAdapter.isEnabled()) {
+			nfcAvailable = true;
+		}
+
+		// make sure that this activity is the first one which can handle the
+		// NFC tags
+		if (nfcAvailable) {
+			nfcAdapter.enableForegroundDispatch(this, pendingIntent,
+					Utility.getNFCIntentFilters(), null);
+		}
+		
 		super.onResume();
 	}
 	
@@ -66,6 +116,12 @@ public class NetworkInformationActivity extends Activity implements OnClickListe
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.network_information, menu);
+		
+		if(getResources().getBoolean(R.bool.display_bottom_bar)){
+			menu.findItem(R.id.action_modify_network).setVisible(false);
+			menu.findItem(R.id.action_next).setVisible(false);
+	    }
+		
 		return true;
 	}
 
@@ -127,56 +183,7 @@ public class NetworkInformationActivity extends Activity implements OnClickListe
 	@Override
 	public void onClick(View view) {
 
-		//TODO can we remove this ??
-		/*if (view == btnWriteNfcTag){
-			if (!nfcAdapter.isEnabled()) {
-
-				// if nfc is available but deactivated ask the user whether he
-				// wants to enable it. If yes, redirect to the settings.
-				AlertDialog alertDialog = new AlertDialog.Builder(getActivity())
-				.create();
-				alertDialog.setTitle("InstaCircle - NFC needs to be enabled");
-				alertDialog
-				.setMessage("In order to use this feature, NFC must be enabled. Enable now?");
-				alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes",
-						new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog,
-							int which) {
-						dialog.dismiss();
-						startActivity(new Intent(
-								android.provider.Settings.ACTION_WIRELESS_SETTINGS));
-					}
-				});
-				alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "No",
-						new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog,
-							int which) {
-						dialog.dismiss();
-					}
-				});
-				alertDialog.show();
-			} else {
-				// display a progress dialog waiting for the NFC tag to be
-				// tapped
-				writeNfcEnabled = true;
-				writeNfcTagDialog = new ProgressDialog(getActivity());
-				writeNfcTagDialog
-				.setTitle("InstaCircle - Share Networkconfiguration with NFC Tag");
-				writeNfcTagDialog
-				.setMessage("Please tap a writeable NFC Tag on the back of your device...");
-				writeNfcTagDialog.setCancelable(false);
-				writeNfcTagDialog.setButton(DialogInterface.BUTTON_NEGATIVE,
-						"Cancel", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog,
-							int which) {
-						writeNfcEnabled = false;
-						dialog.dismiss();
-					}
-				});
-
-				writeNfcTagDialog.show();
-			}
-		} else */if(view == btnRecreateNetwork){
+		if(view == btnRecreateNetwork){
 			Intent i = new Intent(this, NetworkConfigActivity.class);
 			i.putExtra("poll", poll);
 			startActivity(i);
@@ -190,6 +197,18 @@ public class NetworkInformationActivity extends Activity implements OnClickListe
 				startActivity(i);
 			}
 		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.app.Activity#onNewIntent(android.content.Intent)
+	 */
+	@Override
+	public void onNewIntent(Intent intent) {
+		Intent broadcastIntent = new Intent(BroadcastIntentTypes.nfcTagTapped);
+		broadcastIntent.putExtra(NfcAdapter.EXTRA_TAG, intent.getParcelableExtra(NfcAdapter.EXTRA_TAG));
+		LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
 	}
 	
 	/*--------------------------------------------------------------------------------------------

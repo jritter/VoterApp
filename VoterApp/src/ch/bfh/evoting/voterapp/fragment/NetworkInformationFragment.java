@@ -5,8 +5,8 @@ import java.nio.charset.Charset;
 
 import android.app.AlertDialog;
 import android.app.Fragment;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,6 +22,7 @@ import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.nfc.tech.NdefFormatable;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,6 +36,7 @@ import android.widget.TextView;
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
+import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.Utility;
 
 import com.google.zxing.BarcodeFormat;
@@ -57,13 +59,12 @@ public class NetworkInformationFragment extends Fragment implements
 
 	private NfcAdapter nfcAdapter;
 	private boolean writeNfcEnabled;
-	private PendingIntent pendingIntent;
-	private IntentFilter nfcIntentFilter;
-	private IntentFilter[] intentFiltersArray;
+	private BroadcastReceiver nfcTagTappedReceiver;
 
 	private ProgressDialog writeNfcTagDialog;
 	private AlertDialog alertDialog;
 	private Button btnWriteNfcTag;
+	
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -148,29 +149,6 @@ public class NetworkInformationFragment extends Fragment implements
 						}
 
 					});
-
-			// only set up the NFC stuff if NFC is also available
-			if (nfcAvailable) {
-				nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
-				if (nfcAdapter.isEnabled()) {
-
-					// Setting up a pending intent that is invoked when an NFC
-					// tag
-					// is tapped on the back
-					pendingIntent = PendingIntent.getActivity(getActivity(), 0,
-							new Intent(getActivity(), getClass())
-									.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
-							0);
-
-					nfcIntentFilter = new IntentFilter();
-					nfcIntentFilter
-							.addAction(NfcAdapter.ACTION_NDEF_DISCOVERED);
-					nfcIntentFilter.addAction(NfcAdapter.ACTION_TAG_DISCOVERED);
-					intentFiltersArray = new IntentFilter[] { nfcIntentFilter };
-				} else {
-					nfcAvailable = false;
-				}
-			}
 		}
 
 		if (nfcAvailable && paramsAvailable) {
@@ -209,6 +187,45 @@ public class NetworkInformationFragment extends Fragment implements
 					.findViewById(R.id.textview_network_key);
 			tv_network_key.setText(preferences.getString("wlan_key", ""));
 		}
+		
+		//broadcast receiving the poll review acceptations
+				nfcTagTappedReceiver = new BroadcastReceiver() {
+
+					@Override
+					public void onReceive(Context context, Intent intent) {
+						if (writeNfcEnabled){
+							
+							String content = ssid + "||"
+									+ groupName + "||" + groupPassword;
+							
+							// create a new NdefRecord
+							NdefRecord record = createMimeRecord(
+									"application/ch.bfh.instacircle", content.getBytes());
+
+							// create a new Android Application Record
+							NdefRecord aar = NdefRecord
+									.createApplicationRecord(context.getPackageName());
+
+							// create a ndef message
+							NdefMessage message = new NdefMessage(new NdefRecord[] { record,
+									aar });
+
+							// extract tag from the intent
+							Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+
+							// write the tag
+							writeTag(tag, message);
+
+							// close the dialog
+							writeNfcEnabled = false;
+							writeNfcTagDialog.dismiss();
+							
+							writeNfcTagDialog.dismiss();
+							writeNfcEnabled = false;
+						}
+					}
+				};
+				LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(nfcTagTappedReceiver, new IntentFilter(BroadcastIntentTypes.nfcTagTapped));
 
 		return v;
 	}
@@ -326,6 +343,100 @@ public class NetworkInformationFragment extends Fragment implements
 				Bitmap.Config.ARGB_8888);
 		bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
 		return bitmap;
+	}
+	
+	/**
+	 * Creates a custom MIME type encapsulated in an NDEF record
+	 * 
+	 * @param mimeType
+	 *            The string with the mime type name
+	 */
+	public NdefRecord createMimeRecord(String mimeType, byte[] payload) {
+		byte[] mimeBytes = mimeType.getBytes(Charset.forName("US-ASCII"));
+		NdefRecord mimeRecord = new NdefRecord(NdefRecord.TNF_MIME_MEDIA,
+				mimeBytes, new byte[0], payload);
+		return mimeRecord;
+	}
+	
+	/**
+	 * Writes an NFC Tag
+	 * 
+	 * @param tag
+	 *            The reference to the tag
+	 * @param message
+	 *            the message which should be writen on the message
+	 * @return true if successful, false otherwise
+	 */
+	public boolean writeTag(Tag tag, NdefMessage message) {
+
+		alertDialog = new AlertDialog.Builder(getActivity()).create();
+		alertDialog.setTitle(getResources().getString(R.string.nfc_write_failed));
+		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getResources().getString(R.string.ok),
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+		try {
+			// see if tag is already NDEF formatted
+			Ndef ndef = Ndef.get(tag);
+			if (ndef != null) {
+				ndef.connect();
+				if (!ndef.isWritable()) {
+					alertDialog.setMessage(getResources().getString(R.string.nfc_readonly));
+					alertDialog.show();
+					return false;
+				}
+
+				// work out how much space we need for the data
+				int size = message.toByteArray().length;
+				if (ndef.getMaxSize() < size) {
+					alertDialog
+							.setMessage(getResources().getString(R.string.nfc_not_enough_space));
+					alertDialog.show();
+					return false;
+				}
+
+				ndef.writeNdefMessage(message);
+
+			} else {
+				// attempt to format tag
+				NdefFormatable format = NdefFormatable.get(tag);
+				if (format != null) {
+					try {
+						format.connect();
+						format.format(message);
+					} catch (IOException e) {
+						alertDialog.setMessage(getResources().getString(R.string.nfc_unable_format_ndef));
+						alertDialog.show();
+						return false;
+
+					}
+				} else {
+					alertDialog
+							.setMessage(getResources().getString(R.string.nfc_no_ndef_support));
+					alertDialog.show();
+					return false;
+				}
+			}
+		} catch (Exception e) {
+			return false;
+		}
+		alertDialog.setTitle(R.string.nfc_success);
+		alertDialog.setMessage(getResources().getString(R.string.nfc_write_success));
+		
+		alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+			@Override
+			public void onShow(DialogInterface dialog) {
+				Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+				alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundResource(
+						R.drawable.selectable_background_votebartheme);
+
+			}
+		});
+		
+		alertDialog.show();
+		return true;
 	}
 
 }

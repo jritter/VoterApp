@@ -1,6 +1,5 @@
 package ch.bfh.evoting.voterapp.util;
 
-import android.content.Intent;
 
 /**
  * Class listing local broadcast intent types that are sent in the application
@@ -98,5 +97,12 @@ public class BroadcastIntentTypes {
 	 * - nothing
 	 * */
 	public static final String networkSSIDUpdate = "networkSSIDUpdate";
+	
+	/**
+	 * Intent type sent when NFC Tag is tapped to the back of a device
+	 * Extras:
+	 * - The NFC Tag
+	 * */
+	public static final String nfcTagTapped = "NFCTagTapped";
 	
 }

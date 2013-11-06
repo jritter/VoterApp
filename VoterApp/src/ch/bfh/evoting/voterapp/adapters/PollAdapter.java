@@ -75,14 +75,6 @@ public class PollAdapter extends ArrayAdapter<Poll> {
 			});
 		}
 
-		if(position==values.size()-1){
-			ImageView ivIcon = (ImageView)view.findViewById(R.id.imageview_icon);
-			if(ivIcon!=null)((LinearLayout)ivIcon.getParent()).removeView(ivIcon);
-			view.setBackgroundResource(R.drawable.selectable_background_mainbuttons);
-			tvContent.setTextColor(getContext().getResources().getColor(android.R.color.white));
-			tvContent.setAllCaps(true);
-			if(btnDelete!=null)((LinearLayout)btnDelete.getParent()).removeView(btnDelete);
-		}
 		return view;
 	}
 }
