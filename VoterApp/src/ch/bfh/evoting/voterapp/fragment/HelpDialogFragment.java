@@ -1,11 +1,13 @@
 package ch.bfh.evoting.voterapp.fragment;
 
 import ch.bfh.evoting.voterapp.R;
+import ch.bfh.evoting.voterapp.util.Utility;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -44,7 +46,7 @@ public class HelpDialogFragment extends DialogFragment {
 		
 		AlertDialog.Builder builder = new AlertDialog.Builder( getActivity( ) )
 		.setView(view)
-		.setIcon( android.R.drawable.ic_dialog_info )
+		.setIcon( R.drawable.ic_action_help_dark )
 		.setNeutralButton(R.string.close, new DialogInterface.OnClickListener(){
 
 			@Override
@@ -52,19 +54,21 @@ public class HelpDialogFragment extends DialogFragment {
 				dismiss();
 			}
 
-		});
-
+		})
+		.setTitle(R.string.help);
+		
 		dialog = builder.create();
 
 		dialog.setOnShowListener(new OnShowListener() {
 
 			public void onShow(DialogInterface dialog) {
+				Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
 				((AlertDialog) dialog).getButton(AlertDialog.BUTTON_NEUTRAL)
 				.setBackgroundResource(
 						R.drawable.selectable_background_votebartheme);
 			}
 		});
-
+		
 		return dialog;
 	}
 }

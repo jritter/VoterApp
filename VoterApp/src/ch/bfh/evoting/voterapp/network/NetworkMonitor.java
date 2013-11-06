@@ -1,5 +1,6 @@
 package ch.bfh.evoting.voterapp.network;
 
+import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import android.content.BroadcastReceiver;
 import android.content.Context;

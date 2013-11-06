@@ -35,7 +35,7 @@
     <string name="create_network">Create Network</string>
     <string name="identification">Your Identification</string>
     <string name="your_identification">YOUR IDENTIFICATION</string>
-    <string name="capture_qrcode">Capture QR Code</string>
+    <string name="capture_qrcode">Scan QR Code</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="yes">Yes</string>
@@ -111,7 +111,7 @@
     <string name="dialog_network_lost">The group connection has been lost. The vote will be interrupted.</string>
     <string name="taost_password_letter">The password must start with a letter.</string>
     <string name="dialog_title_confirm_vote">Confirm your vote</string>
-    <string name="toast_network_lost">You have been disconnected from the group.</string>
+    <string name="toast_network_lost">You have been disconnected from the network.</string>
     <string name="dialog_title_no_identification">No identification set</string>
     <string name="dialog_no_identification">You did not enter an identification. Please first do that.</string>
     <string name="dialog_confirm_vote">
@@ -211,18 +211,18 @@
     <string name="description_qrcode">QR Code</string>
 
     <!-- Help dialog titles -->
-    <string name="help_title_main">Welcome on the home screen of MobiVote</string>
-    <string name="help_title_electorate">Help for electorate selection</string>
-    <string name="help_title_review">Help for vote review</string>
-    <string name="help_title_network_info">Help for network information</string>
-    <string name="help_title_vote">Help for vote</string>
-    <string name="help_title_wait">Help for vote state</string>
-    <string name="help_title_display_results">Help for results</string>
-    <string name="help_title_archive">Help for archive</string>
-    <string name="help_title_network_config">Help for network configuration</string>
-    <string name="help_title_poll">Help for vote creation</string>
-    <string name="help_title_poll_details">Help for vote details</string>
-    
+    <string name="help_title_main">Welcome to MobiVote</string>
+    <string name="help_title_electorate">Electorate selection</string>
+    <string name="help_title_review">Vote review</string>
+    <string name="help_title_network_info">Network information</string>
+    <string name="help_title_vote">Vote</string>
+    <string name="help_title_wait">Vote progress</string>
+    <string name="help_title_display_results">Vote result</string>
+    <string name="help_title_archive">Vote archive</string>
+    <string name="help_title_network_config">Network configuration</string>
+    <string name="help_title_poll">Vote creation</string>
+    <string name="help_title_poll_details">Vote details</string>
+
     <!-- NFC Strings -->
     <string name="nfc_success">Success</string>
     <string name="nfc_write_success">NFC tag written successfully</string>
@@ -267,7 +267,9 @@
 			<li><b>Question:</b> this is the question to which the voter will have to answer to.</li>
 			<li><b>Options:</b> this is the list of answers out of which the voters will have to choose one. You can add an option by entering a text in the field at the bottom of the screen and validating in with the + button. You can remove an option by clicking on the corresponding garbage icon.</li>
 			<li><b>Allow empty votes:</b> this checkbox adds or remove an option from the list which represent the "No opinon" vote</li>
-			<li><b>Start vote:</b> when you have finished defining the vote, you can either press on the "Start vote" button (at the bottom of the screen for phone, at the upper right corner on tablets) or go back using the button in the upper left corner, and saving it. When you save it, you will be able to access it again later in order to modify and run it.</li>
+			<li><b>Start vote:</b> when you have finished defining the vote, you can either press on the "Start vote" button 
+			 (at the bottom of the screen for phone, at the upper right corner on tablets) or go back using the button in the upper left corner, and saving it.
+			 When you save it, you will be able to access it again later in order to modify and run it.</li>
 			</ul>
 		]]>
     </string>
@@ -275,16 +277,34 @@
 <![CDATA[
 			<b>In this screen you have to configure the way to connect to the vote session.</b>
 			<br/><br/>
-			In a first time, yopu have to indicate which wireless network you want to use. In a second time you have to indicate the group credentials.
+			In a first time, you have to indicate your identification (for example your name). The you have to choose which wireless network you want to use. In a third time you have to indicate the group credentials.
 			<ul>
-			<li><b>If you are administrator of the vote</b>, you only have to indicate the wireless network you want to use.
-			<li><b>If you simply want to join an existing session<b/>
+				<li><b>If you are administrator of the vote</b>, you only have to indicate the wireless network you want to use.
+				 For this purpose, you have two possibilities. Either you can use the curently connected wireless network (button \"Use network x\"),
+				 or you can choose the advanced network settings where you can choose the network you want to connect to. You also have the possibility to set up an access point on your device. This will work only with a vote with a few participants.
+				<li><b>If you simply want to join an existing session</b>, you have four options:</li>
+				<ul>
+				<li><b>Use network x:</b> this option allows you to use the network to which you are currently connected.
+			 	When clicking on this button, you will have to enter the credentials of the vote session that have been defined on the administrator\'s device.</li>
+				<li><b>Scan QR-code:</b> with this option, you just have to scan the QR-code displayed on the administrator\'s device. The connection to the network and the entering of the session credentials will be done automatically.</li>
+				<li><b>Scan NFC tag:</b> if your device support NFC technology, you can scan data saved on a NFC tag. The connection to the network and the entering of the session credentials will be done automatically.</li>
+				<li><b>Advanced network setting:</b> this options allows you to select another network you want to connect to. When clicking on a network, you will have to enter the key of the selected network (if network is not already known) and the credentials of the vote session that have been defined on the administrator\'s device.</li>	
+				</ul>
 			</ul>
+			
 		]]>
     </string>
     <string name="help_text_network_info">
 <![CDATA[
-			
+			<b>This screen displays the information about the vote session.</b>
+			<ul>
+				<li><b>Network name:</b> the wireless network on which the vote session will take place.</li>
+				<li><b>Group number:</b> the name of the group.</li>
+				<li><b>Group password:</b> the password that must be shared by all members of group.</li>
+				<li><b>QR-code:</b> the QR-code containing all these informations that can be scanned by people that want to join the group.</li>
+				<li><b>Write NFC tag:</b> if your device support NFC technology, this button will be displayed. It allow to to write the information on a NFc tag that will be read by other people.</li>
+				<li><b>Your identification:</b> your name as you defined it.</li>
+			</ul>
 		]]>
     </string>
     <string name="help_text_electorate_admin">
@@ -296,42 +316,64 @@
     </string>
     <string name="help_text_review_admin">
 <![CDATA[
-			
+			<b>In this screen, you, as administrator, have to wait that every participant agrees with the content of the vote and the electorate.</b>
+			<br/>Once every participant has accepted the content of the vote, you can start the voting period.
+			<br/><br/>If a participant does not agree with the content of the vote, you can go back to the edition screen using the button on the top left button.<br/>
+			If a participant does not accept the content of the vote just for blocking the vote, you can go back and exclude her from the electorate.
 		]]>
     </string>
     <string name="help_text_electorate_voter">
 <![CDATA[
-			
+			<b>In this screen you can see which participants of the group are included in the electorate by the administrator of the vote.</b>
+			Once the administrator has selected all the participant he wants, you will be redirected to next screen. 
 		]]>
     </string>
     <string name="help_text_review_voter">
 <![CDATA[
-			
+			<b>In this screen you have to check if the content of the vote is correct.</b> If you agree with it, you can press the red tick button corresponding to your name in the list of participants.
+			<br/><br/>
+			You especially have to check following things:
+			<ul>
+				<li>Is the question correct?</li>
+				<li>Does the list of options contain all options?</li>
+				<li>Is every person that has the right to vote in the participant list?</li>
+				<li>Nobody without right to vote should appear in the list!</li>
+			</ul>
+			If one of this condition is not fulfilled, you should not accept the review and ask the administrator of the vote to modify it.
 		]]>
     </string>
     <string name="help_text_vote">
 <![CDATA[
-			
+			<b>In this screen you have to select the option you want to vote for.</b> When selecting an option, a dialog will be shown asking you to confirm your choice.
 		]]>
     </string>
     <string name="help_text_wait_admin">
 <![CDATA[
-			
+			<b>This screen shows the progress of the vote.</b> In the list of participant you can see who has not voted yet.
+			 If someone is not voting (because of phone problem, boycott, or another reason), you, as administrator of the vote can decide to interrupt the vote by pressing on the "Finish vote" button.
+			<br/><br/>Once everyone has voted, you will be redirected to the result screen.
 		]]>
     </string>
     <string name="help_text_wait_voter">
 <![CDATA[
-			
+			<b>This screen shows the progress of the vote.</b> In the list of participant you can see who has not voted yet.
+			<br/><br/>Once everyone has voted, you will be redirected to the result screen.
 		]]>
     </string>
     <string name="help_text_display_results">
 <![CDATA[
-			
+			<b>This screen displays the result of the vote</b>
+			<br/><br/>
+			If you were the administrator of this vote and the vote just finished, you can redo the vote by clicking on the "Redo vote" button.
+			<br/><br/>
+			If you access to this screen through the vote archive, you can clone this vote in order to run it again later.
 		]]>
     </string>
     <string name="help_text_archive">
 <![CDATA[
-			
+			<b>This screen shows a list of all vote to which you participated</b>
+			<br/><br/>
+			When you select a vote in the list, you will be redirected to the screen displaying the result of this vote.
 		]]>
     </string>
 

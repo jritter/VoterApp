@@ -198,10 +198,19 @@ public class NetworkOptionsFragment extends Fragment {
 
 		return v;
 	}
+	
+	
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		LocalBroadcastManager.getInstance(this.getActivity()).unregisterReceiver(ssidChangeReceiver);
+	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		LocalBroadcastManager.getInstance(this.getActivity()).unregisterReceiver(ssidChangeReceiver);
 	}
 
 	@Override
