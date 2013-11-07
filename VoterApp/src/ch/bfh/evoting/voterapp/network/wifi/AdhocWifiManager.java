@@ -215,7 +215,7 @@ public class AdhocWifiManager {
 			}
 			this.ssid = config.SSID;
 
-			d = new ProgressDialog(context);
+			
 		}
 
 		/*
@@ -227,6 +227,7 @@ public class AdhocWifiManager {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			//d.setTitle("Connecting to Network " + ssid + "...");
+			d = new ProgressDialog(context);
 			d.setMessage("...please wait a moment.");
 			d.setProgressStyle(ProgressDialog.THEME_HOLO_LIGHT);
 			d.setOnShowListener(new DialogInterface.OnShowListener() {

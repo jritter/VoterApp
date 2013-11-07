@@ -231,6 +231,7 @@
     <string name="nfc_not_enough_space">This NFC tag doesn\'t have enough free space</string>
     <string name="nfc_unable_format_ndef">Unable to format NFC tag to NDEF</string>
     <string name="nfc_no_ndef_support">This NFC tag doesn\'t appear to support NDEF format</string>
+    <string name="nfc_tag_read_failed">Unable to read NFC tag</string>
 
     <!-- Help dialog texts -->
     <string name="help_text_main">

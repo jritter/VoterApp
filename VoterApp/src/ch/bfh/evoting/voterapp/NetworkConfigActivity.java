@@ -1,6 +1,5 @@
 package ch.bfh.evoting.voterapp;
 
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.PendingIntent;
@@ -13,7 +12,10 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.wifi.WifiManager;
+import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.nfc.tech.Ndef;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -27,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
@@ -40,8 +43,8 @@ import ch.bfh.evoting.voterapp.util.Utility;
  * @author Philémon von Bergen
  * 
  */
-public class NetworkConfigActivity extends Activity implements TextWatcher{
-	
+public class NetworkConfigActivity extends Activity implements TextWatcher {
+
 	private NfcAdapter nfcAdapter;
 	private boolean nfcAvailable;
 	private PendingIntent pendingIntent;
@@ -54,6 +57,8 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 
 	private boolean active;
 	private Poll poll;
+	
+	private String[] config;
 
 	private AsyncTask<Object, Object, Object> rescanWifiTask;
 
@@ -61,24 +66,33 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		if(getResources().getBoolean(R.bool.portrait_only)){
+		if (getResources().getBoolean(R.bool.portrait_only)) {
 			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		}
 
 		final FrameLayout overlayFramelayout = new FrameLayout(this);
 		FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(
-				FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.WRAP_CONTENT);
-		layoutParams.setMargins(getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), 0, getResources().getDimensionPixelSize(R.dimen.activity_horizontal_margin), 0);
+				FrameLayout.LayoutParams.MATCH_PARENT,
+				FrameLayout.LayoutParams.WRAP_CONTENT);
+		layoutParams.setMargins(
+				getResources().getDimensionPixelSize(
+						R.dimen.activity_horizontal_margin),
+				0,
+				getResources().getDimensionPixelSize(
+						R.dimen.activity_horizontal_margin), 0);
 		overlayFramelayout.setLayoutParams(layoutParams);
 
-		View view = getLayoutInflater().inflate(R.layout.activity_network_config, overlayFramelayout,false);
+		View view = getLayoutInflater().inflate(
+				R.layout.activity_network_config, overlayFramelayout, false);
 		overlayFramelayout.addView(view);
 
-		final SharedPreferences settings = getSharedPreferences(AndroidApplication.PREFS_NAME, MODE_PRIVATE);
+		final SharedPreferences settings = getSharedPreferences(
+				AndroidApplication.PREFS_NAME, MODE_PRIVATE);
 
-		if(settings.getBoolean("first_run", true)){
-			//Show General Help Overlay
-			final View overlay_view = getLayoutInflater().inflate(R.layout.overlay_parent_button, null,false);
+		if (settings.getBoolean("first_run", true)) {
+			// Show General Help Overlay
+			final View overlay_view = getLayoutInflater().inflate(
+					R.layout.overlay_parent_button, null, false);
 			overlayFramelayout.addView(overlay_view);
 			overlay_view.setOnClickListener(new View.OnClickListener() {
 
@@ -86,51 +100,68 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 				public void onClick(View v) {
 					overlayFramelayout.removeView(overlay_view);
 					settings.edit().putBoolean("first_run", false).commit();
-					//Show Help Overlay for this activity
-					if(settings.getBoolean("first_run_"+NetworkConfigActivity.this.getClass().getSimpleName(), true)){
-						final View overlay_view = getLayoutInflater().inflate(R.layout.overlay_network_config, null,false);
+					// Show Help Overlay for this activity
+					if (settings.getBoolean("first_run_"
+							+ NetworkConfigActivity.this.getClass()
+									.getSimpleName(), true)) {
+						final View overlay_view = getLayoutInflater().inflate(
+								R.layout.overlay_network_config, null, false);
 						overlayFramelayout.addView(overlay_view);
-						overlay_view.setOnClickListener(new View.OnClickListener() {
+						overlay_view
+								.setOnClickListener(new View.OnClickListener() {
 
-							@Override
-							public void onClick(View v) {
-								overlayFramelayout.removeView(overlay_view);
-								settings.edit().putBoolean("first_run_"+NetworkConfigActivity.this.getClass().getSimpleName(), false).commit();					
-							}
-						});
+									@Override
+									public void onClick(View v) {
+										overlayFramelayout
+												.removeView(overlay_view);
+										settings.edit()
+												.putBoolean(
+														"first_run_"
+																+ NetworkConfigActivity.this
+																		.getClass()
+																		.getSimpleName(),
+														false).commit();
+									}
+								});
 					}
 				}
 			});
-		} else if(settings.getBoolean("first_run_"+this.getClass().getSimpleName(), true)){
-			//Show Help Overlay for this activity
-			final View overlay_view = getLayoutInflater().inflate(R.layout.overlay_network_config, null,false);
+		} else if (settings.getBoolean("first_run_"
+				+ this.getClass().getSimpleName(), true)) {
+			// Show Help Overlay for this activity
+			final View overlay_view = getLayoutInflater().inflate(
+					R.layout.overlay_network_config, null, false);
 			overlayFramelayout.addView(overlay_view);
 			overlay_view.setOnClickListener(new View.OnClickListener() {
 
 				@Override
 				public void onClick(View v) {
 					overlayFramelayout.removeView(overlay_view);
-					settings.edit().putBoolean("first_run_"+NetworkConfigActivity.this.getClass().getSimpleName(), false).commit();					
+					settings.edit()
+							.putBoolean(
+									"first_run_"
+											+ NetworkConfigActivity.this
+													.getClass().getSimpleName(),
+									false).commit();
 				}
 			});
 		}
 		setContentView(overlayFramelayout);
 
-
 		AndroidApplication.getInstance().setCurrentActivity(this);
 
 		Fragment fg = new NetworkOptionsFragment();
 		// adding fragment to relative layout by using layout id
-		getFragmentManager().beginTransaction().add(R.id.fragment_container, fg).commit();
+		getFragmentManager().beginTransaction()
+				.add(R.id.fragment_container, fg).commit();
 
 		// Show the Up button in the action bar.
 		setupActionBar();
 
-		Poll serializedPoll = (Poll)getIntent().getSerializableExtra("poll");
-		if(serializedPoll!=null){
+		Poll serializedPoll = (Poll) getIntent().getSerializableExtra("poll");
+		if (serializedPoll != null) {
 			poll = serializedPoll;
 		}
-
 
 		// reading the identification from the preferences, if it is not there
 		// it will try to read the name of the device owner
@@ -155,19 +186,23 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 			public void onReceive(Context context, Intent intent) {
 				active = false;
 				rescanWifiTask.cancel(true);
-				LocalBroadcastManager.getInstance(NetworkConfigActivity.this).unregisterReceiver(this);
-				if(AndroidApplication.getInstance().isAdmin()){
-					Intent i = new Intent(NetworkConfigActivity.this, NetworkInformationActivity.class);
+				LocalBroadcastManager.getInstance(NetworkConfigActivity.this)
+						.unregisterReceiver(this);
+				if (AndroidApplication.getInstance().isAdmin()) {
+					Intent i = new Intent(NetworkConfigActivity.this,
+							NetworkInformationActivity.class);
 					i.putExtra("poll", poll);
 					startActivity(i);
 				} else {
-					startActivity(new Intent(NetworkConfigActivity.this, CheckElectorateActivity.class));
+					startActivity(new Intent(NetworkConfigActivity.this,
+							CheckElectorateActivity.class));
 				}
 			}
 		};
 		LocalBroadcastManager.getInstance(this).registerReceiver(
 				serviceStartedListener,
-				new IntentFilter(BroadcastIntentTypes.networkConnectionSuccessful));
+				new IntentFilter(
+						BroadcastIntentTypes.networkConnectionSuccessful));
 
 		wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
@@ -185,7 +220,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 			}
 
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-		
+
 		// Is NFC available on this device?
 		nfcAvailable = this.getPackageManager().hasSystemFeature(
 				PackageManager.FEATURE_NFC);
@@ -210,16 +245,39 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 
 	@Override
 	protected void onNewIntent(Intent intent) {
-		//if extra is present, it has priority on the saved poll
-		Poll serializedPoll = (Poll)intent.getSerializableExtra("poll");
-		if(serializedPoll!=null){
+		// if extra is present, it has priority on the saved poll
+		Poll serializedPoll = (Poll) intent.getSerializableExtra("poll");
+		if (serializedPoll != null) {
 			poll = serializedPoll;
 		}
+
+		if (intent.getParcelableExtra(NfcAdapter.EXTRA_TAG) != null) {
+			Intent broadcastIntent = new Intent(
+					BroadcastIntentTypes.nfcTagTapped);
+			broadcastIntent.putExtra(NfcAdapter.EXTRA_TAG,
+					intent.getParcelableExtra(NfcAdapter.EXTRA_TAG));
+			LocalBroadcastManager.getInstance(this).sendBroadcast(
+					broadcastIntent);
+		}
 		
-		if (intent.getParcelableExtra(NfcAdapter.EXTRA_TAG) != null){
-			Intent broadcastIntent = new Intent(BroadcastIntentTypes.nfcTagTapped);
-			broadcastIntent.putExtra(NfcAdapter.EXTRA_TAG, intent.getParcelableExtra(NfcAdapter.EXTRA_TAG));
-			LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
+		Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+		Ndef ndef = Ndef.get(tag);
+
+		if (ndef == null){
+			Toast.makeText(this, getResources().getText(R.string.nfc_tag_read_failed), Toast.LENGTH_LONG).show();
+		}
+		else {
+			NdefMessage msg;
+			msg = ndef.getCachedNdefMessage();
+			config = new String(msg.getRecords()[0].getPayload())
+					.split("\\|\\|");
+
+			// saving the values that we got
+			SharedPreferences.Editor editor = preferences.edit();
+			editor.putString("SSID", config[0]);
+			editor.commit();
+
+			AndroidApplication.getInstance().connect(config, this);
 		}
 		
 		super.onNewIntent(intent);
@@ -234,25 +292,30 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 	@Override
 	public void onRestoreInstanceState(Bundle savedInstanceState) {
 		super.onRestoreInstanceState(savedInstanceState);
-		poll = (Poll)savedInstanceState.getSerializable("poll");
+		poll = (Poll) savedInstanceState.getSerializable("poll");
 	}
 
 	@Override
 	protected void onPause() {
 		active = false;
 		rescanWifiTask.cancel(true);
-		
+
 		if (nfcAvailable) {
 			nfcAdapter.disableForegroundDispatch(this);
 		}
-		
+
 		super.onPause();
 	}
 
 	@Override
 	protected void onResume() {
 		AndroidApplication.getInstance().setCurrentActivity(this);
-		LocalBroadcastManager.getInstance(NetworkConfigActivity.this).registerReceiver(serviceStartedListener, new IntentFilter(BroadcastIntentTypes.networkConnectionSuccessful));
+		LocalBroadcastManager
+				.getInstance(NetworkConfigActivity.this)
+				.registerReceiver(
+						serviceStartedListener,
+						new IntentFilter(
+								BroadcastIntentTypes.networkConnectionSuccessful));
 
 		active = true;
 		rescanWifiTask = new AsyncTask<Object, Object, Object>() {
@@ -268,7 +331,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 			}
 
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-		
+
 		if (nfcAdapter != null && nfcAdapter.isEnabled()) {
 			nfcAvailable = true;
 		}
@@ -301,12 +364,12 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 			//
 			// http://developer.android.com/design/patterns/navigation.html#up-vs-back
 			//
-			//			NavUtils.navigateUpFromSameTask(this);
+			// NavUtils.navigateUpFromSameTask(this);
 			super.onBackPressed();
 			return true;
 		case R.id.network_info:
-			NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();			
-			ndf.show( getFragmentManager( ), "networkInfo" );
+			NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();
+			ndf.show(getFragmentManager(), "networkInfo");
 			return true;
 		case R.id.help:
 			HelpDialogFragment hdf = HelpDialogFragment.newInstance(
@@ -334,10 +397,8 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 
 	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
-	
+
 	}
-	
-	
 
 	/*--------------------------------------------------------------------------------------------
 	 * Helper Methods
@@ -383,8 +444,10 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 				editor.putString("SSID", config[0]);
 				editor.commit();
 
-				AndroidApplication.getInstance().getNetworkInterface().setGroupName(config[1]);
-				AndroidApplication.getInstance().getNetworkInterface().setGroupPassword(config[2]);
+				AndroidApplication.getInstance().getNetworkInterface()
+						.setGroupName(config[1]);
+				AndroidApplication.getInstance().getNetworkInterface()
+						.setGroupPassword(config[2]);
 
 				// connect to the network
 				AndroidApplication.getInstance().connect(config, this);
@@ -395,8 +458,9 @@ public class NetworkConfigActivity extends Activity implements TextWatcher{
 		}
 	}
 
-	public String getIdentification(){
-		Log.d("NetworkConfigActivity", "identification is "+this.etIdentification.toString());
+	public String getIdentification() {
+		Log.d("NetworkConfigActivity", "identification is "
+				+ this.etIdentification.toString());
 		return this.etIdentification.getText().toString();
 	}
 

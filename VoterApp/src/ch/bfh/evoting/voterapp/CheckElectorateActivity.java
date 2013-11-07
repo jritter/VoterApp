@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ListActivity;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -46,7 +45,7 @@ public class CheckElectorateActivity extends ListActivity {
 	private BroadcastReceiver networkParticipantUpdater;
 	private BroadcastReceiver electorateReceiver;
 
-	private Dialog dialogBack = null;
+	private AlertDialog dialogBack;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -226,6 +225,19 @@ public class CheckElectorateActivity extends ListActivity {
 
 		// Create the AlertDialog
 		dialogBack = builder.create();
+		
+		dialogBack.setOnShowListener(new DialogInterface.OnShowListener() {
+			@Override
+			public void onShow(DialogInterface dialog) {
+				Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+				dialogBack.getButton(AlertDialog.BUTTON_NEGATIVE).setBackgroundResource(
+						R.drawable.selectable_background_votebartheme);
+				dialogBack.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundResource(
+						R.drawable.selectable_background_votebartheme);
+				
+			}
+		});
+		
 		dialogBack.show();
 	}
 

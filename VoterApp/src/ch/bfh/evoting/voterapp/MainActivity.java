@@ -2,18 +2,6 @@ package ch.bfh.evoting.voterapp;
 
 import java.util.concurrent.Callable;
 
-import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
-import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
-import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
-import ch.bfh.evoting.voterapp.util.Utility;
-import android.nfc.NdefMessage;
-import android.nfc.NdefRecord;
-import android.nfc.NfcAdapter;
-import android.nfc.Tag;
-import android.nfc.tech.Ndef;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.Parcelable;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
@@ -24,6 +12,13 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.nfc.NdefMessage;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.nfc.tech.Ndef;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Menu;
@@ -32,6 +27,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
+import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
+import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
+import ch.bfh.evoting.voterapp.util.Utility;
 
 /**
  * First activity, displaying the buttons for the different actions
@@ -44,12 +43,15 @@ public class MainActivity extends Activity implements OnClickListener {
 	private NfcAdapter nfcAdapter;
 	private boolean nfcAvailable;
 	private PendingIntent pendingIntent;
+	
+	private BroadcastReceiver serviceStartedListener;
 
 	private Button btnSetupNetwork;
 	private Button btnPollArchive;
 	private Button btnPolls;
 
 	private Parcelable[] rawMsgs;
+	private String[] config;
 
 	private SharedPreferences preferences;
 
@@ -103,10 +105,9 @@ public class MainActivity extends Activity implements OnClickListener {
 			// see whether we got launched with an NFC tag
 
 			if (rawMsgs != null) {
-				Log.d("laksjdfl", "I have rawmsgs...");
 				NdefMessage msg = (NdefMessage) rawMsgs[0];
 
-				String[] config = new String(msg.getRecords()[0].getPayload())
+				config = new String(msg.getRecords()[0].getPayload())
 						.split("\\|\\|");
 
 				// saving the values that we got
@@ -114,16 +115,26 @@ public class MainActivity extends Activity implements OnClickListener {
 				editor.putString("SSID", config[0]);
 				editor.commit();
 
-				AndroidApplication.getInstance().getNetworkInterface()
-						.setGroupName(config[1]);
-				AndroidApplication.getInstance().getNetworkInterface()
-						.setGroupPassword(config[2]);
-
-				// connect to the network
-				AndroidApplication.getInstance().connect(config,
-						MainActivity.this);
+				this.waitForNetworkInterface(new Callable<Void>() {
+					public Void call() {
+						Log.d("lkjdsafl", "call called");
+						return joinNetwork();
+					}
+				});
+				
 			}
 		}
+		
+		serviceStartedListener = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				LocalBroadcastManager.getInstance(MainActivity.this).unregisterReceiver(this);
+				startActivity(new Intent(MainActivity.this, CheckElectorateActivity.class));
+			}
+		};
+		LocalBroadcastManager.getInstance(this).registerReceiver(
+				serviceStartedListener,
+				new IntentFilter(BroadcastIntentTypes.networkConnectionSuccessful));
 
 		
 	}
@@ -227,26 +238,29 @@ public class MainActivity extends Activity implements OnClickListener {
 					broadcastIntent);
 
 			Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-
+			
 			Ndef ndef = Ndef.get(tag);
-
-			NdefMessage msg;
-			msg = ndef.getCachedNdefMessage();
-			String[] config = new String(msg.getRecords()[0].getPayload())
-					.split("\\|\\|");
-
-			// saving the values that we got
-			SharedPreferences.Editor editor = preferences.edit();
-			editor.putString("SSID", config[0]);
-			editor.commit();
-
-			AndroidApplication.getInstance().getNetworkInterface()
-					.setGroupName(config[1]);
-			AndroidApplication.getInstance().getNetworkInterface()
-					.setGroupPassword(config[2]);
-
-			// connect to the network
-			AndroidApplication.getInstance().connect(config, MainActivity.this);
+			
+			if (ndef == null){
+				Toast.makeText(this, getResources().getText(R.string.nfc_tag_read_failed), Toast.LENGTH_LONG).show();
+			}
+			else {
+				NdefMessage msg;
+				msg = ndef.getCachedNdefMessage();
+				config = new String(msg.getRecords()[0].getPayload())
+						.split("\\|\\|");
+	
+				// saving the values that we got
+				SharedPreferences.Editor editor = preferences.edit();
+				editor.putString("SSID", config[0]);
+				editor.commit();
+	
+				this.waitForNetworkInterface(new Callable<Void>() {
+					public Void call() {
+						return joinNetwork();
+					}
+				});
+			}
 		}
 	}
 
@@ -271,13 +285,18 @@ public class MainActivity extends Activity implements OnClickListener {
 							.getNetworkInterface() == null) {
 						// wait
 					}
+					return null;
+				}
+
+				@Override
+				protected void onPostExecute(Object result) {
+					super.onPostExecute(result);
 					waitDialog.dismiss();
 					try {
 						methodToExecute.call();
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
-					return null;
 				}
 
 			}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -302,6 +321,23 @@ public class MainActivity extends Activity implements OnClickListener {
 			Intent i = new Intent(this, NetworkInformationActivity.class);
 			startActivity(i);
 		}
+		return null;
+	}
+
+	private Void joinNetwork() {
+		// then start next activity
+		AndroidApplication.getInstance().getNetworkInterface()
+				.setGroupName(config[1]);
+		AndroidApplication.getInstance().getNetworkInterface()
+				.setGroupPassword(config[2]);
+		
+		Log.d("Join Network", AndroidApplication.getInstance().getNetworkInterface().getGroupName());
+		Log.d("Join Network", AndroidApplication.getInstance().getNetworkInterface().getGroupPassword());
+		
+		// connect to the network
+		AndroidApplication.getInstance().connect(config,
+				MainActivity.this);
+		
 		return null;
 	}
 

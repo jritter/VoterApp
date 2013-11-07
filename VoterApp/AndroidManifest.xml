@@ -41,7 +41,9 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="application/ch.bfh.evoting.voterapp" />
             </intent-filter>
         </activity>
@@ -58,7 +60,7 @@
             android:label="@string/title_activity_poll_detail"
             android:launchMode="singleTop"
             android:parentActivityName="ch.bfh.evoting.voterapp.PollActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize">
+            android:windowSoftInputMode="stateHidden|adjustResize" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.bfh.evoting.voterapp.PollActivity" />
@@ -128,7 +130,7 @@
             android:name="ch.bfh.evoting.voterapp.WaitForVotesVoterActivity"
             android:label="@string/title_activity_wait_for_votes" >
         </activity>
-<!--               android:noHistory="true" > -->
+        <!-- android:noHistory="true" > -->
         <activity
             android:name="ch.bfh.evoting.voterapp.network.wifi.CreateNetworkActivity"
             android:label="@string/title_activity_create_network"
@@ -150,6 +152,14 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="com.google.zxing.client.android.SCAN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.google.zxing.client.android.HelpActivity"
+            android:screenOrientation="user" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
