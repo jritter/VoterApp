@@ -149,9 +149,6 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 			super.onBackPressed();
 		} else {
 			Intent i = new Intent(this, MainActivity.class);
-			i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-					| Intent.FLAG_ACTIVITY_CLEAR_TASK
-					| Intent.FLAG_ACTIVITY_NEW_TASK);
 			startActivity(i);
 		}
 	}
@@ -206,10 +203,6 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 			if (saveToDbNeeded) {
 				Intent i = new Intent(DisplayResultActivity.this,
 						MainActivity.class);
-				i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-						| Intent.FLAG_ACTIVITY_CLEAR_TASK
-						| Intent.FLAG_ACTIVITY_NEW_TASK);
-
 				startActivity(i);
 
 			} else {

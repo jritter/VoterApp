@@ -53,7 +53,7 @@ public class AndroidApplication extends Application {
 	private boolean voteRunning;
 	private WifiManager wifi;
 	private AdhocWifiManager adhoc;
-	
+
 	private AlertDialog dialogNetworkLost;
 	private NetworkMonitor networkMonitor;
 	private WakeLock wl;
@@ -70,23 +70,23 @@ public class AndroidApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-//		PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-//        wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK
-//                | PowerManager.ACQUIRE_CAUSES_WAKEUP
-//                | PowerManager.ON_AFTER_RELEASE, "INFO");
-//        wl.acquire();
-//
-//        KeyguardManager km = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
-//        kl = km.newKeyguardLock("name");
-//        kl.disableKeyguard();
+		//		PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
+		//        wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK
+		//                | PowerManager.ACQUIRE_CAUSES_WAKEUP
+		//                | PowerManager.ON_AFTER_RELEASE, "INFO");
+		//        wl.acquire();
+		//
+		//        KeyguardManager km = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
+		//        kl = km.newKeyguardLock("name");
+		//        kl.disableKeyguard();
 
 		//TODO remove when not used anymore
-//		SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-//		settings.edit().putBoolean("first_run_ReviewPollVoterActivity", true).commit();
-//		settings.edit().putBoolean("first_run_NetworkConfigActivity", true).commit();
-//		settings.edit().putBoolean("first_run", true).commit();
+		//		SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+		//		settings.edit().putBoolean("first_run_ReviewPollVoterActivity", true).commit();
+		//		settings.edit().putBoolean("first_run_NetworkConfigActivity", true).commit();
+		//		settings.edit().putBoolean("first_run", true).commit();
 
-		
+
 		WifiManager wm = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
 		if(!wm.isWifiEnabled()){
 			wm.setWifiEnabled(true);
@@ -95,7 +95,7 @@ public class AndroidApplication extends Application {
 		instance = this;
 		instance.initializeInstance();
 		Utility.initialiseLogging();
-		
+
 		//wifi event listener
 		IntentFilter filters = new IntentFilter();
 		filters.addAction("android.net.wifi.STATE_CHANGED");
@@ -104,12 +104,12 @@ public class AndroidApplication extends Application {
 		this.registerReceiver(networkMonitor, filters);
 		registerActivityLifecycleCallbacks(new AndroidApplicationActivityLifecycleCallbacks());
 
-		
+
 		LocalBroadcastManager.getInstance(this).registerReceiver(mGroupEventReceiver, new IntentFilter(BroadcastIntentTypes.networkGroupDestroyedEvent));
 		LocalBroadcastManager.getInstance(this).registerReceiver(mAttackDetecter, new IntentFilter(BroadcastIntentTypes.attackDetected));
 		LocalBroadcastManager.getInstance(this).registerReceiver(startPollReceiver, new IntentFilter(BroadcastIntentTypes.electorate));
 	}
-	
+
 	@Override
 	public void onTerminate() {
 		if(this.ni!=null)
@@ -120,12 +120,12 @@ public class AndroidApplication extends Application {
 		super.onTerminate();
 	}
 
-	
+
 
 	/*--------------------------------------------------------------------------------------------
 	 * Helper Methods
 	--------------------------------------------------------------------------------------------*/
-	
+
 	/**
 	 * Initialize the Serialization method and the Network Component to use
 	 */
@@ -143,8 +143,8 @@ public class AndroidApplication extends Application {
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
 	}
-	
-	
+
+
 	/**
 	 * This method initiates the connect process
 	 * 
@@ -152,10 +152,10 @@ public class AndroidApplication extends Application {
 	 *            an array containing the SSID and the password of the network
 	 */
 	public void connect(String[] config, Context context) {
-		
+
 		wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 		adhoc = new AdhocWifiManager(wifi);
-		
+
 		boolean connectedSuccessful = false;
 		// check whether the network is already known, i.e. the password is
 		// already stored in the device
@@ -195,7 +195,7 @@ public class AndroidApplication extends Application {
 	/*--------------------------------------------------------------------------------------------
 	 * Getters/Setters
 	--------------------------------------------------------------------------------------------*/
-	
+
 	/**
 	 * Get the serialization helper
 	 * @return the serialization helper
@@ -219,7 +219,7 @@ public class AndroidApplication extends Application {
 	public NetworkMonitor getNetworkMonitor(){
 		return this.networkMonitor;
 	}
-	
+
 	/**
 	 * Get the activity that is currently running
 	 * @return the activity that is currently running, null if none is running
@@ -234,7 +234,7 @@ public class AndroidApplication extends Application {
 	 */
 	public void setCurrentActivity(Activity currentActivity){
 		this.currentActivity = currentActivity;
-		
+
 		if(isVoteRunning()){
 			// Create a pending intent which will be invoked after tapping on the
 			// Android notification
@@ -251,9 +251,9 @@ public class AndroidApplication extends Application {
 			notificationBuilder.setContentTitle(getResources().getString(
 					R.string.voter_app_app_name));
 			notificationBuilder
-					.setContentText(getResources().getString(R.string.notification));
+			.setContentText(getResources().getString(R.string.notification));
 			notificationBuilder
-					.setSmallIcon(R.drawable.ic_launcher);
+			.setSmallIcon(R.drawable.ic_launcher);
 			notificationBuilder.setContentIntent(pendingNotificationIntent);
 			notificationBuilder.setOngoing(true);
 			@SuppressWarnings("deprecation")
@@ -283,7 +283,7 @@ public class AndroidApplication extends Application {
 	public boolean isVoteRunning(){
 		return voteRunning;
 	}
-	
+
 	/**
 	 * Indicate if this user is the administrator of the vote
 	 * @return true if yes, false otherwise
@@ -299,14 +299,14 @@ public class AndroidApplication extends Application {
 	public void setIsAdmin(boolean isAdmin) {
 		this.isAdmin = isAdmin;
 	}
-	
-	
+
+
 
 
 	/*--------------------------------------------------------------------------------------------
 	 * Broadcast receivers
 	--------------------------------------------------------------------------------------------*/
-	
+
 	/**
 	 * this broadcast receiver listens for information about the network group destruction
 	 */
@@ -317,31 +317,31 @@ public class AndroidApplication extends Application {
 			if(ni==null) return;
 			if(currentActivity!=null && ni.getNetworkName()!=null){
 				if(voteRunning){
-				AlertDialog.Builder builder = new AlertDialog.Builder(currentActivity);
-				// Add the buttons
-				builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						Intent i = new Intent(AndroidApplication.this, MainActivity.class);
-						currentActivity.startActivity(i);
-					}
-				});
+					AlertDialog.Builder builder = new AlertDialog.Builder(currentActivity);
+					// Add the buttons
+					builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							Intent i = new Intent(AndroidApplication.this, MainActivity.class);
+							currentActivity.startActivity(i);
+						}
+					});
 
-				builder.setTitle(R.string.dialog_title_network_lost);
-				builder.setMessage(R.string.dialog_network_lost);
+					builder.setTitle(R.string.dialog_title_network_lost);
+					builder.setMessage(R.string.dialog_network_lost);
 
-				
-				dialogNetworkLost = builder.create();
-				dialogNetworkLost.setOnShowListener(new DialogInterface.OnShowListener() {
-					@Override
-					public void onShow(DialogInterface dialog) {
-						Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
-						dialogNetworkLost.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
-								R.drawable.selectable_background_votebartheme);
-					}
-				});
-				
-				// Create the AlertDialog
-				dialogNetworkLost.show();
+
+					dialogNetworkLost = builder.create();
+					dialogNetworkLost.setOnShowListener(new DialogInterface.OnShowListener() {
+						@Override
+						public void onShow(DialogInterface dialog) {
+							Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+							dialogNetworkLost.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
+									R.drawable.selectable_background_votebartheme);
+						}
+					});
+
+					// Create the AlertDialog
+					dialogNetworkLost.show();
 				} else {
 					for(int i=0; i < 2; i++)
 						Toast.makeText(currentActivity, getResources().getString(R.string.toast_network_lost), Toast.LENGTH_SHORT).show();
@@ -381,7 +381,7 @@ public class AndroidApplication extends Application {
 			}
 		}
 	};
-	
+
 	/**
 	 * this broadcast receiver listen for broadcasts containing the electorate. So, if the user is member
 	 * of a session, when the admin sends the electorate, the user is redirected to the correct activity, wherever
@@ -398,15 +398,17 @@ public class AndroidApplication extends Application {
 			}
 		}
 	};
-	
-	
+
+
 	private class AndroidApplicationActivityLifecycleCallbacks implements ActivityLifecycleCallbacks {
 
 		private String connectedSSID = "";
 
 		public void onActivityCreated(Activity activity, Bundle bundle) {
-			activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
-			activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+			if(isVoteRunning()){
+				activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+				activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+			}
 		}
 
 		public void onActivityDestroyed(Activity activity) {
