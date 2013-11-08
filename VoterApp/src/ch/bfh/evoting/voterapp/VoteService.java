@@ -18,9 +18,10 @@ import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 
 public class VoteService extends Service{
 
-	boolean doWork = true;
-	BroadcastReceiver voteReceiver;
-	AsyncTask<Object, Object, Object> sendVotesTask;
+	private static final String TAG = VoteService.class.getSimpleName();
+	private boolean doWork = true;
+	private BroadcastReceiver voteReceiver;
+	private AsyncTask<Object, Object, Object> sendVotesTask;
 	private int votesReceived = 0;
 	private Poll poll;
 	private static VoteService instance;
@@ -33,7 +34,7 @@ public class VoteService extends Service{
 
 	@Override
 	public void onDestroy() {
-		Log.e("VoteService", "Destroyed");
+		Log.d(TAG, "Service destroyed");
 		reset();
 		super.onDestroy();
 	}

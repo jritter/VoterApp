@@ -93,8 +93,6 @@ public class VoteActivity extends Activity {
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 				//Check if the last view is visible
-				Log.e("VoteActivity", "Scroll: firstVisible item="+firstVisibleItem+" visibleItemCount="+visibleItemCount+" totalItemCount="+totalItemCount);
-				Log.e("VoteActivity", "DemoScrollDone: "+demoScrollDone +" Scrolled: "+ scrolled);
 				if (++firstVisibleItem + visibleItemCount > totalItemCount && demoScrollDone) {
 					scrolled=true;
 				}
@@ -322,10 +320,8 @@ public class VoteActivity extends Activity {
 		Option selectedOption = volAdapter.getItemSelected();
 
 		if(selectedOption!=null){
-			Log.e("vote", "Voted "+selectedOption.getText());
 			AndroidApplication.getInstance().getNetworkInterface().sendMessage(new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_VOTE, selectedOption));
 		} else {
-			Log.e("vote", "Voted null");
 			AndroidApplication.getInstance().getNetworkInterface().sendMessage(new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_VOTE, null));
 		}
 

@@ -362,7 +362,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 			protected Object doInBackground(Object... arg0) {
 
 				while(active){
-					Log.e("ElectorateActivity", "sending electorate "+participants + " async task "+ this);
+					Log.d("ElectorateActivity", "sending electorate "+participants);
 					//Send the list of participants in the network over the network
 					VoteMessage vm = new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_ELECTORATE, (Serializable)participants);
 					AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);

@@ -3,8 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-    
-
 
     <fragment
         android:id="@+id/fragment_network_information"
@@ -13,9 +11,8 @@
         android:layout_margin="@dimen/margin"
         android:layout_weight="1"
         class="ch.bfh.evoting.voterapp.fragment.NetworkInformationFragment" >
-
     </fragment>
-    
+
     <LinearLayout
         android:id="@+id/layout_bottom_bar"
         style="@style/ActionBar.Solid.Votebartheme"
@@ -36,7 +33,7 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:text="@string/recreate_network" />
-        
+
         <Button
             android:id="@+id/button_next"
             style="@style/BottomBar"
@@ -48,5 +45,5 @@
             android:paddingRight="16dp"
             android:text="@string/next" />
     </LinearLayout>
-    
+
 </LinearLayout>

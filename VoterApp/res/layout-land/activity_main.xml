@@ -2,9 +2,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:background="@drawable/background_image"
     android:fadingEdge="horizontal"
-    android:background="@drawable/background_image">
+    android:orientation="vertical" >
 
     <TextView
         android:id="@+id/textview_text_header"
@@ -26,33 +26,33 @@
 
         <Button
             android:id="@+id/button_joinnetwork"
+            style="@style/MainButtons"
             android:layout_width="0dp"
             android:layout_height="100dp"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
             android:minWidth="160dip"
-            android:text="@string/join_network"
-            style="@style/MainButtons" />
-        
+            android:text="@string/join_network" />
+
         <Button
             android:id="@+id/button_polls"
+            style="@style/MainButtons"
             android:layout_width="0dp"
             android:layout_height="100dp"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
             android:minWidth="160dip"
-            android:text="@string/polls"
-            style="@style/MainButtons" />
+            android:text="@string/polls" />
 
         <Button
             android:id="@+id/button_archive"
+            style="@style/MainButtons"
             android:layout_width="0dp"
             android:layout_height="100dp"
             android:layout_gravity="center_vertical"
             android:layout_weight="1"
             android:minWidth="160dip"
-            android:text="@string/poll_archive"
-            style="@style/MainButtons" />
+            android:text="@string/poll_archive" />
     </LinearLayout>
 
 </LinearLayout>

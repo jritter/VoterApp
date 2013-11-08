@@ -359,6 +359,9 @@ public class NetworkInformationFragment extends Fragment implements
 	 * 
 	 * @param mimeType
 	 *            The string with the mime type name
+	 * @param payload
+	 * 			  Content to write 
+	 * @return 	NDEF record
 	 */
 	public NdefRecord createMimeRecord(String mimeType, byte[] payload) {
 		byte[] mimeBytes = mimeType.getBytes(Charset.forName("US-ASCII"));

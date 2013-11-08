@@ -14,8 +14,6 @@ import ch.bfh.evoting.voterapp.util.Utility;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
-import android.app.KeyguardManager;
-import android.app.KeyguardManager.KeyguardLock;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -29,8 +27,6 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -56,8 +52,6 @@ public class AndroidApplication extends Application {
 
 	private AlertDialog dialogNetworkLost;
 	private NetworkMonitor networkMonitor;
-	private WakeLock wl;
-	private KeyguardLock kl;
 
 	/**
 	 * Return the single instance of this class
@@ -141,6 +135,7 @@ public class AndroidApplication extends Application {
 	 * 
 	 * @param config
 	 *            an array containing the SSID and the password of the network
+	 * @param context android context
 	 */
 	public void connect(String[] config, Context context) {
 

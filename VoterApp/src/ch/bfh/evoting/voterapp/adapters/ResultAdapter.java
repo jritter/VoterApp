@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.List;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
@@ -36,7 +35,6 @@ public class ResultAdapter extends BaseAdapter {
 	private ArrayList<Object> data = new ArrayList<Object>();
 	private FragmentManager fm;
 	private FragmentTransaction ft;
-	private Fragment resultChartFragment;
 
 	public ResultAdapter(Context context, Poll poll) {
 		this.context = context;

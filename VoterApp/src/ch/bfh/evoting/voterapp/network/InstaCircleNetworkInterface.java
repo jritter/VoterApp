@@ -132,7 +132,6 @@
 //	private BroadcastReceiver participantsDiscoverer = new BroadcastReceiver() {
 //		@Override
 //		public void onReceive(Context context, Intent intent) {
-//			Log.e("InstaCircleNetworkInterface", "Participant State Update received from IC");
 //			Intent participantsUpdate = new Intent(BroadcastIntentTypes.participantStateUpdate);
 //			LocalBroadcastManager.getInstance(context).sendBroadcast(participantsUpdate);
 //		}

@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,8 +58,6 @@ public class PollReviewFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		Log.e("PollReviewFragment", "poll is "+poll);
-		
 		if(poll.getParticipants().containsKey(sender))
 			poll.getParticipants().get(sender).setHasAcceptedReview(true);
 
@@ -120,7 +117,6 @@ public class PollReviewFragment extends Fragment {
 					//Poll is not in the DB, so reset the id
 					poll.setId(-1);
 					String sender = intent.getStringExtra("sender");
-					Log.e("PollReviewFragment", sender);
 					poll.getParticipants().get(sender).setHasAcceptedReview(true);
 					adapter.notifyDataSetChanged();
 				}

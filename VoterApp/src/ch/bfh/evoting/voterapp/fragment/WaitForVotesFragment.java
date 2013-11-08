@@ -21,7 +21,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -143,7 +142,6 @@ public class WaitForVotesFragment extends ListFragment {
 			//go through compute result and set percentage result
 			List<Option> options = poll.getOptions();
 			for(Option option : options){
-				Log.e("WaitForVotesFRAGMENT","Number of votes is "+numberOfReceivedVotes);
 				if(numberOfReceivedVotes!=0){
 					option.setPercentage(option.getVotes()*100/numberOfReceivedVotes);
 				} else {

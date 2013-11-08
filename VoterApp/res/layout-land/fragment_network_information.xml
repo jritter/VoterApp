@@ -8,17 +8,15 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_weight="1" >
+        android:layout_weight="1"
+        android:orientation="vertical" >
 
-      
-        
         <TextView
             android:id="@+id/textview_network_name_desc"
+            style="?android:attr/listSeparatorTextViewStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/network_name"
-            style="?android:attr/listSeparatorTextViewStyle" >
+            android:text="@string/network_name" >
         </TextView>
 
         <TextView
@@ -38,10 +36,10 @@
 
             <TextView
                 android:id="@+id/textview_network_key_desc"
+                style="?android:attr/listSeparatorTextViewStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/network_key"
-                style="?android:attr/listSeparatorTextViewStyle" >
+                android:text="@string/network_key" >
             </TextView>
 
             <TextView
@@ -56,14 +54,12 @@
 
         <TextView
             android:id="@+id/textview_group_name_desc"
+            style="?android:attr/listSeparatorTextViewStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="@string/group_name_desc"
-            style="?android:attr/listSeparatorTextViewStyle" >
+            android:text="@string/group_name_desc" >
         </TextView>
-
-
 
         <TextView
             android:id="@+id/textview_group_name"
@@ -76,13 +72,13 @@
 
         <TextView
             android:id="@+id/textview_group_password_desc"
+            style="?android:attr/listSeparatorTextViewStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="@string/group_password_desc"
-            style="?android:attr/listSeparatorTextViewStyle" >
+            android:text="@string/group_password_desc" >
         </TextView>
-        
+
         <TextView
             android:id="@+id/textview_group_password"
             android:layout_width="match_parent"
@@ -91,14 +87,14 @@
             android:textSize="20sp"
             android:textStyle="" >
         </TextView>
-        
+
         <TextView
             android:id="@+id/textview_identification_desc"
+            style="?android:attr/listSeparatorTextViewStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="@string/identification"
-            style="?android:attr/listSeparatorTextViewStyle" >
+            android:text="@string/identification" >
         </TextView>
 
         <TextView
@@ -112,20 +108,19 @@
 
         <Button
             android:id="@+id/button_write_nfc_tag"
+            style="@style/MainButtons"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:minHeight="40dip"
-            android:text="@string/write_nfc_tag"
-            style="@style/MainButtons" />
-        
+            android:text="@string/write_nfc_tag" />
     </LinearLayout>
-    
+
     <ImageView
-            android:id="@+id/imageview_qrcode"
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_weight="1"
-            android:layout_gravity="top"
-            android:contentDescription="@string/description_qrcode" />
+        android:id="@+id/imageview_qrcode"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_gravity="top"
+        android:layout_weight="1"
+        android:contentDescription="@string/description_qrcode" />
 
 </LinearLayout>

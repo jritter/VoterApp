@@ -37,6 +37,7 @@ import ch.bfh.evoting.voterapp.util.Utility;
  */
 public class DisplayResultActivity extends Activity implements OnClickListener {
 
+	private static final String TAG = DisplayResultActivity.class.getSimpleName();
 	private NfcAdapter nfcAdapter;
 	private boolean nfcAvailable;
 	private PendingIntent pendingIntent;
@@ -115,7 +116,7 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 					poll.setId(newPollId);
 				}
 			} catch (DatabaseException e) {
-				Log.e(this.getClass().getSimpleName(),
+				Log.e(TAG,
 						"DB error: " + e.getMessage());
 				e.printStackTrace();
 			}
