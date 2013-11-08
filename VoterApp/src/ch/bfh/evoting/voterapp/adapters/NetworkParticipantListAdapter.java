@@ -50,9 +50,9 @@ public class NetworkParticipantListAdapter extends ArrayAdapter<Participant> {
 		//Set the corresponding if the administrator has selected the participant a part of the electorate
 		ImageView ivSelected = (ImageView)view.findViewById(R.id.imageview_participant_selected);
 		if(this.values.get(position).isSelected()){
-			ivSelected.setImageResource(R.drawable.included);
+			ivSelected.setImageResource(R.drawable.ic_included);
 		} else {
-			ivSelected.setImageResource(R.drawable.not_included);
+			ivSelected.setImageResource(R.drawable.ic_not_included);
 		}
 		
 

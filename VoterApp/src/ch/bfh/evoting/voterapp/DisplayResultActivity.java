@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -26,6 +27,7 @@ import ch.bfh.evoting.voterapp.entities.DatabaseException;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.ResultChartFragment;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.Utility;
 
@@ -67,7 +69,14 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 		AndroidApplication.getInstance().setVoteRunning(false);
 		if (AndroidApplication.getInstance().isAdmin()) {
 			AndroidApplication.getInstance().getNetworkInterface()
-					.unlockGroup();
+			.unlockGroup();
+		}
+
+		if( findViewById(R.id.chartfragment_container) != null){
+			ResultChartFragment newFragment = new ResultChartFragment();
+			FragmentTransaction transaction = getFragmentManager().beginTransaction();
+			transaction.add(R.id.chartfragment_container, newFragment);
+			transaction.commit();
 		}
 
 		ListView lv = (ListView) findViewById(android.R.id.list);
@@ -136,7 +145,7 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 				// is tapped on the back
 				pendingIntent = PendingIntent.getActivity(this, 0, new Intent(
 						this, getClass())
-						.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+				.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 			} else {
 				nfcAvailable = false;
 			}
@@ -147,13 +156,15 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 	@Override
 	public void onBackPressed() {
 		if (!this.saveToDbNeeded) {
-			super.onBackPressed();
+			// if consulting an archive
+			startActivity(new Intent(this,
+					ListTerminatedPollsActivity.class));
 		} else {
 			Intent i = new Intent(this, MainActivity.class);
 			startActivity(i);
 		}
 	}
-	
+
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -167,7 +178,7 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 		super.onResume();
 		AndroidApplication.getInstance().setVoteRunning(false);
 		AndroidApplication.getInstance().setCurrentActivity(this);
-		
+
 		if (nfcAdapter != null && nfcAdapter.isEnabled()) {
 			nfcAvailable = true;
 		}
@@ -251,7 +262,7 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 			redoVote();
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 

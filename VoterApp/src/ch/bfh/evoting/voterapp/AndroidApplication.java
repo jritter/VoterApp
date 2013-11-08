@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -66,10 +67,10 @@ public class AndroidApplication extends Application {
 		super.onCreate();
 		
 		//TODO remove when not used anymore
-		//		SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-		//		settings.edit().putBoolean("first_run_ReviewPollVoterActivity", true).commit();
-		//		settings.edit().putBoolean("first_run_NetworkConfigActivity", true).commit();
-		//		settings.edit().putBoolean("first_run", true).commit();
+				SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+				settings.edit().putBoolean("first_run_ReviewPollVoterActivity", true).commit();
+				settings.edit().putBoolean("first_run_NetworkConfigActivity", true).commit();
+				settings.edit().putBoolean("first_run", true).commit();
 
 
 		WifiManager wm = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);

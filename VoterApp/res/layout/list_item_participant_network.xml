@@ -43,7 +43,7 @@
             android:contentDescription="@string/description_participant_included"
             android:cropToPadding="true"
             android:padding="8dp"
-            android:src="@drawable/included" />
+            android:src="@drawable/ic_included" />
     </LinearLayout>
 
 </LinearLayout>

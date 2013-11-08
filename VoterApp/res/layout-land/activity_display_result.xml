@@ -35,12 +35,19 @@
                 android:gravity="center_vertical"
                 android:text="@string/result_chart" />
 
-            <fragment
+            <RelativeLayout 
+                android:id="@+id/chartfragment_container" 
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/margin">
+                
+            </RelativeLayout>
+            <!-- <fragment
                 android:id="@+id/fragment_result_chart"
                 android:name="ch.bfh.evoting.voterapp.fragment.ResultChartFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="@dimen/margin" />
+                android:layout_margin="@dimen/margin" />  -->
         </LinearLayout>
     </LinearLayout>
 

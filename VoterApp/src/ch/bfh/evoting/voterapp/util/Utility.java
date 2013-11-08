@@ -56,9 +56,9 @@ public class Utility {
 	public static void initialiseLogging() {
 		final LogConfigurator logConfigurator = new LogConfigurator();
 
-		logConfigurator.setFileName(Environment.getExternalStorageDirectory()
-				+ "/evotingcircle.log");
+		logConfigurator.setFileName(AndroidApplication.getInstance().getFilesDir() + "/evotingcircle.log");
 		logConfigurator.setRootLevel(AndroidApplication.LEVEL);
+		
 		// max 3 rotated log files
 		logConfigurator.setMaxBackupSize(3);
 		// Max 500ko per file
