@@ -6,8 +6,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
         android:baselineAligned="false"
         android:orientation="horizontal" >
 
@@ -40,9 +39,8 @@
                 android:id="@+id/fragment_result_chart"
                 android:name="ch.bfh.evoting.voterapp.fragment.ResultChartFragment"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_margin="@dimen/margin"
-                android:layout_weight="1" />
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/margin" />
         </LinearLayout>
     </LinearLayout>
 
@@ -65,7 +63,7 @@
             android:drawableLeft="@drawable/ic_action_undo"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:text="@string/redo_poll" />
+            android:text="@string/action_redo_poll" />
     </LinearLayout>
 
 </LinearLayout>

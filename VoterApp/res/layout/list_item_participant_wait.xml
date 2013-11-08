@@ -10,7 +10,7 @@
         android:layout_height="32dp"
         android:layout_margin="8dp"
         android:background="@color/participant"
-        android:contentDescription="@string/participant_avatar"
+        android:contentDescription="@string/description_participant_avatar"
         android:padding="2dp"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_action_person" >

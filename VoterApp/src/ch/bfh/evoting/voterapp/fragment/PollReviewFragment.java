@@ -96,8 +96,8 @@ public class PollReviewFragment extends Fragment {
 							}
 						});
 
-						builder.setTitle(R.string.not_included_title);
-						builder.setMessage(R.string.not_included);
+						builder.setTitle(R.string.dialog_not_included_title);
+						builder.setMessage(R.string.dialog_not_included);
 
 						// Create the AlertDialog
 						AlertDialog dialog = builder.create();

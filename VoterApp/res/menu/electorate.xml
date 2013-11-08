@@ -17,7 +17,7 @@
         android:id="@+id/action_next"
         android:icon="@drawable/ic_action_next_item"
         android:showAsAction="always|withText"
-        android:title="@string/next">
+        android:title="@string/action_next">
     </item>
 
 </menu>

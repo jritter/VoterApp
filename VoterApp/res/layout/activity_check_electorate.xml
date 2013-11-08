@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
             android:gravity="center_vertical|center_horizontal"
-            android:text="@string/check_electorate"
+            android:text="@string/subtitle_check_electorate"
             android:textAppearance="?android:attr/textAppearanceLarge" />
     </LinearLayout>
 

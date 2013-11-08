@@ -35,7 +35,7 @@
             android:drawableLeft="@drawable/ic_action_undo"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:text="@string/redo_poll" />
+            android:text="@string/action_redo_poll" />
     </LinearLayout>
 
 </LinearLayout>

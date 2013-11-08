@@ -166,14 +166,14 @@ public class AndroidApplication extends Application {
 		// display a message if the connection was not successful
 		if (!connectedSuccessful) {
 			AlertDialog alertDialog = new AlertDialog.Builder(context).create();
-			alertDialog.setTitle(R.string.network_not_found);
+			alertDialog.setTitle(R.string.dialog_network_not_found);
 			alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.ok),
 					new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					dialog.dismiss();
 				}
 			});
-			alertDialog.setMessage(getString(R.string.network_not_found_text, config[0]));
+			alertDialog.setMessage(getString(R.string.dialog_network_not_found_text, config[0]));
 			alertDialog.show();
 		}
 	}

@@ -10,7 +10,7 @@
         android:layout_height="32dp"
         android:layout_margin="8dp"
         android:background="@color/participant"
-        android:contentDescription="@string/participant_avatar"
+        android:contentDescription="@string/description_participant_avatar"
         android:padding="2dp"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_action_person" >
@@ -40,7 +40,7 @@
             style="?android:attr/buttonBarButtonStyle"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:contentDescription="@string/participant_included"
+            android:contentDescription="@string/description_participant_included"
             android:cropToPadding="true"
             android:padding="8dp"
             android:src="@drawable/included" />

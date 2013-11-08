@@ -11,7 +11,7 @@
         android:id="@+id/action_redo_vote"
         android:icon="@drawable/ic_action_undo"
         android:showAsAction="always|withText"
-        android:title="@string/redo_poll">
+        android:title="@string/action_redo_poll">
     </item>
 
 </menu>

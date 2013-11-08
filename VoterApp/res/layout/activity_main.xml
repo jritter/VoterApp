@@ -15,7 +15,7 @@
         android:layout_margin="@dimen/margin"
         android:gravity="center_vertical|center_horizontal"
         android:minHeight="70dp"
-        android:text="@string/welcome"
+        android:text="@string/subtitle_welcome"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <LinearLayout

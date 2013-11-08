@@ -428,19 +428,19 @@ public class AdhocWifiManager {
 							int status = intent.getIntExtra("error", 0);
 							if(status==1){
 								for(int i=0; i < 2; i++)
-									Toast.makeText(context, context.getString(R.string.join_error_invalid_name), Toast.LENGTH_LONG).show();
+									Toast.makeText(context, context.getString(R.string.toast_join_error_invalid_name), Toast.LENGTH_LONG).show();
 							} else if (status == 2){
 								for(int i=0; i < 2; i++)
-									Toast.makeText(context, context.getString(R.string.join_error_admin), Toast.LENGTH_LONG).show();
+									Toast.makeText(context, context.getString(R.string.toast_join_error_admin), Toast.LENGTH_LONG).show();
 							} else if (status == 3){
 								for(int i=0; i < 2; i++)
-									Toast.makeText(context, context.getString(R.string.join_error_voter), Toast.LENGTH_LONG).show();
+									Toast.makeText(context, context.getString(R.string.toast_join_error_voter), Toast.LENGTH_LONG).show();
 							} else if (status == 4){
 								for(int i=0; i < 3; i++)
-									Toast.makeText(context, context.getString(R.string.join_error_voter_network), Toast.LENGTH_LONG).show();
+									Toast.makeText(context, context.getString(R.string.toast_join_error_voter_network), Toast.LENGTH_LONG).show();
 							} else {
 								for(int i=0; i < 2; i++)
-									Toast.makeText(context, context.getString(R.string.join_error), Toast.LENGTH_LONG).show();
+									Toast.makeText(context, context.getString(R.string.toast_join_error), Toast.LENGTH_LONG).show();
 							}
 						}
 					}, new IntentFilter(BroadcastIntentTypes.networkConnectionFailed));
@@ -485,7 +485,7 @@ public class AdhocWifiManager {
 			} else {
 				d.dismiss();
 				Log.e(TAG, "Wireless connection failed");
-				Toast.makeText(context, context.getString(R.string.network_connection_error), Toast.LENGTH_LONG).show();
+				Toast.makeText(context, context.getString(R.string.toast_network_connection_error), Toast.LENGTH_LONG).show();
 			}
 		}
 	}

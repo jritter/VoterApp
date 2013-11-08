@@ -1,164 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- Generic strings -->
-    <string name="poll_start_time">Start date</string>
-    <string name="header_votes">Votes</string>
-    <string name="header_percentage">%</string>
-    <string name="header_option">Option</string>
-    <string name="cast">Cast Vote</string>
-    <string name="join">Join</string>
-    <string name="cast_votes">Cast votes: %1$d of %2$d</string>
-    <string name="content">Content</string>
-    <string name="description">Description</string>
-    <string name="options">Options</string>
-    <string name="participants">Participants</string>
-    <string name="network_name">Network name</string>
-    <string name="network_key">Network key</string>
-    <string name="vote_singular">vote</string>
-    <string name="vote_plural">votes</string>
-    <string name="network_info">Network information</string>
-    <string name="not_connected">No network set up</string>
-    <string name="help">Help</string>
-    <string name="networks">Network Connection for Voting</string>
-    <string name="empty_vote">Empty vote</string>
-    <string name="dialog_wait_wifi">Please wait...</string>
-    <string name="button_use_actual_ssid">Use network \" %1$s \"</string>
-    <string name="button_scan_nfc">Scan NFC tag</string>
-    <string name="advance_network_config">Advanced network configuration</string>
-    <string name="write_nfc_tag">Write NFC tag</string>
-    <string name="scan_qrcode">Scan QR code</string>
-    <string name="put_nfc">Put an NFC tag in proximity of your device...</string>
-    <string name="create_new_network">CREATE NEW NETWORK</string>
-    <string name="network_name_label">Network Name</string>
-    <string name="network_wlan_key">WLAN Key</string>
-    <string name="create_network">Create Network</string>
-    <string name="identification">Your Identification</string>
-    <string name="your_identification">YOUR IDENTIFICATION</string>
-    <string name="capture_qrcode">Scan QR Code</string>
+    <!-- Common words -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="add">Add</string>
     <string name="close">Close</string>
-    <string name="network_password">Network password</string>
+    <string name="help">Help</string>
+    <string name="content">Content</string>
+    <string name="description">Description</string>
+    <string name="identification">Your Identification</string>
+    <string name="polls">Votes</string>
+    <string name="question">Question</string>
+    <string name="options">Options</string>
+    <string name="participants">Participants</string>
+    <string name="vote_singular">vote</string>
+    <string name="vote_plural">votes</string>
+    <string name="empty_vote">Blank vote</string>
+    <string name="join">Join</string>
+
+    <!-- Activities -->
+    <string name="notification">A vote is currently running. Tap to bring in front.</string>
+    <string name="poll_archive">Vote Archive</string>
+    <string name="cast">Cast Vote</string>
+    <string name="cast_votes">Cast votes: %1$d of %2$d</string>
+    <string name="poll_start_time">Start date</string>
     <string name="number_voters">Eligible voters</string>
     <string name="number_cast_votes">Cast votes</string>
     <string name="participation">Participation</string>
+    <string name="result_chart">Result Chart</string>
+    <string name="archived_votes">Archived Votes</string>
+    <string name="no_archived_votes">There are currently no archived votes</string>
+    <string name="no_votes">There are currently no votes</string>
+    <string name="allow_empty_vote">Allow blank votes</string>
+    <string name="no_options">There are currently no options</string>
+
+    <!-- Network -->
+    <string name="network_name">Network name</string>
+    <string name="network_key">Network key</string>
+    <string name="network_info">Network information</string>
+    <string name="not_connected">No network set up</string>
+    <string name="networks">Network Connection for Voting</string>
+    <string name="dialog_wait_wifi">Please wait&#8230;</string>
+    <string name="button_use_actual_ssid">Use network \" %1$s \"</string>
+    <string name="button_scan_nfc">Scan NFC tag</string>
+    <string name="advance_network_config">Advanced network configuration</string>
+    <string name="write_nfc_tag">Write NFC tag</string>
+    <string name="put_nfc">Put an NFC tag in proximity of your device&#8230;</string>
+    <string name="create_new_network">Create network</string>
+    <string name="network_wlan_key">WLAN Key</string>
+    <string name="capture_qrcode">Scan QR-code</string>
     <string name="join_network">Join electorate</string>
-    <string name="action_settings">Settings</string>
-    <string name="setup_network">Setup Network</string>
-    <string name="polls">Votes</string>
-    <string name="poll_archive">Vote Archive</string>
     <string name="group_password_desc">Group password</string>
     <string name="group_name_desc">Group number</string>
     <string name="network_password">Password</string>
-    <string name="cancel">Cancel</string>
-    <string name="poll_setup">Vote Setup</string>
-    <string name="add">Add</string>
-    <string name="available_polls">Available Votes</string>
-    <string name="create">Create</string>
-    <string name="delete_option">Delete Option</string>
-    <string name="content">Content</string>
-    <string name="allow_empty_vote">Allow empty votes</string>
-    <string name="identification">Your identification</string>
-    <string name="next">Next</string>
     <string name="recreate_network">Modify</string>
-    <string name="question">Question</string>
     <string name="tap_nfc_tag">Please tap a writeable NFC Tag on the back of your device</string>
-    <string name="enable_nfc">Enable NFC</string>
-    <string name="enable_nfc_question">In order to use this feature, NFC must be enabled. Enable now?</string>
-    <string name="archived_votes">Archived Votes</string>
-    <string name="result_chart">Result Chart</string>
-    <string name="no_options">There are currently no options</string>
-    <string name="no_votes">There are currently no votes</string>
-    <string name="no_archived_votes">There are currently no archived votes</string>
-    <string name="notification">A vote is currently running. Tap to bring in front.</string>
-    <string name="network_not_found">Network not found</string>
-    <string name="network_not_found_text">The network \"%1$s\" is not available, cannot connect.</string>
+    
 
     <!-- Action bar titles -->
-    <string name="action_rescan_wifi">Rescan Wifi Networks</string>
-    <string name="validate_review">I agree</string>
-    <string name="delete_poll">Delete vote</string>
-    <string name="redo_poll">Repeat vote</string>
-    <string name="clone_poll">Clone vote</string>
+    <string name="action_redo_poll">Repeat vote</string>
+    <string name="action_clone_poll">Clone vote</string>
     <string name="action_create_poll">Create new vote</string>
-    <string name="action_save">Save</string>
     <string name="action_start_poll">Start vote</string>
     <string name="action_next">Next</string>
-    <string name="action_back">Back</string>
     <string name="action_stop_poll">Finish vote</string>
-    <string name="action_rescan_wifi">Rescan Wifi Networks</string>
     <string name="action_start_poll_period">Start Voting Period</string>
 
-    <!-- Toasts / Dialogs -->
-    <string name="delete_poll_confirm_title">Delete the vote?</string>
-    <string name="delete_poll_confirm_text">Do you really want to delete this vote? It won\'t be accessible anymore.</string>
-    <string name="scroll">Please first have a look at all options</string>
-    <string name="choose_one_option">Please choose one of the given options</string>
-    <string name="join_error_admin">A group with the same name already exists! Please choose another name!</string>
-    <string name="join_error_voter">No group with the given name exists. Please wait for the administrator to create the group.</string>
-    <string name="join_error">Error creating/joining the group!</string>
-    <string name="join_error_voter_network">Error joining the group! It seems there is a problem with your network card. Please try to disable the wifi and enable it again.</string>
-    <string name="join_error_invalid_name">Invalid group name! Please choose another name!</string>
-    <string name="network_connection_error">Failed to connect to network!</string>
-    <string name="redo_impossible">An error occurred while trying to restart the vote.</string>
-    <string name="redo_impossible">An error occurred while trying to restart the poll.</string>
-    <string name="not_included_title">Your are not in the electorate</string>
-    <string name="not_included">You were not included in the electorate. So, you cannot participate to the vote. You will be redirected to the main screen.</string>
-    <string name="dialog_title_network_lost">Group connection lost!</string>
-    <string name="dialog_network_lost">The group connection has been lost. The vote will be interrupted.</string>
-    <string name="taost_password_letter">The password must start with a letter.</string>
-    <string name="dialog_title_confirm_vote">Confirm your vote</string>
-    <string name="toast_network_lost">You have been disconnected from the network.</string>
-    <string name="dialog_title_no_identification">No identification set</string>
-    <string name="dialog_no_identification">You did not enter an identification. Please first do that.</string>
+    <!-- Question Dialogs -->
+    <string name="dialog_title_confirm_vote">Confirm your vote?</string>
     <string name="dialog_confirm_vote">
 <![CDATA[
 			You have selected the following option:<br /><br /><b>%1$s</b><br /><br />Do you want to confirm your choice and send your vote?"
 		]]>
     </string>
-    <string name="toast_poll_saved">Vote has been saved.</string>
-    <string name="toast_poll_updated">Vote has been updated.</string>
-    <string name="toast_question_empty">Question cannot be empty.</string>
-    <string name="toast_not_enough_options">There must be at least two options.</string>
-    <string name="toast_option_empty">Options cannot be empty.</string>
-    <string name="toast_not_enough_participant_selected">Please select at least two participants.</string>
-    <string name="toast_no_network_set_up">No network has been set up. Please first set one up. You have to return to the main screen.</string>
-    <string name="toast_not_everybody_accepted">Not every body has accepted the vote. Wait or exclude the concerned people from the electorate.</string>
     <string name="dialog_title_save_poll">Save the vote?</string>
     <string name="dialog_save_poll">Do you want to save the modifications you have done on this vote?</string>
     <string name="dialog_title_stop_poll">Finish the vote?</string>
     <string name="dialog_stop_poll">Some participants have not voted yet. Do you really want to finish the voting phase?</string>
     <string name="dialog_title_add_option">Add option in edition?</string>
     <string name="dialog_add_option">You still have an option in edition. Do you want to add it to the vote?</string>
+    <string name="dialog_title_back">Quit?</string>
+    <string name="dialog_back">By going back, you won\'t be able to participate to the vote. Do you really want that?</string>
+    <string name="dialog_back_admin">By going back, you won\'t be able to administrate the vote. You will have to restart the procedure from the beginning. Do you really want that?</string>
+    <string name="dialog_back_result">By going back, you won\'t be able to see result of the vote. Do you really want that?</string>
+
+    <!-- Error or Info Dialogs / Toast -->
+    <string name="toast_scroll">Please first have a look at all options</string>
+    <string name="toast_choose_one_option">Please choose one of the given options</string>
+    <string name="toast_join_error_admin">A group with the same name already exists! Please choose another name!</string>
+    <string name="toast_join_error_voter">No group with the given name exists. Please wait for the administrator to create the group.</string>
+    <string name="toast_join_error">Error creating/joining the group!</string>
+    <string name="toast_join_error_voter_network">Error joining the group! It seems there is a problem with your network card. Please try to disable the wifi and enable it again.</string>
+    <string name="toast_join_error_invalid_name">Invalid group name! Please choose another name!</string>
+    <string name="toast_network_connection_error">Failed to connect to network!</string>
+    <string name="toast_redo_impossible">An error occurred while trying to restart the vote.</string>
+    <string name="toast_wifi_is_not_connected">You are not currently connected to a wireless network. Please choose another option.</string>
+    <string name="toast_wifi_is_disabled">Wifi is currently disabled. Please enable it first.</string>
+    <string name="toast_network_lost">You have been disconnected from the network.</string>
+    <string name="toast_question_empty">Question cannot be empty.</string>
+    <string name="toast_not_enough_options">There must be at least two options.</string>
+    <string name="toast_option_empty">Options cannot be empty.</string>
+    <string name="toast_not_enough_participant_selected">Please select at least two participants.</string>
+    <string name="toast_not_everybody_accepted">Not every body has accepted the vote. Wait or exclude the concerned people from the electorate.</string>
+    <string name="dialog_title_no_identification">No identification set</string>
+    <string name="dialog_no_identification">You did not enter an identification. Please first do that.</string>
     <string name="dialog_title_attack_detected">Attack detected !!</string>
     <string name="dialog_attack_impersonalization">An attack has been detected! Someone is trying to impersonate a group member in order to be able to vote in his name. We strongly recommand to interrupt the vote session and start a new session.</string>
     <string name="dialog_attack_different_senders">An attack has been detected! Someone has sent a message on behalf of another member of the group. We strongly recommand to interrupt the vote session and start a new session.</string>
     <string name="dialog_attack_different_salts">An attack has been detected! Someone is sending different cryptographic values. The vote must be interrupted. Create a new group and give the password only to people allowed to vote.</string>
-    <string name="dialog_title_back">Quit?</string>
-    <string name="dialog_back">By going back, you won\'t be able to participate to the vote. Do you really want that?</string>
-    <string name="dialog_back_admin">By going back, you won\'t be able to administrate the vote. You will have to start the procedure from the beginning. Do you really want that?</string>
-    <string name="dialog_back_result">By going back, you won\'t be able to see result of the vote. Do you really want that?</string>
     <string name="dialog_title_result_chart">Result Chart</string>
-    <string name="toast_wifi_is_not_connected">You are not currently connected to a wireless network. Please choose another option.</string>
-    <string name="toast_wifi_is_disabled">Wifi is currently disabled. Please enable it first.</string>
+    <string name="dialog_not_included_title">Your are not in the electorate</string>
+    <string name="dialog_not_included">You were not included in the electorate. So, you cannot participate to the vote. You will be redirected to the main screen.</string>
+    <string name="dialog_title_network_lost">Group connection lost!</string>
+    <string name="dialog_network_lost">The group connection has been lost. The vote will be interrupted.</string>
+    <string name="dialog_network_not_found">Network not found</string>
+    <string name="dialog_network_not_found_text">The network \"%1$s\" is not available, cannot connect.</string>
 
     <!-- Help overlays -->
     <string name="overlay_close">Touch the screen to close this help</string>
-    <string name="overlay_identification">Put your identification here...</string>
-    <string name="overlay_network_option">... then choose a method to join the network where the vote session takes place.</string>
-    <string name="overlay_review">Check the content...</string>
-    <string name="overlay_review_ok">... and press the button if you agree with it.</string>
+    <string name="overlay_identification">Put your identification here&#8230;</string>
+    <string name="overlay_network_option">&#8230; then choose a method to join the network where the vote session takes place.</string>
+    <string name="overlay_review">Check the content&#8230;</string>
+    <string name="overlay_review_ok">&#8230; and press the button if you agree with it.</string>
     <string name="overlay_previous_screen">Use this button to return to previous screen.</string>
 
     <!-- Activity titles -->
     <string name="voter_app_app_name">MobiVote</string>
-    <string name="title_activity_network_config">Join Group</string>
     <string name="title_activity_check_electorate">Check electorate</string>
-    <string name="title_activity_review_poll">Review vote</string>
-    <string name="title_activity_wait_for_votes">Waiting...</string>
+    <string name="title_activity_wait_for_votes">Waiting&#8230;</string>
     <string name="title_activity_vote">Vote</string>
     <string name="title_activity_list_terminated_polls">Vote Archive</string>
     <string name="title_activity_display_result">Vote Results</string>
@@ -169,46 +141,31 @@
     <string name="title_activity_poll_detail">Vote Setup</string>
     <string name="title_activity_electorate">Choose electorate</string>
     <string name="title_activity_review_poll">Vote review</string>
-    <string name="title_activity_wait_for_votes_admin">Waiting...</string>
+    <string name="title_activity_wait_for_votes_admin">Waiting&#8230;</string>
 
     <!-- Activity subtitles -->
-    <string name="choose_network">Choose the network you want to use</string>
-    <string name="check_electorate">Please wait...</string>
-    <string name="review_poll">Review the poll!</string>
-    <string name="welcome">Welcome to MobiVote</string>
-    <string name="list_polls_title">Vote archives</string>
-    <string name="display_result_title">Vote results</string>
-    <string name="vote_title">Please vote</string>
-    <string name="wait_votes">Thanks for voting!\nWaiting for votes...</string>
-    <string name="title_activity_network_ready">Network connection information</string>
-    <string name="title_activity_choosenetwork">Please choose the Network you want to use</string>
-    <string name="title_activity_chooseelectorate">Please choose the electorate</string>
-    <string name="title_activity_reviewpoll">Please review the vote</string>
-    <string name="wait_votes_admin">Thanks for voting!\nWaiting for votes...</string>
+    <string name="subtitle_welcome">Welcome to MobiVote</string>
+    <string name="subtitle_check_electorate">Please wait&#8230;</string>
+    <string name="subtitle_wait_votes">Thanks for voting!\nWaiting for votes&#8230;</string>
+    <string name="subtitle_wait_votes_admin">Thanks for voting!\nWaiting for votes&#8230;</string>
 
     <!-- Hints in EditText fields -->
     <string name="hint_group_name">Group number</string>
     <string name="hint_group_password">Group Password</string>
     <string name="hint_network_wlan_key">WLAN Key</string>
     <string name="hint_enter_question">Enter the question of the vote here</string>
-    <string name="hint_enter_option">Enter the Option here</string>
+    <string name="hint_enter_option">Enter the option here</string>
 
     <!-- Image descriptions -->
-    <string name="participant_included">Participants included</string>
+    <string name="description_participant_included">Participants included</string>
     <string name="description_network">Network</string>
-    <string name="participant_avatar">Participant avatar</string>
-    <string name="participant_state">Participant state</string>
-    <string name="tick">Tick</string>
-    <string name="poll_image">Vote image</string>
-    <string name="accepted">Review accepted</string>
+    <string name="description_participant_avatar">Participant avatar</string>
+    <string name="description_accepted">Review accepted</string>
     <string name="description_poll">Vote</string>
-    <string name="description_add_poll">Add Vote</string>
     <string name="description_delete_poll">Delete Vote</string>
     <string name="description_option">Option</string>
-    <string name="description_add_option">Add Option</string>
-    <string name="description_delete_option">Delete Option</string>
-    <string name="description_help">Help</string>
-    <string name="description_qrcode">QR Code</string>
+    <string name="description_add_option">Add option</string>
+    <string name="description_qrcode">QR-code</string>
 
     <!-- Help dialog titles -->
     <string name="help_title_main">Welcome to MobiVote</string>
@@ -232,6 +189,8 @@
     <string name="nfc_unable_format_ndef">Unable to format NFC tag to NDEF</string>
     <string name="nfc_no_ndef_support">This NFC tag doesn\'t appear to support NDEF format</string>
     <string name="nfc_tag_read_failed">Unable to read NFC tag</string>
+    <string name="nfc_enable_nfc">Enable NFC</string>
+    <string name="nfc_enable_nfc_question">In order to use this feature, NFC must be enabled. Enable now?</string>
 
     <!-- Help dialog texts -->
     <string name="help_text_main">
@@ -267,7 +226,7 @@
 			<ul>
 			<li><b>Question:</b> this is the question to which the voter will have to answer to.</li>
 			<li><b>Options:</b> this is the list of answers out of which the voters will have to choose one. You can add an option by entering a text in the field at the bottom of the screen and validating in with the + button. You can remove an option by clicking on the corresponding garbage icon.</li>
-			<li><b>Allow empty votes:</b> this checkbox adds or remove an option from the list which represent the "No opinon" vote</li>
+			<li><b>Allow blank votes:</b> this checkbox adds or remove an option from the list which represent the "No opinion" vote</li>
 			<li><b>Start vote:</b> when you have finished defining the vote, you can either press on the "Start vote" button 
 			 (at the bottom of the screen for phone, at the upper right corner on tablets) or go back using the button in the upper left corner, and saving it.
 			 When you save it, you will be able to access it again later in order to modify and run it.</li>

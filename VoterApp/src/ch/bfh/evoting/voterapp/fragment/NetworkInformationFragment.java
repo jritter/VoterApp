@@ -247,9 +247,9 @@ public class NetworkInformationFragment extends Fragment implements
 				// wants to enable it. If yes, redirect to the settings.
 				alertDialog = new AlertDialog.Builder(getActivity()).create();
 				alertDialog.setTitle(getResources().getString(
-						R.string.enable_nfc));
+						R.string.nfc_enable_nfc));
 				alertDialog.setMessage(getResources().getString(
-						R.string.enable_nfc_question));
+						R.string.nfc_enable_nfc_question));
 				alertDialog.setButton(AlertDialog.BUTTON_POSITIVE,
 						getResources().getString(R.string.yes),
 						new DialogInterface.OnClickListener() {

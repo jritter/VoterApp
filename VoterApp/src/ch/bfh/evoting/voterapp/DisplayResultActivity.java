@@ -96,9 +96,9 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 			btnRedo.setOnClickListener(this);
 			// Poll is just finished
 			if (saveToDbNeeded) {
-				btnRedo.setText(R.string.redo_poll);
+				btnRedo.setText(R.string.action_redo_poll);
 			} else {
-				btnRedo.setText(R.string.clone_poll);
+				btnRedo.setText(R.string.action_clone_poll);
 			}
 		}
 
@@ -231,11 +231,11 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 		getMenuInflater().inflate(R.menu.display_results, menu);
 
 		if (saveToDbNeeded) {
-			menu.findItem(R.id.action_redo_vote).setTitle(R.string.redo_poll);
+			menu.findItem(R.id.action_redo_vote).setTitle(R.string.action_redo_poll);
 			menu.findItem(R.id.action_redo_vote).setVisible(
 					AndroidApplication.getInstance().isAdmin());
 		} else {
-			menu.findItem(R.id.action_redo_vote).setTitle(R.string.clone_poll);
+			menu.findItem(R.id.action_redo_vote).setTitle(R.string.action_clone_poll);
 		}
 
 		if (getResources().getBoolean(R.bool.display_bottom_bar)) {
@@ -301,7 +301,7 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 		} catch (DatabaseException e) {
 			for (int i = 0; i < 2; i++)
 				Toast.makeText(DisplayResultActivity.this,
-						getString(R.string.redo_impossible), Toast.LENGTH_LONG)
+						getString(R.string.toast_redo_impossible), Toast.LENGTH_LONG)
 						.show();
 			e.printStackTrace();
 		}
