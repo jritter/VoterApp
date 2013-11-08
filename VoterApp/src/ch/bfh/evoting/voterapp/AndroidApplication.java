@@ -70,16 +70,7 @@ public class AndroidApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		//		PowerManager pm = (PowerManager) getSystemService(POWER_SERVICE);
-		//        wl = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK
-		//                | PowerManager.ACQUIRE_CAUSES_WAKEUP
-		//                | PowerManager.ON_AFTER_RELEASE, "INFO");
-		//        wl.acquire();
-		//
-		//        KeyguardManager km = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
-		//        kl = km.newKeyguardLock("name");
-		//        kl.disableKeyguard();
-
+		
 		//TODO remove when not used anymore
 		//		SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 		//		settings.edit().putBoolean("first_run_ReviewPollVoterActivity", true).commit();

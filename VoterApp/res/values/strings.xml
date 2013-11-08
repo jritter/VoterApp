@@ -280,9 +280,10 @@
 			<br/><br/>
 			In a first time, you have to indicate your identification (for example your name). The you have to choose which wireless network you want to use. In a third time you have to indicate the group credentials.
 			<ul>
-				<li><b>If you are administrator of the vote</b>, you only have to indicate the wireless network you want to use.
-				 For this purpose, you have two possibilities. Either you can use the curently connected wireless network (button \"Use network x\"),
-				 or you can choose the advanced network settings where you can choose the network you want to connect to. You also have the possibility to set up an access point on your device. This will work only with a vote with a few participants.
+				<li><b>If you are administrator of the vote</b>, you only have to indicate the wireless network you want to use. 
+				For this purpose, you have two possibilities. Either you can use the curently connected wireless network (button \"Use network x\"), 
+				or you can choose the advanced network settings where you can choose the network you want to connect to. 
+				You also have the possibility to set up an access point on your device. This will work only with a vote with a few participants.</li>
 				<li><b>If you simply want to join an existing session</b>, you have four options:</li>
 				<ul>
 				<li><b>Use network x:</b> this option allows you to use the network to which you are currently connected.
