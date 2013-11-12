@@ -168,13 +168,13 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 		preferences = getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
 		String identification = preferences.getString("identification", "");
 
-		if (identification.equals("")) {
-			identification = readOwnerName();
-			// saving the identification field
-			SharedPreferences.Editor editor = preferences.edit();
-			editor.putString("identification", identification);
-			editor.commit();
-		}
+//		if (identification.equals("")) {
+//			identification = readOwnerName();
+//			// saving the identification field
+//			SharedPreferences.Editor editor = preferences.edit();
+//			editor.putString("identification", identification);
+//			editor.commit();
+//		}
 
 		etIdentification = (EditText) findViewById(R.id.edittext_identification);
 		etIdentification.setText(identification);
@@ -413,25 +413,26 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 
 	}
 
-	/**
-	 * This method is used to extract the name of the device owner
-	 * 
-	 * @return the name of the device owner
-	 */
-	private String readOwnerName() {
-
-		Cursor c = getContentResolver().query(
-				ContactsContract.Profile.CONTENT_URI, null, null, null, null);
-		if (c.getCount() == 0) {
-			return "";
-		}
-		c.moveToFirst();
-		String displayName = c.getString(c.getColumnIndex("display_name"));
-		c.close();
-
-		return displayName;
-
-	}
+//	Commented out in order to be able to remove the permissions
+//	/**
+//	 * This method is used to extract the name of the device owner
+//	 * 
+//	 * @return the name of the device owner
+//	 */
+//	private String readOwnerName() {
+//
+//		Cursor c = getContentResolver().query(
+//				ContactsContract.Profile.CONTENT_URI, null, null, null, null);
+//		if (c.getCount() == 0) {
+//			return "";
+//		}
+//		c.moveToFirst();
+//		String displayName = c.getString(c.getColumnIndex("display_name"));
+//		c.close();
+//
+//		return displayName;
+//
+//	}
 
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		if (requestCode == 0) {

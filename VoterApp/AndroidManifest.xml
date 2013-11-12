@@ -17,10 +17,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.NFC" />
     
-    <!-- Why was this used ??? 
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />  -->
+    <!-- Read owner name permissions
     <uses-permission android:name="android.permission.READ_PROFILE" />
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" /> -->
 
     <application
         android:name="ch.bfh.evoting.voterapp.AndroidApplication"
