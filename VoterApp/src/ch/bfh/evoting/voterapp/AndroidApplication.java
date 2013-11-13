@@ -3,14 +3,6 @@ package ch.bfh.evoting.voterapp;
 
 import org.apache.log4j.Level;
 
-import ch.bfh.evoting.voterapp.network.AllJoynNetworkInterface;
-import ch.bfh.evoting.voterapp.network.NetworkInterface;
-import ch.bfh.evoting.voterapp.network.NetworkMonitor;
-import ch.bfh.evoting.voterapp.network.wifi.AdhocWifiManager;
-import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
-import ch.bfh.evoting.voterapp.util.JavaSerialization;
-import ch.bfh.evoting.voterapp.util.SerializationUtil;
-import ch.bfh.evoting.voterapp.util.Utility;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
@@ -22,15 +14,19 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.WindowManager;
 import android.widget.Toast;
+import ch.bfh.evoting.voterapp.network.AllJoynNetworkInterface;
+import ch.bfh.evoting.voterapp.network.NetworkInterface;
+import ch.bfh.evoting.voterapp.network.NetworkMonitor;
+import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
+import ch.bfh.evoting.voterapp.util.JavaSerialization;
+import ch.bfh.evoting.voterapp.util.SerializationUtil;
+import ch.bfh.evoting.voterapp.util.Utility;
 
 /**
  * Class representing the application. This class is used to do some initializations and to share data.
@@ -48,8 +44,7 @@ public class AndroidApplication extends Application {
 	private Activity currentActivity = null;
 	private boolean isAdmin = false;
 	private boolean voteRunning;
-	private WifiManager wifi;
-	private AdhocWifiManager adhoc;
+
 
 	private AlertDialog dialogNetworkLost;
 	private NetworkMonitor networkMonitor;
@@ -131,53 +126,7 @@ public class AndroidApplication extends Application {
 	}
 
 
-	/**
-	 * This method initiates the connect process
-	 * 
-	 * @param config
-	 *            an array containing the SSID and the password of the network
-	 * @param context android context
-	 */
-	public void connect(String[] config, Context context) {
-
-		wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-		adhoc = new AdhocWifiManager(wifi);
-
-		boolean connectedSuccessful = false;
-		// check whether the network is already known, i.e. the password is
-		// already stored in the device
-		for (WifiConfiguration configuredNetwork : wifi.getConfiguredNetworks()) {
-			if (configuredNetwork.SSID.equals("\"".concat(config[0]).concat(
-					"\""))) {
-				connectedSuccessful = true;
-				adhoc.connectToNetwork(configuredNetwork.networkId, context);
-				break;
-			}
-		}
-		if (!connectedSuccessful) {
-			for (ScanResult result : wifi.getScanResults()) {
-				if (result.SSID.equals(config[0])) {
-					connectedSuccessful = true;
-					adhoc.connectToNetwork(config[0], config[1], context);
-					break;
-				}
-			}
-		}
-
-		// display a message if the connection was not successful
-		if (!connectedSuccessful) {
-			AlertDialog alertDialog = new AlertDialog.Builder(context).create();
-			alertDialog.setTitle(R.string.dialog_network_not_found);
-			alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.ok),
-					new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int which) {
-					dialog.dismiss();
-				}
-			});
-			alertDialog.setMessage(getString(R.string.dialog_network_not_found_text, config[0]));
-			alertDialog.show();
-		}
-	}
+	
 
 	/*--------------------------------------------------------------------------------------------
 	 * Getters/Setters

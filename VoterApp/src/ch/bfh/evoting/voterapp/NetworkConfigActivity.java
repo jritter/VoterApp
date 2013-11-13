@@ -1,16 +1,19 @@
 package ch.bfh.evoting.voterapp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
@@ -19,7 +22,6 @@ import android.nfc.tech.Ndef;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.provider.ContactsContract;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -34,6 +36,7 @@ import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkOptionsFragment;
+import ch.bfh.evoting.voterapp.network.wifi.AdhocWifiManager;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.Utility;
 
@@ -49,18 +52,19 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 	private boolean nfcAvailable;
 	private PendingIntent pendingIntent;
 
-	private WifiManager wifi;
-
 	private SharedPreferences preferences;
 	private EditText etIdentification;
 	private BroadcastReceiver serviceStartedListener;
 
 	private boolean active;
 	private Poll poll;
-	
+
 	private String[] config;
 
 	private AsyncTask<Object, Object, Object> rescanWifiTask;
+
+	private WifiManager wifi;
+	private AdhocWifiManager adhoc;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -168,13 +172,13 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 		preferences = getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
 		String identification = preferences.getString("identification", "");
 
-//		if (identification.equals("")) {
-//			identification = readOwnerName();
-//			// saving the identification field
-//			SharedPreferences.Editor editor = preferences.edit();
-//			editor.putString("identification", identification);
-//			editor.commit();
-//		}
+		// if (identification.equals("")) {
+		// identification = readOwnerName();
+		// // saving the identification field
+		// SharedPreferences.Editor editor = preferences.edit();
+		// editor.putString("identification", identification);
+		// editor.commit();
+		// }
 
 		etIdentification = (EditText) findViewById(R.id.edittext_identification);
 		etIdentification.setText(identification);
@@ -259,14 +263,15 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 			LocalBroadcastManager.getInstance(this).sendBroadcast(
 					broadcastIntent);
 		}
-		
+
 		Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
 		Ndef ndef = Ndef.get(tag);
 
-		if (ndef == null){
-			Toast.makeText(this, getResources().getText(R.string.nfc_tag_read_failed), Toast.LENGTH_LONG).show();
-		}
-		else {
+		if (ndef == null) {
+			Toast.makeText(this,
+					getResources().getText(R.string.nfc_tag_read_failed),
+					Toast.LENGTH_LONG).show();
+		} else {
 			NdefMessage msg;
 			msg = ndef.getCachedNdefMessage();
 			config = new String(msg.getRecords()[0].getPayload())
@@ -277,9 +282,9 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 			editor.putString("SSID", config[0]);
 			editor.commit();
 
-			AndroidApplication.getInstance().connect(config, this);
+			connect(config, this);
 		}
-		
+
 		super.onNewIntent(intent);
 	}
 
@@ -342,7 +347,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 			nfcAdapter.enableForegroundDispatch(this, pendingIntent,
 					Utility.getNFCIntentFilters(), null);
 		}
-		
+
 		super.onResume();
 	}
 
@@ -413,26 +418,26 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 
 	}
 
-//	Commented out in order to be able to remove the permissions
-//	/**
-//	 * This method is used to extract the name of the device owner
-//	 * 
-//	 * @return the name of the device owner
-//	 */
-//	private String readOwnerName() {
-//
-//		Cursor c = getContentResolver().query(
-//				ContactsContract.Profile.CONTENT_URI, null, null, null, null);
-//		if (c.getCount() == 0) {
-//			return "";
-//		}
-//		c.moveToFirst();
-//		String displayName = c.getString(c.getColumnIndex("display_name"));
-//		c.close();
-//
-//		return displayName;
-//
-//	}
+	// Commented out in order to be able to remove the permissions
+	// /**
+	// * This method is used to extract the name of the device owner
+	// *
+	// * @return the name of the device owner
+	// */
+	// private String readOwnerName() {
+	//
+	// Cursor c = getContentResolver().query(
+	// ContactsContract.Profile.CONTENT_URI, null, null, null, null);
+	// if (c.getCount() == 0) {
+	// return "";
+	// }
+	// c.moveToFirst();
+	// String displayName = c.getString(c.getColumnIndex("display_name"));
+	// c.close();
+	//
+	// return displayName;
+	//
+	// }
 
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		if (requestCode == 0) {
@@ -451,7 +456,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 						.setGroupPassword(config[2]);
 
 				// connect to the network
-				AndroidApplication.getInstance().connect(config, this);
+				connect(config, this);
 
 			} else if (resultCode == RESULT_CANCELED) {
 				// Handle cancel
@@ -463,6 +468,57 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 		Log.d("NetworkConfigActivity", "identification is "
 				+ this.etIdentification.toString());
 		return this.etIdentification.getText().toString();
+	}
+
+	/**
+	 * This method initiates the connect process
+	 * 
+	 * @param config
+	 *            an array containing the SSID and the password of the network
+	 * @param context
+	 *            android context
+	 */
+	public void connect(String[] config, Context context) {
+
+		wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+		adhoc = new AdhocWifiManager(wifi);
+
+		boolean connectedSuccessful = false;
+		// check whether the network is already known, i.e. the password is
+		// already stored in the device
+		for (WifiConfiguration configuredNetwork : wifi.getConfiguredNetworks()) {
+			if (configuredNetwork.SSID.equals("\"".concat(config[0]).concat(
+					"\""))) {
+				connectedSuccessful = true;
+				adhoc.connectToNetwork(configuredNetwork.networkId, context);
+				break;
+			}
+		}
+		if (!connectedSuccessful) {
+			for (ScanResult result : wifi.getScanResults()) {
+				if (result.SSID.equals(config[0])) {
+					connectedSuccessful = true;
+					adhoc.connectToNetwork(config[0], config[1], context);
+					break;
+				}
+			}
+		}
+
+		// display a message if the connection was not successful
+		if (!connectedSuccessful) {
+			AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+			alertDialog.setTitle(R.string.dialog_network_not_found);
+			alertDialog.setButton(AlertDialog.BUTTON_POSITIVE,
+					getString(R.string.ok),
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+						}
+					});
+			alertDialog.setMessage(getString(
+					R.string.dialog_network_not_found_text, config[0]));
+			alertDialog.show();
+		}
 	}
 
 }
