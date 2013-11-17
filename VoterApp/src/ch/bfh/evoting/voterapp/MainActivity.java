@@ -4,6 +4,7 @@ import java.util.concurrent.Callable;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -32,6 +33,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.IdentificationWlanKeyDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
 import ch.bfh.evoting.voterapp.network.wifi.AdhocWifiManager;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
@@ -43,7 +45,7 @@ import ch.bfh.evoting.voterapp.util.Utility;
  * @author Philémon von Bergen
  * 
  */
-public class MainActivity extends Activity implements OnClickListener {
+public class MainActivity extends Activity implements OnClickListener, IdentificationWlanKeyDialogFragment.NoticeDialogListener {
 
 	private NfcAdapter nfcAdapter;
 	private boolean nfcAvailable;
@@ -62,6 +64,16 @@ public class MainActivity extends Activity implements OnClickListener {
 
 	private WifiManager wifi;
 	private AdhocWifiManager adhoc;
+	private String identification;
+	private String ssid;
+	private boolean identificationMissing = false;
+	private boolean wlanKeyMissing = false;
+	
+	private int networkId;
+	
+	private IdentificationWlanKeyDialogFragment identificationWlanKeyDialogFragment;
+	public static final int DIALOG_FRAGMENT = 1;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +131,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 				// saving the values that we got
 				SharedPreferences.Editor editor = preferences.edit();
-				editor.putString("SSID", config[0]);
+				editor.putString("SSID", ssid);
 				editor.commit();
 
 				this.waitForNetworkInterface(new Callable<Void>() {
@@ -262,7 +274,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 				// saving the values that we got
 				SharedPreferences.Editor editor = preferences.edit();
-				editor.putString("SSID", config[0]);
+				editor.putString("SSID", ssid);
 				editor.commit();
 
 				this.waitForNetworkInterface(new Callable<Void>() {
@@ -367,33 +379,58 @@ public class MainActivity extends Activity implements OnClickListener {
 	 *            android context
 	 */
 	public void connect(String[] config, Context context) {
+		
+		identificationMissing = false;
+		wlanKeyMissing = false;
 
 		wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 		adhoc = new AdhocWifiManager(wifi);
+		ssid = config[0];
+		
+		identification = preferences.getString("identification", "");
+		
+		if (identification.equals("")){
+			identificationMissing  = true;
+		}
 
 		boolean connectedSuccessful = false;
 		// check whether the network is already known, i.e. the password is
 		// already stored in the device
 		for (WifiConfiguration configuredNetwork : wifi.getConfiguredNetworks()) {
-			if (configuredNetwork.SSID.equals("\"".concat(config[0]).concat(
+			if (configuredNetwork.SSID.equals("\"".concat(ssid).concat(
 					"\""))) {
 				connectedSuccessful = true;
-				adhoc.connectToNetwork(configuredNetwork.networkId, context);
+				networkId = configuredNetwork.networkId;
 				break;
 			}
 		}
+		
 		if (!connectedSuccessful) {
 			for (ScanResult result : wifi.getScanResults()) {
-				if (result.SSID.equals(config[0])) {
+				if (result.SSID.equals(ssid)) {
 					connectedSuccessful = true;
-					adhoc.connectToNetwork(config[0], config[1], context);
+					
+					if (result.capabilities.contains("WPA")
+							|| result.capabilities.contains("WEP")) {
+						wlanKeyMissing = true;
+					} 
 					break;
 				}
 			}
 		}
-
-		// display a message if the connection was not successful
-		if (!connectedSuccessful) {
+		
+		if (connectedSuccessful){
+		
+			if (identificationMissing || wlanKeyMissing){
+				identificationWlanKeyDialogFragment = new IdentificationWlanKeyDialogFragment(identificationMissing, wlanKeyMissing);
+				identificationWlanKeyDialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog);
+				identificationWlanKeyDialogFragment.show(getFragmentManager(), "identificationWlanKeyDialogFragment");
+			}
+			else {
+				adhoc.connectToNetwork(networkId, this);
+			}
+		}
+		else {
 			AlertDialog alertDialog = new AlertDialog.Builder(context).create();
 			alertDialog.setTitle(R.string.dialog_network_not_found);
 			alertDialog.setButton(AlertDialog.BUTTON_POSITIVE,
@@ -404,9 +441,33 @@ public class MainActivity extends Activity implements OnClickListener {
 						}
 					});
 			alertDialog.setMessage(getString(
-					R.string.dialog_network_not_found_text, config[0]));
+					R.string.dialog_network_not_found_text, ssid));
 			alertDialog.show();
 		}
+	}
+
+	@Override
+	public void onDialogPositiveClick(DialogFragment dialog) {
+		if (identificationMissing){
+    		SharedPreferences.Editor editor = preferences.edit();
+			editor.putString("identification", ((IdentificationWlanKeyDialogFragment)dialog).getIdentification());
+			editor.commit();
+    	}
+    	
+    	if (wlanKeyMissing){
+    		adhoc.connectToNetwork(ssid, ((IdentificationWlanKeyDialogFragment)dialog).getWlanKey(), this);
+    	}
+    	else {
+    		adhoc.connectToNetwork(networkId, this);
+    	}
+
+    	dialog.dismiss();
+		
+	}
+
+	@Override
+	public void onDialogNegativeClick(DialogFragment dialog) {
+		identificationWlanKeyDialogFragment.dismiss();
 	}
 
 }

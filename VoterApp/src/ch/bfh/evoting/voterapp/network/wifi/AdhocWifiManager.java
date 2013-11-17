@@ -44,6 +44,7 @@ public class AdhocWifiManager {
 	private SharedPreferences preferences;
 	private SharedPreferences.Editor editor;
 	private String SSID;
+	private AlertDialog dialogConnectFailed;
 
 	/**
 	 * Instatiates a new instance
@@ -250,7 +251,7 @@ public class AdhocWifiManager {
 
 			// make sure that wifi on the device is enabled
 			wifi.setWifiEnabled(true);
-
+			
 			// extract the current networkId and store it in the preferences
 			// file
 			preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
@@ -351,6 +352,7 @@ public class AdhocWifiManager {
 				// add the network to the known network configuration and enable
 				// it
 				networkId = wifi.addNetwork(config);
+				wifi.saveConfiguration();
 				success = wifi.enableNetwork(networkId, true);
 			}
 
@@ -465,9 +467,9 @@ public class AdhocWifiManager {
 					// display a dialog if the connection was not successful
 					AlertDialog.Builder builder = new AlertDialog.Builder(
 							context);
-					builder.setTitle("InstaCircle - Connect failed");
-					builder.setMessage("The attempt to connect to the network failed.");
-					builder.setPositiveButton("OK",
+					builder.setTitle(context.getResources().getString(R.string.dialog_title_connect_failed));
+					builder.setMessage(context.getResources().getString(R.string.dialog_content_connect_failed));
+					builder.setPositiveButton(context.getResources().getString(R.string.ok),
 							new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog,
 								int which) {
@@ -475,11 +477,23 @@ public class AdhocWifiManager {
 							return;
 						}
 					});
-					AlertDialog dialog = builder.create();
+					dialogConnectFailed = builder.create();
+					
+					dialogConnectFailed.setOnShowListener(new DialogInterface.OnShowListener() {
+						@Override
+						public void onShow(DialogInterface dialog) {
+							Utility.setTextColor(dialog, context.getResources().getColor(R.color.theme_color));
+							dialogConnectFailed.getButton(AlertDialog.BUTTON_NEGATIVE).setBackgroundResource(
+									R.drawable.selectable_background_votebartheme);
+							dialogConnectFailed.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundResource(
+									R.drawable.selectable_background_votebartheme);
+						}
+					});
+					
 					try{
-						dialog.show();
+						dialogConnectFailed.show();
 					} catch (BadTokenException e){
-						//other activity was already started
+						// other activity has already been started
 					}
 				}
 			} else {
