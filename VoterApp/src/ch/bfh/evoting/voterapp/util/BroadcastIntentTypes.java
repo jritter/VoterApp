@@ -109,7 +109,9 @@ public class BroadcastIntentTypes {
 	 * Intent type sent when 5 decryptions failed and 0 successed
 	 * This means that we are probably using a wrong decryption key (wrong group password or wrong salt)
 	 * Extras:
-	 * - nothing
+	 * - "type" type of error
+	 * 		password: 	the error is contained in the password
+	 * 		salt:		the salt received did not correspond to the hash contained in the password
 	 * */
 	public static final String probablyWrongDecryptionKeyUsed = "probablyWrongDecryptionKeyUsed";
 
