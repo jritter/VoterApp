@@ -6,6 +6,7 @@ import java.util.TreeMap;
 
 import ch.bfh.evoting.alljoyn.BusHandler;
 import ch.bfh.evoting.voterapp.AndroidApplication;
+import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
@@ -22,6 +23,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
+import android.widget.Toast;
 
 public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 
@@ -139,7 +142,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 			//generate group password
 			this.groupPassword = generatePassword();
 		}
-		
+
 		this.groupName = groupName;
 
 
@@ -228,6 +231,24 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 		public void onReceive(Context context, Intent intent) {
 			feedbackReceived = true;
 			groupName = null;
+
+			int status = intent.getIntExtra("error", 0);
+			if(status==1){
+				for(int i=0; i < 2; i++)
+					Toast.makeText(context, context.getString(R.string.toast_join_error_invalid_name), Toast.LENGTH_SHORT).show();
+			} else if (status == 2){
+				for(int i=0; i < 2; i++)
+					Toast.makeText(context, context.getString(R.string.toast_join_error_admin), Toast.LENGTH_SHORT).show();
+			} else if (status == 3){
+				for(int i=0; i < 2; i++)
+					Toast.makeText(context, context.getString(R.string.toast_join_error_voter), Toast.LENGTH_SHORT).show();
+			} else if (status == 4){
+				for(int i=0; i < 2; i++)
+					Toast.makeText(context, context.getString(R.string.toast_join_error_voter_network), Toast.LENGTH_SHORT).show();
+			} else {
+				for(int i=0; i < 2; i++)
+					Toast.makeText(context, context.getString(R.string.toast_join_error), Toast.LENGTH_SHORT).show();
+			}
 		}
 	};
 

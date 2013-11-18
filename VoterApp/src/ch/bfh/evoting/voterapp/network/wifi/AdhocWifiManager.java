@@ -21,6 +21,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.WindowManager.BadTokenException;
@@ -54,7 +55,7 @@ public class AdhocWifiManager {
 	 * 
 	 */
 	public AdhocWifiManager(WifiManager wifi) {
-		this.wifi = wifi;
+		this.wifi = wifi;				
 	}
 
 	/**
@@ -261,18 +262,26 @@ public class AdhocWifiManager {
 			editor.commit();
 			SSID = config.SSID.replace("\"", "");
 			
-			Log.d(TAG, "SSID to connect to: " +config.SSID+ " . Currently connected SSID: "+ wifi.getConnectionInfo().getSSID());
-			if(config.SSID.equals(wifi.getConnectionInfo().getSSID())){
+			Log.d(TAG, "SSID to connect to: " +SSID+ " . Currently connected SSID: "+ wifi.getConnectionInfo().getSSID().replace("\"", ""));
+			if(SSID.equals(wifi.getConnectionInfo().getSSID().replace("\"", ""))){
 				success = true;
 				return null;
 			}
 
+			Log.d(TAG, "Connect to: " + SSID);
 			// handle the strange habit with the double quotes...
 			config.SSID = "\"" + config.SSID + "\"";
 
 			if (networkId != -1) {
 				// Configuration already exists, no need to create a new one...
 				success = wifi.enableNetwork(networkId, true);
+				//Sleep in order to let time to disconnect from current wifi and connect to new
+				Log.e(TAG, "Sleeping a while to let disconnection happen");
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			} else {
 
 				// make sure that we have scan results before we continue
@@ -354,6 +363,12 @@ public class AdhocWifiManager {
 				networkId = wifi.addNetwork(config);
 				wifi.saveConfiguration();
 				success = wifi.enableNetwork(networkId, true);
+				//Sleep in order to let time to disconnect from current wifi and connect to new
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 
 			// wait until the connection is actually established
@@ -369,8 +384,17 @@ public class AdhocWifiManager {
 						+ nInfo.getState().toString());
 				if (nInfo.getDetailedState() == NetworkInfo.DetailedState.CONNECTED
 						&& nInfo.getState() == NetworkInfo.State.CONNECTED
-						&& getBroadcastAddress() != null) {
+						&& getBroadcastAddress() != null && nInfo.isConnected()) {
 					Log.d(TAG, "Connected!");
+					if(i>1){
+						//just connected
+						//wait until completely connected
+						try {
+							Thread.sleep(3000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
 					break;
 				}
 				try {
@@ -415,34 +439,17 @@ public class AdhocWifiManager {
 					editor.putString("SSID", SSID);
 					editor.commit();
 
-					String groupName = AndroidApplication.getInstance().getNetworkInterface().getGroupName();
-					AndroidApplication.getInstance().getNetworkInterface().joinGroup(groupName);
-
+					
+					//Register listener on group connexion event to dismiss the dialog
 					LocalBroadcastManager.getInstance(context).registerReceiver(new BroadcastReceiver() {
 
 						@Override
 						public void onReceive(Context arg0, Intent intent) {
+							
 							try{
 								d.dismiss();
 							} catch(Throwable t){
 								//do nothing;
-							}
-							int status = intent.getIntExtra("error", 0);
-							if(status==1){
-								for(int i=0; i < 1; i++)
-									Toast.makeText(context, context.getString(R.string.toast_join_error_invalid_name), Toast.LENGTH_SHORT).show();
-							} else if (status == 2){
-								for(int i=0; i < 1; i++)
-									Toast.makeText(context, context.getString(R.string.toast_join_error_admin), Toast.LENGTH_SHORT).show();
-							} else if (status == 3){
-								for(int i=0; i < 1; i++)
-									Toast.makeText(context, context.getString(R.string.toast_join_error_voter), Toast.LENGTH_SHORT).show();
-							} else if (status == 4){
-								for(int i=0; i < 2; i++)
-									Toast.makeText(context, context.getString(R.string.toast_join_error_voter_network), Toast.LENGTH_SHORT).show();
-							} else {
-								for(int i=0; i < 1; i++)
-									Toast.makeText(context, context.getString(R.string.toast_join_error), Toast.LENGTH_SHORT).show();
 							}
 						}
 					}, new IntentFilter(BroadcastIntentTypes.networkConnectionFailed));
@@ -458,6 +465,9 @@ public class AdhocWifiManager {
 						}
 					}, new IntentFilter(BroadcastIntentTypes.networkConnectionSuccessful));
 
+					String groupName = AndroidApplication.getInstance().getNetworkInterface().getGroupName();
+					AndroidApplication.getInstance().getNetworkInterface().joinGroup(groupName);
+					
 				} else {
 					try{
 						d.dismiss();
