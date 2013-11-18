@@ -105,4 +105,13 @@ public class BroadcastIntentTypes {
 	 * */
 	public static final String nfcTagTapped = "NFCTagTapped";
 	
+	/**
+	 * Intent type sent when 5 decryptions failed and 0 successed
+	 * This means that we are probably using a wrong decryption key (wrong group password or wrong salt)
+	 * Extras:
+	 * - nothing
+	 * */
+	public static final String probablyWrongDecryptionKeyUsed = "probablyWrongDecryptionKeyUsed";
+
+	
 }

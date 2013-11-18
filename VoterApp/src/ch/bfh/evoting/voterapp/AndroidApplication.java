@@ -14,6 +14,7 @@ import ch.bfh.evoting.voterapp.util.Utility;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
+import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -94,6 +95,7 @@ public class AndroidApplication extends Application {
 		LocalBroadcastManager.getInstance(this).registerReceiver(mGroupEventReceiver, new IntentFilter(BroadcastIntentTypes.networkGroupDestroyedEvent));
 		LocalBroadcastManager.getInstance(this).registerReceiver(mAttackDetecter, new IntentFilter(BroadcastIntentTypes.attackDetected));
 		LocalBroadcastManager.getInstance(this).registerReceiver(startPollReceiver, new IntentFilter(BroadcastIntentTypes.electorate));
+		LocalBroadcastManager.getInstance(this).registerReceiver(wrongDecryptionKeyReceiver, new IntentFilter(BroadcastIntentTypes.probablyWrongDecryptionKeyUsed));
 	}
 
 	@Override
@@ -382,6 +384,32 @@ public class AndroidApplication extends Application {
 				Intent i = new Intent(AndroidApplication.this, CheckElectorateActivity.class);
 				i.putExtra("participants", intent.getSerializableExtra("participants"));
 				currentActivity.startActivity(i);
+			}
+		}
+	};
+	
+	/**
+	 * this broadcast receiver listens for messages indicating that many decryptions failed
+	 */
+	private BroadcastReceiver wrongDecryptionKeyReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if(currentActivity!=null){
+				AlertDialog.Builder builder = new AlertDialog.Builder(currentActivity);
+				Dialog dialog = null;
+				// Add the buttons
+				builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+					}
+				});
+
+				builder.setTitle(R.string.dialog_title_wrong_key);
+				builder.setMessage(R.string.dialog_wrong_key);
+				
+				// Create the AlertDialog
+				dialog = builder.create(); 
+				dialog.show();
 			}
 		}
 	};

@@ -1,5 +1,6 @@
 package ch.bfh.evoting.voterapp.network;
 
+import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -45,7 +46,8 @@ public class NetworkMonitor extends BroadcastReceiver {
 	 */
 	private void checkConnectivity(){
 		String backupSSID = this.ssid;
-	    if (wifi.isWifiEnabled()==true) {
+		WifiAPManager wifiAp = new WifiAPManager();
+	    if (wifi.isWifiEnabled()==true || wifiAp.isWifiAPEnabled(wifi)) {
 	      wifiEnabled = true;
 	    } else {
 	    	wifiEnabled = false;

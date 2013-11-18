@@ -44,7 +44,7 @@
     <string name="not_connected">No network set up</string>
     <string name="networks">Network Connection for Voting</string>
     <string name="dialog_wait_wifi">Please wait&#8230;</string>
-    <string name="button_use_actual_ssid">Use network \" %1$s \"</string>
+    <string name="button_use_actual_ssid">Use network \"%1$s\"</string>
     <string name="button_scan_nfc">Scan NFC tag</string>
     <string name="advance_network_config">Advanced network configuration</string>
     <string name="write_nfc_tag">Write NFC tag</string>
@@ -118,6 +118,8 @@
     <string name="dialog_network_lost">The group connection has been lost. The vote will be interrupted.</string>
     <string name="dialog_network_not_found">Network not found</string>
     <string name="dialog_network_not_found_text">The network \"%1$s\" is not available, cannot connect.</string>
+    <string name="dialog_title_wrong_key">Wrong group password!</string>
+    <string name="dialog_wrong_key">You probably indicated a wrong group password! Please go back and try to reconnect to the group.</string>
 
     <!-- Help overlays -->
     <string name="overlay_close">Touch the screen to close this help</string>

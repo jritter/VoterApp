@@ -50,9 +50,13 @@ public class ResultAdapter extends BaseAdapter {
 		double participation = (double) numberCastVotes
 				/ (double) numberParticipants * 100;
 
-		List<Option> options = poll.getOptions();
+		//Copy the list of options and sort the copy in descendant number of votes received
+		List<Option> options = new ArrayList<Option>();
+		for(Option op : poll.getOptions()){
+			options.add(op);
+		}
 		Collections.sort(options, new OptionsComparator());
-
+		
 		DateFormat dateFormat = android.text.format.DateFormat
 				.getDateFormat(context.getApplicationContext());
 
