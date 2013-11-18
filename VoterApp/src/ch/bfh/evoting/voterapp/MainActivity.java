@@ -4,14 +4,19 @@ import java.util.concurrent.Callable;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiManager;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
@@ -28,7 +33,9 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.IdentificationWlanKeyDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
+import ch.bfh.evoting.voterapp.network.wifi.AdhocWifiManager;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.Utility;
 
@@ -38,12 +45,12 @@ import ch.bfh.evoting.voterapp.util.Utility;
  * @author Philémon von Bergen
  * 
  */
-public class MainActivity extends Activity implements OnClickListener {
+public class MainActivity extends Activity implements OnClickListener, IdentificationWlanKeyDialogFragment.NoticeDialogListener {
 
 	private NfcAdapter nfcAdapter;
 	private boolean nfcAvailable;
 	private PendingIntent pendingIntent;
-	
+
 	private BroadcastReceiver serviceStartedListener;
 
 	private Button btnSetupNetwork;
@@ -54,6 +61,19 @@ public class MainActivity extends Activity implements OnClickListener {
 	private String[] config;
 
 	private SharedPreferences preferences;
+
+	private WifiManager wifi;
+	private AdhocWifiManager adhoc;
+	private String identification;
+	private String ssid;
+	private boolean identificationMissing = false;
+	private boolean wlanKeyMissing = false;
+	
+	private int networkId;
+	
+	private IdentificationWlanKeyDialogFragment identificationWlanKeyDialogFragment;
+	public static final int DIALOG_FRAGMENT = 1;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +96,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		btnSetupNetwork.setOnClickListener(this);
 		btnPolls.setOnClickListener(this);
 		btnPollArchive.setOnClickListener(this);
-		
+
 		preferences = getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
 
 		// Is NFC available on this device?
@@ -98,7 +118,6 @@ public class MainActivity extends Activity implements OnClickListener {
 				nfcAvailable = false;
 			}
 
-			
 			rawMsgs = null;
 			rawMsgs = getIntent().getParcelableArrayExtra(
 					NfcAdapter.EXTRA_NDEF_MESSAGES);
@@ -112,7 +131,7 @@ public class MainActivity extends Activity implements OnClickListener {
 
 				// saving the values that we got
 				SharedPreferences.Editor editor = preferences.edit();
-				editor.putString("SSID", config[0]);
+				editor.putString("SSID", ssid);
 				editor.commit();
 
 				this.waitForNetworkInterface(new Callable<Void>() {
@@ -121,22 +140,24 @@ public class MainActivity extends Activity implements OnClickListener {
 						return joinNetwork();
 					}
 				});
-				
+
 			}
 		}
-		
+
 		serviceStartedListener = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
-				LocalBroadcastManager.getInstance(MainActivity.this).unregisterReceiver(this);
-				startActivity(new Intent(MainActivity.this, CheckElectorateActivity.class));
+				LocalBroadcastManager.getInstance(MainActivity.this)
+						.unregisterReceiver(this);
+				startActivity(new Intent(MainActivity.this,
+						CheckElectorateActivity.class));
 			}
 		};
 		LocalBroadcastManager.getInstance(this).registerReceiver(
 				serviceStartedListener,
-				new IntentFilter(BroadcastIntentTypes.networkConnectionSuccessful));
+				new IntentFilter(
+						BroadcastIntentTypes.networkConnectionSuccessful));
 
-		
 	}
 
 	@Override
@@ -238,23 +259,24 @@ public class MainActivity extends Activity implements OnClickListener {
 					broadcastIntent);
 
 			Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-			
+
 			Ndef ndef = Ndef.get(tag);
-			
-			if (ndef == null){
-				Toast.makeText(this, getResources().getText(R.string.nfc_tag_read_failed), Toast.LENGTH_LONG).show();
-			}
-			else {
+
+			if (ndef == null) {
+				Toast.makeText(this,
+						getResources().getText(R.string.nfc_tag_read_failed),
+						Toast.LENGTH_LONG).show();
+			} else {
 				NdefMessage msg;
 				msg = ndef.getCachedNdefMessage();
 				config = new String(msg.getRecords()[0].getPayload())
 						.split("\\|\\|");
-	
+
 				// saving the values that we got
 				SharedPreferences.Editor editor = preferences.edit();
-				editor.putString("SSID", config[0]);
+				editor.putString("SSID", ssid);
 				editor.commit();
-	
+
 				this.waitForNetworkInterface(new Callable<Void>() {
 					public Void call() {
 						return joinNetwork();
@@ -330,14 +352,15 @@ public class MainActivity extends Activity implements OnClickListener {
 				.setGroupName(config[1]);
 		AndroidApplication.getInstance().getNetworkInterface()
 				.setGroupPassword(config[2]);
-		
-		Log.d("Join Network", AndroidApplication.getInstance().getNetworkInterface().getGroupName());
-		Log.d("Join Network", AndroidApplication.getInstance().getNetworkInterface().getGroupPassword());
-		
+
+		Log.d("Join Network", AndroidApplication.getInstance()
+				.getNetworkInterface().getGroupName());
+		Log.d("Join Network", AndroidApplication.getInstance()
+				.getNetworkInterface().getGroupPassword());
+
 		// connect to the network
-		AndroidApplication.getInstance().connect(config,
-				MainActivity.this);
-		
+		connect(config, MainActivity.this);
+
 		return null;
 	}
 
@@ -345,6 +368,106 @@ public class MainActivity extends Activity implements OnClickListener {
 		NetworkDialogFragment ndf = NetworkDialogFragment.newInstance();
 		ndf.show(getFragmentManager(), "networkInfo");
 		return null;
+	}
+
+	/**
+	 * This method initiates the connect process
+	 * 
+	 * @param config
+	 *            an array containing the SSID and the password of the network
+	 * @param context
+	 *            android context
+	 */
+	public void connect(String[] config, Context context) {
+		
+		identificationMissing = false;
+		wlanKeyMissing = false;
+
+		wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+		adhoc = new AdhocWifiManager(wifi);
+		ssid = config[0];
+		
+		identification = preferences.getString("identification", "");
+		
+		if (identification.equals("")){
+			identificationMissing  = true;
+		}
+
+		boolean connectedSuccessful = false;
+		// check whether the network is already known, i.e. the password is
+		// already stored in the device
+		for (WifiConfiguration configuredNetwork : wifi.getConfiguredNetworks()) {
+			if (configuredNetwork.SSID.equals("\"".concat(ssid).concat(
+					"\""))) {
+				connectedSuccessful = true;
+				networkId = configuredNetwork.networkId;
+				break;
+			}
+		}
+		
+		if (!connectedSuccessful) {
+			for (ScanResult result : wifi.getScanResults()) {
+				if (result.SSID.equals(ssid)) {
+					connectedSuccessful = true;
+					
+					if (result.capabilities.contains("WPA")
+							|| result.capabilities.contains("WEP")) {
+						wlanKeyMissing = true;
+					} 
+					break;
+				}
+			}
+		}
+		
+		if (connectedSuccessful){
+		
+			if (identificationMissing || wlanKeyMissing){
+				identificationWlanKeyDialogFragment = new IdentificationWlanKeyDialogFragment(identificationMissing, wlanKeyMissing);
+				identificationWlanKeyDialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog);
+				identificationWlanKeyDialogFragment.show(getFragmentManager(), "identificationWlanKeyDialogFragment");
+			}
+			else {
+				adhoc.connectToNetwork(networkId, this);
+			}
+		}
+		else {
+			AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+			alertDialog.setTitle(R.string.dialog_network_not_found);
+			alertDialog.setButton(AlertDialog.BUTTON_POSITIVE,
+					getString(R.string.ok),
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+						}
+					});
+			alertDialog.setMessage(getString(
+					R.string.dialog_network_not_found_text, ssid));
+			alertDialog.show();
+		}
+	}
+
+	@Override
+	public void onDialogPositiveClick(DialogFragment dialog) {
+		if (identificationMissing){
+    		SharedPreferences.Editor editor = preferences.edit();
+			editor.putString("identification", ((IdentificationWlanKeyDialogFragment)dialog).getIdentification());
+			editor.commit();
+    	}
+    	
+    	if (wlanKeyMissing){
+    		adhoc.connectToNetwork(ssid, ((IdentificationWlanKeyDialogFragment)dialog).getWlanKey(), this);
+    	}
+    	else {
+    		adhoc.connectToNetwork(networkId, this);
+    	}
+
+    	dialog.dismiss();
+		
+	}
+
+	@Override
+	public void onDialogNegativeClick(DialogFragment dialog) {
+		identificationWlanKeyDialogFragment.dismiss();
 	}
 
 }

@@ -273,8 +273,4 @@ public class NetworkListFragment extends ListFragment implements OnItemClickList
 
 		mActivatedPosition = position;
 	}
-	
-	
-	
-
 }

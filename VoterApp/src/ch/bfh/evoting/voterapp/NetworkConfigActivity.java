@@ -1,16 +1,20 @@
 package ch.bfh.evoting.voterapp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
@@ -19,7 +23,6 @@ import android.nfc.tech.Ndef;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.provider.ContactsContract;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -32,8 +35,10 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.fragment.IdentificationWlanKeyDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkOptionsFragment;
+import ch.bfh.evoting.voterapp.network.wifi.AdhocWifiManager;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.Utility;
 
@@ -43,13 +48,11 @@ import ch.bfh.evoting.voterapp.util.Utility;
  * @author Philémon von Bergen
  * 
  */
-public class NetworkConfigActivity extends Activity implements TextWatcher {
+public class NetworkConfigActivity extends Activity implements TextWatcher, IdentificationWlanKeyDialogFragment.NoticeDialogListener {
 
 	private NfcAdapter nfcAdapter;
 	private boolean nfcAvailable;
 	private PendingIntent pendingIntent;
-
-	private WifiManager wifi;
 
 	private SharedPreferences preferences;
 	private EditText etIdentification;
@@ -57,10 +60,25 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 
 	private boolean active;
 	private Poll poll;
-	
+
 	private String[] config;
 
 	private AsyncTask<Object, Object, Object> rescanWifiTask;
+
+	private WifiManager wifi;
+	private AdhocWifiManager adhoc;
+	
+	private AlertDialog dialogNoIdentificationSet;
+	
+	private String identification;
+	private String ssid;
+	private boolean identificationMissing = false;
+	private boolean wlanKeyMissing = false;
+	
+	private int networkId;
+	
+	private IdentificationWlanKeyDialogFragment identificationWlanKeyDialogFragment;
+	public static final int DIALOG_FRAGMENT = 1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -168,13 +186,13 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 		preferences = getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
 		String identification = preferences.getString("identification", "");
 
-//		if (identification.equals("")) {
-//			identification = readOwnerName();
-//			// saving the identification field
-//			SharedPreferences.Editor editor = preferences.edit();
-//			editor.putString("identification", identification);
-//			editor.commit();
-//		}
+		// if (identification.equals("")) {
+		// identification = readOwnerName();
+		// // saving the identification field
+		// SharedPreferences.Editor editor = preferences.edit();
+		// editor.putString("identification", identification);
+		// editor.commit();
+		// }
 
 		etIdentification = (EditText) findViewById(R.id.edittext_identification);
 		etIdentification.setText(identification);
@@ -259,14 +277,15 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 			LocalBroadcastManager.getInstance(this).sendBroadcast(
 					broadcastIntent);
 		}
-		
+
 		Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
 		Ndef ndef = Ndef.get(tag);
 
-		if (ndef == null){
-			Toast.makeText(this, getResources().getText(R.string.nfc_tag_read_failed), Toast.LENGTH_LONG).show();
-		}
-		else {
+		if (ndef == null) {
+			Toast.makeText(this,
+					getResources().getText(R.string.nfc_tag_read_failed),
+					Toast.LENGTH_LONG).show();
+		} else {
 			NdefMessage msg;
 			msg = ndef.getCachedNdefMessage();
 			config = new String(msg.getRecords()[0].getPayload())
@@ -274,12 +293,14 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 
 			// saving the values that we got
 			SharedPreferences.Editor editor = preferences.edit();
-			editor.putString("SSID", config[0]);
+			editor.putString("SSID", ssid);
 			editor.commit();
-
-			AndroidApplication.getInstance().connect(config, this);
+			
+			if (checkIdentification()){
+				connect(config, this);
+			}
 		}
-		
+
 		super.onNewIntent(intent);
 	}
 
@@ -342,7 +363,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 			nfcAdapter.enableForegroundDispatch(this, pendingIntent,
 					Utility.getNFCIntentFilters(), null);
 		}
-		
+
 		super.onResume();
 	}
 
@@ -413,26 +434,26 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 
 	}
 
-//	Commented out in order to be able to remove the permissions
-//	/**
-//	 * This method is used to extract the name of the device owner
-//	 * 
-//	 * @return the name of the device owner
-//	 */
-//	private String readOwnerName() {
-//
-//		Cursor c = getContentResolver().query(
-//				ContactsContract.Profile.CONTENT_URI, null, null, null, null);
-//		if (c.getCount() == 0) {
-//			return "";
-//		}
-//		c.moveToFirst();
-//		String displayName = c.getString(c.getColumnIndex("display_name"));
-//		c.close();
-//
-//		return displayName;
-//
-//	}
+	// Commented out in order to be able to remove the permissions
+	// /**
+	// * This method is used to extract the name of the device owner
+	// *
+	// * @return the name of the device owner
+	// */
+	// private String readOwnerName() {
+	//
+	// Cursor c = getContentResolver().query(
+	// ContactsContract.Profile.CONTENT_URI, null, null, null, null);
+	// if (c.getCount() == 0) {
+	// return "";
+	// }
+	// c.moveToFirst();
+	// String displayName = c.getString(c.getColumnIndex("display_name"));
+	// c.close();
+	//
+	// return displayName;
+	//
+	// }
 
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		if (requestCode == 0) {
@@ -450,8 +471,10 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 				AndroidApplication.getInstance().getNetworkInterface()
 						.setGroupPassword(config[2]);
 
+				if (checkIdentification()){
 				// connect to the network
-				AndroidApplication.getInstance().connect(config, this);
+				connect(config, this);
+				}
 
 			} else if (resultCode == RESULT_CANCELED) {
 				// Handle cancel
@@ -463,6 +486,145 @@ public class NetworkConfigActivity extends Activity implements TextWatcher {
 		Log.d("NetworkConfigActivity", "identification is "
 				+ this.etIdentification.toString());
 		return this.etIdentification.getText().toString();
+	}
+
+	/**
+	 * This method initiates the connect process
+	 * 
+	 * @param config
+	 *            an array containing the SSID and the password of the network
+	 * @param context
+	 *            android context
+	 */
+	public void connect(String[] config, Context context) {
+		
+		identificationMissing = false;
+		wlanKeyMissing = false;
+
+		wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+		adhoc = new AdhocWifiManager(wifi);
+		ssid = config[0];
+		
+		identification = preferences.getString("identification", "");
+		
+		if (identification.equals("")){
+			identificationMissing  = true;
+		}
+
+		boolean connectedSuccessful = false;
+		
+		// check whether the network is already known, i.e. the password is
+		// already stored in the device
+		for (WifiConfiguration configuredNetwork : wifi.getConfiguredNetworks()) {
+			if (configuredNetwork.SSID.equals("\"".concat(ssid).concat(
+					"\""))) {
+				connectedSuccessful = true;
+				networkId = configuredNetwork.networkId;
+				break;
+			}
+		}
+		
+		if (!connectedSuccessful) {
+			for (ScanResult result : wifi.getScanResults()) {
+				if (result.SSID.equals(ssid)) {
+					connectedSuccessful = true;
+					
+					if (result.capabilities.contains("WPA")
+							|| result.capabilities.contains("WEP")) {
+						wlanKeyMissing = true;
+					} 
+					break;
+				}
+			}
+		}
+		
+		if (connectedSuccessful){
+		
+			if (identificationMissing || wlanKeyMissing){
+				identificationWlanKeyDialogFragment = new IdentificationWlanKeyDialogFragment(identificationMissing, wlanKeyMissing);
+				identificationWlanKeyDialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog);
+				identificationWlanKeyDialogFragment.show(getFragmentManager(), "identificationWlanKeyDialogFragment");
+			}
+			else {
+				adhoc.connectToNetwork(networkId, this);
+			}
+		}
+		else {
+			AlertDialog alertDialog = new AlertDialog.Builder(context).create();
+			alertDialog.setTitle(R.string.dialog_network_not_found);
+			alertDialog.setButton(AlertDialog.BUTTON_POSITIVE,
+					getString(R.string.ok),
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int which) {
+							dialog.dismiss();
+						}
+					});
+			alertDialog.setMessage(getString(
+					R.string.dialog_network_not_found_text, ssid));
+			alertDialog.show();
+		}
+	}
+
+	@Override
+	public void onDialogPositiveClick(DialogFragment dialog) {
+		if (identificationMissing){
+    		SharedPreferences.Editor editor = preferences.edit();
+			editor.putString("identification", ((IdentificationWlanKeyDialogFragment)dialog).getIdentification());
+			editor.commit();
+    	}
+    	
+    	if (wlanKeyMissing){
+    		adhoc.connectToNetwork(ssid, ((IdentificationWlanKeyDialogFragment)dialog).getWlanKey(), this);
+    	}
+    	else {
+    		adhoc.connectToNetwork(networkId, this);
+    	}
+
+    	dialog.dismiss();
+	}
+
+	@Override
+	public void onDialogNegativeClick(DialogFragment dialog) {
+		dialog.dismiss();
+	}
+	
+	/**
+	 * Controls if identification is empty and shows a dialog
+	 * @return true if identification was filled, false otherwise
+	 */
+	private boolean checkIdentification() {
+		if(this.getIdentification().equals("")){
+			//show dialog
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+			// Add the buttons
+			builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialogNoIdentificationSet.dismiss();
+					return;
+				}
+			});
+
+			builder.setTitle(R.string.dialog_title_no_identification);
+			builder.setMessage(R.string.dialog_no_identification);
+
+
+			dialogNoIdentificationSet = builder.create();
+			dialogNoIdentificationSet.setOnShowListener(new DialogInterface.OnShowListener() {
+				@Override
+				public void onShow(DialogInterface dialog) {
+					Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+					dialogNoIdentificationSet.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
+							R.drawable.selectable_background_votebartheme);
+				}
+			});
+
+			// Create the AlertDialog
+			dialogNoIdentificationSet.show();
+
+			return false;
+		}
+		return true;
 	}
 
 }

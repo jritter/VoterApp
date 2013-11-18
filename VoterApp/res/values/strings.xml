@@ -120,7 +120,9 @@
     <string name="dialog_network_not_found_text">The network \"%1$s\" is not available, cannot connect.</string>
     <string name="dialog_title_wrong_key">Wrong group password!</string>
     <string name="dialog_wrong_key">You probably indicated a wrong group password! Please go back and try to reconnect to the group.</string>
-
+    <string name="dialog_title_connect_failed">Connect failed</string>
+    <string name="dialog_content_connect_failed">The attempt to connect to the network failed.</string>
+    
     <!-- Help overlays -->
     <string name="overlay_close">Touch the screen to close this help</string>
     <string name="overlay_identification">Put your identification here&#8230;</string>
@@ -157,6 +159,7 @@
     <string name="hint_network_wlan_key">WLAN Key</string>
     <string name="hint_enter_question">Enter the question of the vote here</string>
     <string name="hint_enter_option">Enter the option here</string>
+    <string name="hint_identification">Identification</string>
 
     <!-- Image descriptions -->
     <string name="description_participant_included">Participants included</string>
