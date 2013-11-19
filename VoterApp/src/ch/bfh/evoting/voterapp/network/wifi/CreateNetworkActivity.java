@@ -22,6 +22,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.R;
+import ch.bfh.evoting.voterapp.util.Utility;
 
 /**
  * Activity which provides functionality to set up a new Wifi access point
@@ -38,6 +39,7 @@ TextWatcher {
 
 	private EditText txtNetworkName;
 	private EditText txtNetworkPIN;
+	private AlertDialog dialogUseAP;
 
 	/*
 	 * (non-Javadoc)
@@ -75,9 +77,9 @@ TextWatcher {
 		// asking if we should use the already running access point
 		if (wifiapman.isWifiAPEnabled(wifiman)) {
 			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle("InstaCircle - WiFi AP");
-			builder.setMessage("The Wifi AP already enabled. Use this connection?");
-			builder.setPositiveButton("Yes",
+			builder.setTitle(getResources().getString(R.string.dialog_title_access_point));
+			builder.setMessage(getResources().getString(R.string.dialog_content_access_point));
+			builder.setPositiveButton(getResources().getString(R.string.yes),
 					new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 
@@ -86,14 +88,26 @@ TextWatcher {
 					CreateNetworkActivity.this.finish();
 				}
 			});
-			builder.setNegativeButton("No",
+			builder.setNegativeButton(getResources().getString(R.string.no),
 					new DialogInterface.OnClickListener() {
 				public void onClick(DialogInterface dialog, int which) {
 					return;
 				}
 			});
-			AlertDialog dialog = builder.create();
-			dialog.show();
+			dialogUseAP = builder.create();
+			
+			dialogUseAP.setOnShowListener(new DialogInterface.OnShowListener() {
+				@Override
+				public void onShow(DialogInterface dialog) {
+					Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+					dialogUseAP.getButton(AlertDialog.BUTTON_NEGATIVE).setBackgroundResource(
+							R.drawable.selectable_background_votebartheme);
+					dialogUseAP.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundResource(
+							R.drawable.selectable_background_votebartheme);
+				}
+			});
+			
+			dialogUseAP.show();
 		}
 
 		// enable the create button only if the key has a sufficient length

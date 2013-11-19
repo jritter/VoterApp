@@ -6,10 +6,10 @@ package ch.bfh.evoting.voterapp.fragment;
 
 import org.achartengine.GraphicalView;
 
+import ch.bfh.evoting.voterapp.DisplayResultActivity;
 import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.util.PieChartView;
-
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -51,9 +51,10 @@ public class ResultChartFragment extends Fragment {
 
 			@Override
 			public void onClick(View v) {
-				ResultChartDialogFragment.newInstance().show(getFragmentManager(), "resultChartDialog");
+				if (getFragmentManager().findFragmentByTag("resultChartDialog") == null){
+					ResultChartDialogFragment.newInstance().show(getFragmentManager(), "resultChartDialog");
+				}
 			}
-			
 		});
 		
 		layoutGraph.addView(chartView);

@@ -19,6 +19,7 @@ import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
 import ch.bfh.evoting.voterapp.AndroidApplication;
+import ch.bfh.evoting.voterapp.R;
 
 /**
  * Handle enabling and disabling of WiFi AP
@@ -371,8 +372,7 @@ public class WifiAPManager {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			if (mode) {
-				d.setTitle("Turning WiFi AP " + (mode ? "on" : "off") + "...");
-				d.setMessage("...please wait a moment.");
+				d.setMessage(d.getContext().getResources().getString(R.string.subtitle_check_electorate));
 				d.show();
 			}
 		}

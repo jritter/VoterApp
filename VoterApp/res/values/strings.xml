@@ -123,6 +123,8 @@
     <string name="dialog_wrong_key_salt">You probably indicated a wrong group password! Please check in the network info (info button in the top bar) if the three last chars of the password match the ones declared by the administrator of the vote. If they do not match, go back and try to reconnect to the group. If they match, there is probably an attacker on the network.</string>
     <string name="dialog_title_connect_failed">Connect failed</string>
     <string name="dialog_content_connect_failed">The attempt to connect to the network failed.</string>
+    <string name="dialog_title_access_point">WiFi Access Point</string>
+    <string name="dialog_content_access_point">The Wifi Access Point is already enabled. Use this connection?</string>
     
     <!-- Help overlays -->
     <string name="overlay_close">Touch the screen to close this help</string>
