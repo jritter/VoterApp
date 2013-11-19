@@ -3,10 +3,8 @@
  */
 package ch.bfh.evoting.voterapp.fragment;
 
-
 import org.achartengine.GraphicalView;
 
-import ch.bfh.evoting.voterapp.DisplayResultActivity;
 import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.util.PieChartView;
