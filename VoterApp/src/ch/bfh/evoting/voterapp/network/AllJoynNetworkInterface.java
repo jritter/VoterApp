@@ -38,7 +38,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 		super(context);
 		HandlerThread busThread = new HandlerThread("BusHandler");
 		busThread.start();
-		mBusHandler = new BusHandler(busThread.getLooper(), AndroidApplication.getInstance().getApplicationContext());
+		mBusHandler = new BusHandler(busThread.getLooper(), context);
 
 		// Listening for arriving messages
 		LocalBroadcastManager.getInstance(context).registerReceiver(mMessageReceiver, new IntentFilter("messageArrived"));
@@ -215,7 +215,8 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String groupName = intent.getStringExtra("groupName");
-			if(groupName.equals(groupName)){
+			
+			if(AllJoynNetworkInterface.this.groupName!=null && groupName !=null && AllJoynNetworkInterface.this.groupName.equals(groupName)){
 				groupName = null;
 				Intent i  = new Intent(BroadcastIntentTypes.networkGroupDestroyedEvent);
 				LocalBroadcastManager.getInstance(context).sendBroadcast(i);
