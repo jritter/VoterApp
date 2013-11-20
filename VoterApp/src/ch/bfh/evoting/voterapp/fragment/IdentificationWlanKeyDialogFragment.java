@@ -60,7 +60,10 @@ OnClickListener, TextWatcher {
 
 
 	/**
-	 * @param showNetworkKeyField
+	 * @param showIdentificationField
+	 * 			  this boolean defines whether the identification field should be
+	 *            displayed or not
+	 * @param showWlanKeyField
 	 *            this boolean defines whether the network key field should be
 	 *            displayed or not
 	 */

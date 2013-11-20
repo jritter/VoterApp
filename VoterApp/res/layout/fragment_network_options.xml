@@ -19,20 +19,20 @@
             android:text="@string/capture_qrcode" />
 
         <Button
-            android:id="@+id/button_use_actual_ssid"
-            style="@style/MainButtons"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="80dip"
-            android:text="@string/button_use_actual_ssid" />
-
-        <Button
             android:id="@+id/button_scan_nfc"
             style="@style/MainButtons"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:minHeight="80dip"
             android:text="@string/button_scan_nfc" />
+        
+        <Button
+            android:id="@+id/button_use_actual_ssid"
+            style="@style/MainButtons"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="80dip"
+            android:text="@string/button_use_actual_ssid" />
 
         <Button
             android:id="@+id/button_advanced_network_config"

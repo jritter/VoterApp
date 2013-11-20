@@ -113,17 +113,22 @@ public class AndroidApplication extends Application {
 	 * Initialize the Serialization method and the Network Component to use
 	 */
 	private void initializeInstance() {
-//		new AsyncTask<Object, Object, Object>() {
-//
-//			@Override
-//			protected Object doInBackground(Object... params) {
+
+		//initialize ICE for AllJoyn
+		//This must be done on the main thread
+        org.alljoyn.bus.alljoyn.DaemonInit.PrepareDaemon(this); 
+
+		new AsyncTask<Object, Object, Object>() {
+
+			@Override
+			protected Object doInBackground(Object... params) {
 
 				su = new SerializationUtil(new JavaSerialization());
 				ni = new AllJoynNetworkInterface(AndroidApplication.this.getApplicationContext());///* new InstaCircleNetworkInterface(this.getApplicationContext());*/new SimulatedNetworkInterface(AndroidApplication.this.getApplicationContext());
 
-//				return null;
-//			}
-//		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+				return null;
+			}
+		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
 	}
 
