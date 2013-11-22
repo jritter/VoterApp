@@ -113,7 +113,6 @@
     <string name="toast_network_not_found_text">Wi-Fi network \"%1$s\" not available.</string>
     <string name="toast_content_connect_failed">Connection to Wi-Fi network failed.</string>
     <string name="toast_nfc_write_success">NFC tag written successfully</string>
-        
     <string name="dialog_title_attack_detected">Attack detected</string>
     <string name="dialog_attack_impersonalization">An attack has been detected! Someone is trying to impersonate a group member in order to be able to vote in his name. We strongly recommend to interrupt the vote period and restart.</string>
     <string name="dialog_attack_different_senders">An attack has been detected! Someone has sent a message on behalf of another member of the group. We strongly recommand to interrupt the vote period and restart.</string>
