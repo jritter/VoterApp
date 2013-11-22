@@ -21,10 +21,10 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import ch.bfh.evoting.voterapp.CreateNetworkActivity;
 import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.adapters.NetworkArrayAdapter;
 import ch.bfh.evoting.voterapp.network.wifi.AdhocWifiManager;
-import ch.bfh.evoting.voterapp.network.wifi.CreateNetworkActivity;
 
 /**
  * This class implements the fragment which lists all the messages of the
@@ -115,7 +115,7 @@ public class NetworkListFragment extends ListFragment implements OnItemClickList
 		setListAdapter(adapter);
 		
 		if (!hideCreateNetwork){
-			lastItem.put("SSID", "Create new network...");
+			lastItem.put("SSID", getString(R.string.create_new_network));
 			adapter.add(lastItem);
 		}
 		lvNetworks.setAdapter(adapter);

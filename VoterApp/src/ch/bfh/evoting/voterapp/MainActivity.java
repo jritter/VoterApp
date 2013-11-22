@@ -431,18 +431,8 @@ public class MainActivity extends Activity implements OnClickListener, Identific
 			}
 		}
 		else {
-			AlertDialog alertDialog = new AlertDialog.Builder(context).create();
-			alertDialog.setTitle(R.string.dialog_network_not_found);
-			alertDialog.setButton(AlertDialog.BUTTON_POSITIVE,
-					getString(R.string.ok),
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();
-						}
-					});
-			alertDialog.setMessage(getString(
-					R.string.dialog_network_not_found_text, ssid));
-			alertDialog.show();
+			for(int i=0; i<2; i++)
+				Toast.makeText(this, getString(R.string.dialog_network_not_found_text, ssid), Toast.LENGTH_SHORT).show();
 		}
 	}
 

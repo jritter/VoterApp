@@ -98,11 +98,11 @@ public class NetworkArrayAdapter extends ArrayAdapter<HashMap<String, Object>> {
 				if (capabilities == null) {
 					description.setText("");
 				} else if (capabilities.contains("WPA")) {
-					description.setText("WPA secured network");
+					description.setText(R.string.wpa_secure);
 				} else if (capabilities.contains("WEP")) {
-					description.setText("WEP secured network");
+					description.setText(R.string.wep_secure);
 				} else {
-					description.setText("unsecure open network");
+					description.setText(R.string.unsecure);
 				}
 			}
 			content.setText((String) item.get("SSID"));

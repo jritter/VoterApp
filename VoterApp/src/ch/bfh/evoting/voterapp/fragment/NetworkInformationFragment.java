@@ -33,6 +33,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
@@ -293,7 +294,7 @@ public class NetworkInformationFragment extends Fragment implements
 				writeNfcEnabled = true;
 				writeNfcTagDialog = new ProgressDialog(getActivity());
 				writeNfcTagDialog.setMessage(getResources().getString(
-						R.string.tap_nfc_tag));
+						R.string.put_nfc));
 				writeNfcTagDialog.setCancelable(false);
 				writeNfcTagDialog.setButton(DialogInterface.BUTTON_NEGATIVE,
 						"Cancel", new DialogInterface.OnClickListener() {
@@ -434,8 +435,8 @@ public class NetworkInformationFragment extends Fragment implements
 		} catch (Exception e) {
 			return false;
 		}
-		alertDialog.setTitle(R.string.nfc_success);
-		alertDialog.setMessage(getResources().getString(R.string.nfc_write_success));
+//		alertDialog.setTitle(R.string.nfc_success);
+//		alertDialog.setMessage(getResources().getString(R.string.nfc_write_success));
 		
 		alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
 			@Override
@@ -447,7 +448,9 @@ public class NetworkInformationFragment extends Fragment implements
 			}
 		});
 		
-		alertDialog.show();
+		for(int i=0; i<2; i++)
+			Toast.makeText(this.getActivity(), R.string.nfc_write_success, Toast.LENGTH_SHORT).show();
+//		alertDialog.show();
 		return true;
 	}
 

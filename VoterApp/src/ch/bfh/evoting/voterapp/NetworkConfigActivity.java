@@ -550,18 +550,8 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, Iden
 			}
 		}
 		else {
-			AlertDialog alertDialog = new AlertDialog.Builder(context).create();
-			alertDialog.setTitle(R.string.dialog_network_not_found);
-			alertDialog.setButton(AlertDialog.BUTTON_POSITIVE,
-					getString(R.string.ok),
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();
-						}
-					});
-			alertDialog.setMessage(getString(
-					R.string.dialog_network_not_found_text, ssid));
-			alertDialog.show();
+			for(int i=0; i<2; i++)
+				Toast.makeText(this, getString(R.string.dialog_network_not_found_text, ssid), Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -594,33 +584,9 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, Iden
 	 */
 	private boolean checkIdentification() {
 		if(this.getIdentification().equals("")){
-			//show dialog
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-			// Add the buttons
-			builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					dialogNoIdentificationSet.dismiss();
-					return;
-				}
-			});
-
-			builder.setTitle(R.string.dialog_title_no_identification);
-			builder.setMessage(R.string.dialog_no_identification);
-
-
-			dialogNoIdentificationSet = builder.create();
-			dialogNoIdentificationSet.setOnShowListener(new DialogInterface.OnShowListener() {
-				@Override
-				public void onShow(DialogInterface dialog) {
-					Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
-					dialogNoIdentificationSet.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
-							R.drawable.selectable_background_votebartheme);
-				}
-			});
-
-			// Create the AlertDialog
-			dialogNoIdentificationSet.show();
+					
+			for(int i=0; i<2; i++)
+				Toast.makeText(this, R.string.dialog_no_identification, Toast.LENGTH_SHORT).show();
 
 			return false;
 		}

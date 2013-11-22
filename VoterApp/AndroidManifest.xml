@@ -132,7 +132,7 @@
         </activity>
         <!-- android:noHistory="true" > -->
         <activity
-            android:name="ch.bfh.evoting.voterapp.network.wifi.CreateNetworkActivity"
+            android:name="ch.bfh.evoting.voterapp.CreateNetworkActivity"
             android:label="@string/title_activity_create_network"
             android:parentActivityName="ch.bfh.evoting.voterapp.NetworkConfigActivity" >
             <meta-data

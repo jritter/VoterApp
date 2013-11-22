@@ -1,5 +1,5 @@
 
-package ch.bfh.evoting.voterapp.network.wifi;
+package ch.bfh.evoting.voterapp;
 
 import java.util.UUID;
 
@@ -20,8 +20,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.R;
+import ch.bfh.evoting.voterapp.network.wifi.WifiAPManager;
 import ch.bfh.evoting.voterapp.util.Utility;
 
 /**

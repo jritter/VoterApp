@@ -7,16 +7,6 @@
     android:orientation="vertical" >
 
     <TextView
-        android:id="@+id/textview_check_electorate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin"
-        android:gravity="center_vertical|center_horizontal"
-        android:minHeight="70dp"
-        android:text="@string/create_new_network"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <TextView
         android:id="@+id/textview_create_network"
         style="?android:attr/listSeparatorTextViewStyle"
         android:layout_width="match_parent"

@@ -359,11 +359,8 @@ public class AndroidApplication extends Application {
 				});
 
 				builder.setTitle(R.string.dialog_title_wrong_key);
-				if(intent.getStringExtra("type").equals("password")){
-					builder.setMessage(R.string.dialog_wrong_key_pwd);
-				} else {
-					builder.setMessage(R.string.dialog_wrong_key_salt);
-				}
+				builder.setMessage(R.string.dialog_wrong_key_pwd);
+				
 				// Create the AlertDialog
 				dialog = builder.create(); 
 				dialog.show();
