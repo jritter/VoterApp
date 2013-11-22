@@ -1,13 +1,11 @@
 package ch.bfh.evoting.voterapp;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -67,9 +65,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, Iden
 
 	private WifiManager wifi;
 	private AdhocWifiManager adhoc;
-	
-	private AlertDialog dialogNoIdentificationSet;
-	
+		
 	private String identification;
 	private String ssid;
 	private boolean identificationMissing = false;

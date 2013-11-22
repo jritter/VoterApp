@@ -6,7 +6,6 @@ import java.net.UnknownHostException;
 import java.util.List;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -23,7 +22,6 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.WindowManager.BadTokenException;
 import android.widget.Toast;
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.R;
@@ -44,7 +42,6 @@ public class AdhocWifiManager {
 	private SharedPreferences preferences;
 	private SharedPreferences.Editor editor;
 	private String SSID;
-	private AlertDialog dialogConnectFailed;
 
 	/**
 	 * Instatiates a new instance

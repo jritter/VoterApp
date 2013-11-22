@@ -6,16 +6,13 @@ import ch.bfh.evoting.voterapp.NetworkConfigActivity;
 import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.network.wifi.AdhocWifiManager;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
-import ch.bfh.evoting.voterapp.util.Utility;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -45,7 +42,6 @@ public class NetworkOptionsFragment extends Fragment {
 	private NetworkConfigActivity activity;
 
 	private ConnectNetworkDialogFragment dialogFragment;
-	private AlertDialog dialogNoIdentificationSet = null;
 	private BroadcastReceiver ssidChangeReceiver;
 
 	@Override
