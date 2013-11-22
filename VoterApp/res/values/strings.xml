@@ -108,13 +108,11 @@
     <string name="toast_option_empty">Please specify a text for the option.</string>
     <string name="toast_not_enough_participant_selected">Please select at least two participants.</string>
     <string name="toast_not_everybody_accepted">Not everybody has accepted the vote. Please wait for them to accept it or exclude the concerned people from the electorate.</string>
-    <string name="nfc_tag_read_failed">Unable to read NFC tag</string>
-    
-    <!-- TODO toast -->
-    <string name="dialog_no_identification">Please specify your identification.</string>
-    <string name="dialog_network_not_found_text">Wi-Fi network \"%1$s\" not available.</string>
-    <string name="dialog_content_connect_failed">Connection to Wi-Fi network failed.</string>
-    <string name="nfc_write_success">NFC tag written successfully</string>
+    <string name="toast_nfc_tag_read_failed">Unable to read NFC tag</string>
+    <string name="toast_no_identification">Please specify your identification.</string>
+    <string name="toast_network_not_found_text">Wi-Fi network \"%1$s\" not available.</string>
+    <string name="toast_content_connect_failed">Connection to Wi-Fi network failed.</string>
+    <string name="toast_nfc_write_success">NFC tag written successfully</string>
         
     <string name="dialog_title_attack_detected">Attack detected</string>
     <string name="dialog_attack_impersonalization">An attack has been detected! Someone is trying to impersonate a group member in order to be able to vote in his name. We strongly recommend to interrupt the vote period and restart.</string>
@@ -126,11 +124,11 @@
     <string name="dialog_network_lost">The group connection has been lost. You will not be able to vote.</string>
     <string name="dialog_title_wrong_key">Wrong group password</string>
     <string name="dialog_wrong_key_pwd">You probably entered a wrong group password. Please double check the password with another group member. If they do not match, go back and try to reconnect to the group. If they match, there is probably an attacker on the network</string>
-    <string name="nfc_write_failed">NFC tag write failed</string>
-    <string name="nfc_readonly">This NFC tag is read only.</string>
-    <string name="nfc_not_enough_space">This NFC tag does not have enough free space.</string>
-    <string name="nfc_unable_format_ndef">Unable to format NFC tag to NDEF.</string>
-    <string name="nfc_no_ndef_support">This NFC tag does not appear to support NDEF format.</string>
+    <string name="dialog_nfc_write_failed">NFC tag write failed</string>
+    <string name="dialog_nfc_readonly">This NFC tag is read only.</string>
+    <string name="dialog_nfc_not_enough_space">This NFC tag does not have enough free space.</string>
+    <string name="dialog_nfc_unable_format_ndef">Unable to format NFC tag to NDEF.</string>
+    <string name="dialog_nfc_no_ndef_support">This NFC tag does not appear to support NDEF format.</string>
     <string name="dialog_title_result_chart">Result chart</string>
 
     <!-- Help overlays -->

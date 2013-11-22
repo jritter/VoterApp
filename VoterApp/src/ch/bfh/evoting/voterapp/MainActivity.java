@@ -264,7 +264,7 @@ public class MainActivity extends Activity implements OnClickListener, Identific
 
 			if (ndef == null) {
 				Toast.makeText(this,
-						getResources().getText(R.string.nfc_tag_read_failed),
+						getResources().getText(R.string.toast_nfc_tag_read_failed),
 						Toast.LENGTH_LONG).show();
 			} else {
 				NdefMessage msg;
@@ -432,7 +432,7 @@ public class MainActivity extends Activity implements OnClickListener, Identific
 		}
 		else {
 			for(int i=0; i<2; i++)
-				Toast.makeText(this, getString(R.string.dialog_network_not_found_text, ssid), Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, getString(R.string.toast_network_not_found_text, ssid), Toast.LENGTH_SHORT).show();
 		}
 	}
 

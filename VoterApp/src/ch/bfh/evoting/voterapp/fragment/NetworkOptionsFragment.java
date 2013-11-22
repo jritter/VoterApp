@@ -250,33 +250,9 @@ public class NetworkOptionsFragment extends Fragment {
 	 */
 	private boolean checkIdentification() {
 		if(((NetworkConfigActivity)this.getActivity()).getIdentification().equals("")){
-			//show dialog
-			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-
-			// Add the buttons
-			builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog, int id) {
-					dialogNoIdentificationSet.dismiss();
-					return;
-				}
-			});
-
-			builder.setTitle(R.string.dialog_title_no_identification);
-			builder.setMessage(R.string.dialog_no_identification);
-
-
-			dialogNoIdentificationSet = builder.create();
-			dialogNoIdentificationSet.setOnShowListener(new DialogInterface.OnShowListener() {
-				@Override
-				public void onShow(DialogInterface dialog) {
-					Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
-					dialogNoIdentificationSet.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
-							R.drawable.selectable_background_votebartheme);
-				}
-			});
-
-			// Create the AlertDialog
-			dialogNoIdentificationSet.show();
+			
+			for(int i=0; i<2; i++)
+				Toast.makeText(this.getActivity(), R.string.toast_no_identification, Toast.LENGTH_SHORT).show();
 
 			return false;
 		}

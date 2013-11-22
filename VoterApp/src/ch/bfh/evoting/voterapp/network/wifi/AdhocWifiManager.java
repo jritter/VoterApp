@@ -473,37 +473,9 @@ public class AdhocWifiManager {
 					} catch(Throwable t){
 						//do nothing;
 					}
-					// display a dialog if the connection was not successful
-					AlertDialog.Builder builder = new AlertDialog.Builder(
-							context);
-					builder.setTitle(context.getResources().getString(R.string.dialog_title_connect_failed));
-					builder.setMessage(context.getResources().getString(R.string.dialog_content_connect_failed));
-					builder.setPositiveButton(context.getResources().getString(R.string.ok),
-							new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog,
-								int which) {
-							dialog.dismiss();
-							return;
-						}
-					});
-					dialogConnectFailed = builder.create();
 					
-					dialogConnectFailed.setOnShowListener(new DialogInterface.OnShowListener() {
-						@Override
-						public void onShow(DialogInterface dialog) {
-							Utility.setTextColor(dialog, context.getResources().getColor(R.color.theme_color));
-							dialogConnectFailed.getButton(AlertDialog.BUTTON_NEGATIVE).setBackgroundResource(
-									R.drawable.selectable_background_votebartheme);
-							dialogConnectFailed.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundResource(
-									R.drawable.selectable_background_votebartheme);
-						}
-					});
-					
-					try{
-						dialogConnectFailed.show();
-					} catch (BadTokenException e){
-						// other activity has already been started
-					}
+					for(int i=0; i<2; i++)
+						Toast.makeText(AndroidApplication.getInstance(), R.string.toast_content_connect_failed, Toast.LENGTH_SHORT).show();
 				}
 			} else {
 				d.dismiss();

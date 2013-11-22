@@ -383,7 +383,7 @@ public class NetworkInformationFragment extends Fragment implements
 	public boolean writeTag(Tag tag, NdefMessage message) {
 
 		alertDialog = new AlertDialog.Builder(getActivity()).create();
-		alertDialog.setTitle(getResources().getString(R.string.nfc_write_failed));
+		alertDialog.setTitle(getResources().getString(R.string.dialog_nfc_write_failed));
 		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getResources().getString(R.string.ok),
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
@@ -396,7 +396,7 @@ public class NetworkInformationFragment extends Fragment implements
 			if (ndef != null) {
 				ndef.connect();
 				if (!ndef.isWritable()) {
-					alertDialog.setMessage(getResources().getString(R.string.nfc_readonly));
+					alertDialog.setMessage(getResources().getString(R.string.dialog_nfc_readonly));
 					alertDialog.show();
 					return false;
 				}
@@ -405,7 +405,7 @@ public class NetworkInformationFragment extends Fragment implements
 				int size = message.toByteArray().length;
 				if (ndef.getMaxSize() < size) {
 					alertDialog
-							.setMessage(getResources().getString(R.string.nfc_not_enough_space));
+							.setMessage(getResources().getString(R.string.dialog_nfc_not_enough_space));
 					alertDialog.show();
 					return false;
 				}
@@ -420,14 +420,14 @@ public class NetworkInformationFragment extends Fragment implements
 						format.connect();
 						format.format(message);
 					} catch (IOException e) {
-						alertDialog.setMessage(getResources().getString(R.string.nfc_unable_format_ndef));
+						alertDialog.setMessage(getResources().getString(R.string.dialog_nfc_unable_format_ndef));
 						alertDialog.show();
 						return false;
 
 					}
 				} else {
 					alertDialog
-							.setMessage(getResources().getString(R.string.nfc_no_ndef_support));
+							.setMessage(getResources().getString(R.string.dialog_nfc_no_ndef_support));
 					alertDialog.show();
 					return false;
 				}
@@ -449,7 +449,7 @@ public class NetworkInformationFragment extends Fragment implements
 		});
 		
 		for(int i=0; i<2; i++)
-			Toast.makeText(this.getActivity(), R.string.nfc_write_success, Toast.LENGTH_SHORT).show();
+			Toast.makeText(this.getActivity(), R.string.toast_nfc_write_success, Toast.LENGTH_SHORT).show();
 //		alertDialog.show();
 		return true;
 	}

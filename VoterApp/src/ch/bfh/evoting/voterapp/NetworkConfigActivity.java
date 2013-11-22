@@ -283,7 +283,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, Iden
 
 		if (ndef == null) {
 			Toast.makeText(this,
-					getResources().getText(R.string.nfc_tag_read_failed),
+					getResources().getText(R.string.toast_nfc_tag_read_failed),
 					Toast.LENGTH_LONG).show();
 		} else {
 			NdefMessage msg;
@@ -551,7 +551,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, Iden
 		}
 		else {
 			for(int i=0; i<2; i++)
-				Toast.makeText(this, getString(R.string.dialog_network_not_found_text, ssid), Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, getString(R.string.toast_network_not_found_text, ssid), Toast.LENGTH_SHORT).show();
 		}
 	}
 
@@ -586,7 +586,7 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, Iden
 		if(this.getIdentification().equals("")){
 					
 			for(int i=0; i<2; i++)
-				Toast.makeText(this, R.string.dialog_no_identification, Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, R.string.toast_no_identification, Toast.LENGTH_SHORT).show();
 
 			return false;
 		}
