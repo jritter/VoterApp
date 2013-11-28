@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -66,7 +67,7 @@ public class ReviewPollAdapter extends BaseAdapter {
 
 			ImageView ivAcceptImage = (ImageView)view.findViewById(R.id.imageview_accepted_img);
 			ProgressBar pgWaitForAccept = (ProgressBar)view.findViewById(R.id.progress_bar_waitforaccept);
-			ImageView btnValidateReview = (ImageView)view.findViewById(R.id.button_validate_review);
+			CheckBox btnValidateReview = (CheckBox)view.findViewById(R.id.button_validate_review);
 
 			
 			//set the correct image

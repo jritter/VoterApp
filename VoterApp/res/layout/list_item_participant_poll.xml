@@ -51,13 +51,12 @@
             android:layout_height="48dp"
             android:indeterminate="true" />
 
-        <ImageButton
+        <CheckBox
             android:id="@+id/button_validate_review"
-            style="@style/AcceptReviewButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:contentDescription="@string/description_accepted"
-            android:src="@drawable/ic_action_accept" />
+            android:layout_width="42dp"
+    		android:layout_height="wrap_content"
+    		android:layout_gravity="center_vertical|center_horizontal"
+    		android:layout_marginLeft="6dp" />
     </LinearLayout>
 
 </LinearLayout>
