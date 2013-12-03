@@ -4,12 +4,14 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import ch.bfh.evoting.voterapp.adapters.ResultAdapter;
 import ch.bfh.evoting.voterapp.adapters.VoteOptionListAdapter;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.protocol.VoteService;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.Utility;
 import android.nfc.NfcAdapter;
@@ -41,7 +43,7 @@ import android.widget.TextView;
  *
  */
 public class VoteActivity extends Activity {
-	
+
 	private NfcAdapter nfcAdapter;
 	private boolean nfcAvailable;
 
@@ -57,6 +59,8 @@ public class VoteActivity extends Activity {
 
 	private AlertDialog dialogBack;
 	private BroadcastReceiver updateVoteReceiver;
+	private BroadcastReceiver showNextActivityListener;
+	private BroadcastReceiver showNextActivityListener2;
 
 
 	@Override
@@ -70,7 +74,7 @@ public class VoteActivity extends Activity {
 		AndroidApplication.getInstance().setCurrentActivity(this);
 
 		setContentView(R.layout.activity_vote);
-		
+
 		lvChoices = (ListView)findViewById(R.id.listview_choices);
 
 		//Get the data in the intent
@@ -138,53 +142,50 @@ public class VoteActivity extends Activity {
 		});
 
 
-		//Register a BroadcastReceiver on stop poll order events
-		stopReceiver = new BroadcastReceiver(){
+		//		//Register a BroadcastReceiver on stop poll order events
+		//		stopReceiver = new BroadcastReceiver(){
+		//
+		//			private int numberOfVotes = 0;
+		//			@Override
+		//			public void onReceive(Context arg0, Intent intent) {
+		//				stopService(new Intent(VoteActivity.this, VoteService.class));
+		//				//go through compute result and set percentage result
+		//				List<Option> options = poll.getOptions();
+		//				for(Option option : options){
+		//					numberOfVotes += option.getVotes();	
+		//				}
+		//				for(Option option : options){
+		//					if(numberOfVotes!=0){
+		//						option.setPercentage(option.getVotes()*100/numberOfVotes);
+		//					} else {
+		//						option.setPercentage(0);
+		//					}
+		//				}
+		//
+		//				poll.setTerminated(true);
+		//
+		//				//start to result activity
+		//				Intent i = new Intent(VoteActivity.this, DisplayResultActivity.class);
+		//				i.putExtra("poll", (Serializable)poll);
+		//				i.putExtra("saveToDb", true);
+		//				startActivity(i);
+		//				LocalBroadcastManager.getInstance(VoteActivity.this).unregisterReceiver(this);
+		//				LocalBroadcastManager.getInstance(VoteActivity.this).unregisterReceiver(updateVoteReceiver);
+		//			}
+		//		};
+		//		LocalBroadcastManager.getInstance(this).registerReceiver(stopReceiver, new IntentFilter(BroadcastIntentTypes.stopVote));
 
-			private int numberOfVotes = 0;
-			@Override
-			public void onReceive(Context arg0, Intent intent) {
-				stopService(new Intent(VoteActivity.this, VoteService.class));
-				//go through compute result and set percentage result
-				List<Option> options = poll.getOptions();
-				for(Option option : options){
-					numberOfVotes += option.getVotes();	
-				}
-				for(Option option : options){
-					if(numberOfVotes!=0){
-						option.setPercentage(option.getVotes()*100/numberOfVotes);
-					} else {
-						option.setPercentage(0);
-					}
-				}
+		//		//Register a BroadcastReceiver on new incoming vote events
+		//		updateVoteReceiver = new BroadcastReceiver(){
+		//			@SuppressWarnings("unchecked")
+		//			@Override
+		//			public void onReceive(Context arg0, Intent intent) {
+		//				poll.setOptions((List<Option>)intent.getSerializableExtra("options"));
+		//				poll.setParticipants((Map<String,Participant>)intent.getSerializableExtra("participants"));
+		//			}
+		//		};
+		//		LocalBroadcastManager.getInstance(this).registerReceiver(updateVoteReceiver, new IntentFilter(BroadcastIntentTypes.newIncomingVote));
 
-				poll.setTerminated(true);
-
-				//start to result activity
-				Intent i = new Intent(VoteActivity.this, DisplayResultActivity.class);
-				i.putExtra("poll", (Serializable)poll);
-				i.putExtra("saveToDb", true);
-				startActivity(i);
-				LocalBroadcastManager.getInstance(VoteActivity.this).unregisterReceiver(this);
-				LocalBroadcastManager.getInstance(VoteActivity.this).unregisterReceiver(updateVoteReceiver);
-			}
-		};
-		LocalBroadcastManager.getInstance(this).registerReceiver(stopReceiver, new IntentFilter(BroadcastIntentTypes.stopVote));
-
-		//Register a BroadcastReceiver on new incoming vote events
-		//TODO see if needed after simulation
-		updateVoteReceiver = new BroadcastReceiver(){
-			@SuppressWarnings("unchecked")
-			@Override
-			public void onReceive(Context arg0, Intent intent) {
-				poll.setOptions((List<Option>)intent.getSerializableExtra("options"));
-				poll.setParticipants((Map<String,Participant>)intent.getSerializableExtra("participants"));
-			}
-		};
-		LocalBroadcastManager.getInstance(this).registerReceiver(updateVoteReceiver, new IntentFilter(BroadcastIntentTypes.newIncomingVote));
-
-		this.startService(new Intent(this, VoteService.class).putExtra("poll", poll));
-		
 		// Is NFC available on this device?
 		nfcAvailable = this.getPackageManager().hasSystemFeature(
 				PackageManager.FEATURE_NFC);
@@ -199,13 +200,54 @@ public class VoteActivity extends Activity {
 				// is tapped on the back
 				pendingIntent = PendingIntent.getActivity(this, 0, new Intent(
 						this, getClass())
-						.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+				.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 			} else {
 				nfcAvailable = false;
 			}
 		}
+
+		// Subscribing to the showNextActivity request to show WaitForVotesActivity
+		showNextActivityListener = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				LocalBroadcastManager.getInstance(VoteActivity.this).unregisterReceiver(this);
+
+				//Start activity waiting for other participants to vote
+				//If is admin, returns to admin app wait activity
+				if(AndroidApplication.getInstance().isAdmin()){
+					Intent i = new Intent(context, WaitForVotesAdminActivity.class);
+					i.putExtras(intent.getExtras());
+					//TODO needed?
+					i.putExtra("votes", VoteService.getInstance().getVotes());
+					AndroidApplication.getInstance().getCurrentActivity().startActivity(i);
+				} else {
+					Intent i = new Intent(context, WaitForVotesVoterActivity.class);
+					i.putExtras(intent.getExtras());
+					//TODO needed?
+					i.putExtra("votes", VoteService.getInstance().getVotes());
+					AndroidApplication.getInstance().getCurrentActivity().startActivity(i);
+				}
+			}
+		};
+		LocalBroadcastManager.getInstance(this).registerReceiver(showNextActivityListener, new IntentFilter(BroadcastIntentTypes.showNextActivity));
+
+		// Subscribing to the showNextActivity request to show ResultActivity
+		showNextActivityListener2 = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				LocalBroadcastManager.getInstance(VoteActivity.this).unregisterReceiver(this);
+
+				//start Review activity
+				Intent i = new Intent(context, DisplayResultActivity.class);
+				i.putExtras(intent.getExtras());
+				i.putExtra("saveToDb", true);
+				startActivity(i);
+			}
+		};
+		LocalBroadcastManager.getInstance(this).registerReceiver(showNextActivityListener2, new IntentFilter(BroadcastIntentTypes.showResultActivity));
+
 	}
-	
+
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -218,7 +260,7 @@ public class VoteActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		AndroidApplication.getInstance().setCurrentActivity(this);
-		
+
 		if (nfcAdapter != null && nfcAdapter.isEnabled()) {
 			nfcAvailable = true;
 		}
@@ -299,7 +341,7 @@ public class VoteActivity extends Activity {
 		getMenuInflater().inflate(R.menu.vote, menu);
 		return true;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -316,28 +358,8 @@ public class VoteActivity extends Activity {
 	 * Method called when cast button is clicked
 	 */
 	public void castBallot(){
-
 		Option selectedOption = volAdapter.getItemSelected();
-
-		if(selectedOption!=null){
-			AndroidApplication.getInstance().getNetworkInterface().sendMessage(new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_VOTE, selectedOption));
-		} else {
-			AndroidApplication.getInstance().getNetworkInterface().sendMessage(new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_VOTE, null));
-		}
-
-		//Start activity waiting for other participants to vote
-		//If is admin, returns to admin app wait activity
-		if(AndroidApplication.getInstance().isAdmin()){
-			Intent i = new Intent(this, WaitForVotesAdminActivity.class);
-			i.putExtra("poll", (Serializable)poll);
-			i.putExtra("votes", VoteService.getInstance().getVotes());
-			startActivity(i);
-		} else {
-			Intent intent = new Intent(this, WaitForVotesVoterActivity.class);
-			intent.putExtra("poll", (Serializable)poll);
-			intent.putExtra("votes", VoteService.getInstance().getVotes());
-			startActivity(intent);
-		}
+		AndroidApplication.getInstance().getProtocolInterface().vote(selectedOption, poll);
 	}
 
 	/**

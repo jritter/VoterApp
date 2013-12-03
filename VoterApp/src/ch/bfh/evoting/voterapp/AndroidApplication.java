@@ -24,6 +24,8 @@ import android.widget.Toast;
 import ch.bfh.evoting.voterapp.network.AllJoynNetworkInterface;
 import ch.bfh.evoting.voterapp.network.NetworkInterface;
 import ch.bfh.evoting.voterapp.network.NetworkMonitor;
+import ch.bfh.evoting.voterapp.protocol.DummyProtocolInterface;
+import ch.bfh.evoting.voterapp.protocol.ProtocolInterface;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.JavaSerialization;
 import ch.bfh.evoting.voterapp.util.SerializationUtil;
@@ -42,6 +44,7 @@ public class AndroidApplication extends Application {
 	private static AndroidApplication instance;
 	private SerializationUtil su;
 	private NetworkInterface ni;
+	private ProtocolInterface pi;
 	private Activity currentActivity = null;
 	private boolean isAdmin = false;
 	private boolean voteRunning;
@@ -64,10 +67,10 @@ public class AndroidApplication extends Application {
 		super.onCreate();
 
 		//TODO remove when not used anymore
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-		settings.edit().putBoolean("first_run_ReviewPollVoterActivity", true).commit();
-		settings.edit().putBoolean("first_run_NetworkConfigActivity", true).commit();
-		settings.edit().putBoolean("first_run", true).commit();
+//		SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+//		settings.edit().putBoolean("first_run_ReviewPollVoterActivity", true).commit();
+//		settings.edit().putBoolean("first_run_NetworkConfigActivity", true).commit();
+//		settings.edit().putBoolean("first_run", true).commit();
 
 
 		WifiManager wm = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
@@ -126,7 +129,8 @@ public class AndroidApplication extends Application {
 
 				su = new SerializationUtil(new JavaSerialization());
 				ni = new AllJoynNetworkInterface(AndroidApplication.this.getApplicationContext());///* new InstaCircleNetworkInterface(this.getApplicationContext());*/new SimulatedNetworkInterface(AndroidApplication.this.getApplicationContext());
-
+				pi = new DummyProtocolInterface(AndroidApplication.this.getApplicationContext());
+				
 				return null;
 			}
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -154,6 +158,14 @@ public class AndroidApplication extends Application {
 	 */
 	public NetworkInterface getNetworkInterface(){
 		return ni;
+	}
+	
+	/**
+	 * Get the protocol component
+	 * @return the protocol component
+	 */
+	public ProtocolInterface getProtocolInterface(){
+		return pi;
 	}
 
 	/**

@@ -46,6 +46,7 @@ public class CheckElectorateActivity extends ListActivity {
 	private BroadcastReceiver electorateReceiver;
 
 	private AlertDialog dialogBack;
+	private BroadcastReceiver showNextActivityListener;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -122,55 +123,65 @@ public class CheckElectorateActivity extends ListActivity {
 				electorateReceiver,
 				new IntentFilter(BroadcastIntentTypes.electorate));
 
-		// broadcast receiving the info to go to next view
-		LocalBroadcastManager.getInstance(this).registerReceiver(
-				new BroadcastReceiver() {
+//		// broadcast receiving the info to go to next view
+//		LocalBroadcastManager.getInstance(this).registerReceiver(
+//				new BroadcastReceiver() {
+//
+//					@Override
+//					public void onReceive(Context context, Intent intent) {
+//
+//						//TODO remove if modification works
+//						//						Poll poll = (Poll) intent.getSerializableExtra("poll");
+//						//						// Poll is not in the DB, so reset the id
+//						//						poll.setId(-1);
+//						//						Intent i = new Intent(CheckElectorateActivity.this,
+//						//								ReviewPollVoterActivity.class);
+//						//						i.putExtra("poll", (Serializable) poll);
+//						//						i.putExtra("sender", intent.getStringExtra("sender"));
+//						//						startActivity(i);
+//						
+//					}
+//				}, new IntentFilter(BroadcastIntentTypes.pollToReview));
 
-					@Override
-					public void onReceive(Context context, Intent intent) {
+		
+		// Subscribing to the showNextActivity request
+		showNextActivityListener = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				LocalBroadcastManager.getInstance(CheckElectorateActivity.this).unregisterReceiver(this);
+				LocalBroadcastManager.getInstance(CheckElectorateActivity.this).unregisterReceiver(electorateReceiver);
+				LocalBroadcastManager.getInstance(CheckElectorateActivity.this).unregisterReceiver(networkParticipantUpdater);
+				//start Review activity
+				Intent i = new Intent(context, ReviewPollVoterActivity.class);
+				i.putExtras(intent.getExtras());
+				startActivity(i);
+			}
+		};
+		LocalBroadcastManager.getInstance(this).registerReceiver(showNextActivityListener, new IntentFilter(BroadcastIntentTypes.showNextActivity));
 
-						Poll poll = (Poll) intent.getSerializableExtra("poll");
-						// Poll is not in the DB, so reset the id
-						poll.setId(-1);
-						Intent i = new Intent(CheckElectorateActivity.this,
-								ReviewPollVoterActivity.class);
-						i.putExtra("poll", (Serializable) poll);
-						i.putExtra("sender", intent.getStringExtra("sender"));
-						startActivity(i);
-						LocalBroadcastManager.getInstance(
-								CheckElectorateActivity.this)
-								.unregisterReceiver(this);
-						LocalBroadcastManager.getInstance(
-								CheckElectorateActivity.this)
-								.unregisterReceiver(electorateReceiver);
-						LocalBroadcastManager.getInstance(
-								CheckElectorateActivity.this)
-								.unregisterReceiver(networkParticipantUpdater);
-					}
-				}, new IntentFilter(BroadcastIntentTypes.pollToReview));
 
 		// Is NFC available on this device?
 		nfcAvailable = this.getPackageManager().hasSystemFeature(
 				PackageManager.FEATURE_NFC);
 
 		if (nfcAvailable) {
-			
+
 			nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-			
+
 			if (nfcAdapter.isEnabled()) {
 
 				// Setting up a pending intent that is invoked when an NFC tag
 				// is tapped on the back
 				pendingIntent = PendingIntent.getActivity(this, 0, new Intent(
 						this, getClass())
-						.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+				.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 			} else {
 				nfcAvailable = false;
 			}
 		}
 
 	}
-	
+
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -184,7 +195,7 @@ public class CheckElectorateActivity extends ListActivity {
 		super.onResume();
 		AndroidApplication.getInstance().setVoteRunning(true);
 		AndroidApplication.getInstance().setCurrentActivity(this);
-		
+
 		if (nfcAdapter != null && nfcAdapter.isEnabled()) {
 			nfcAvailable = true;
 		}
@@ -205,27 +216,27 @@ public class CheckElectorateActivity extends ListActivity {
 		// Add the buttons
 		builder.setPositiveButton(R.string.yes,
 				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialogBack.dismiss();
-						startActivity(new Intent(CheckElectorateActivity.this,
-								MainActivity.class).addFlags(
+			public void onClick(DialogInterface dialog, int id) {
+				dialogBack.dismiss();
+				startActivity(new Intent(CheckElectorateActivity.this,
+						MainActivity.class).addFlags(
 								Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(
-								Intent.FLAG_ACTIVITY_CLEAR_TASK));
-					}
-				});
+										Intent.FLAG_ACTIVITY_CLEAR_TASK));
+			}
+		});
 		builder.setNegativeButton(R.string.no,
 				new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialogBack.dismiss();
-					}
-				});
+			public void onClick(DialogInterface dialog, int id) {
+				dialogBack.dismiss();
+			}
+		});
 
 		builder.setTitle(R.string.dialog_title_back);
 		builder.setMessage(this.getString(R.string.dialog_back));
 
 		// Create the AlertDialog
 		dialogBack = builder.create();
-		
+
 		dialogBack.setOnShowListener(new DialogInterface.OnShowListener() {
 			@Override
 			public void onShow(DialogInterface dialog) {
@@ -234,10 +245,10 @@ public class CheckElectorateActivity extends ListActivity {
 						R.drawable.selectable_background_votebartheme);
 				dialogBack.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundResource(
 						R.drawable.selectable_background_votebartheme);
-				
+
 			}
 		});
-		
+
 		dialogBack.show();
 	}
 
@@ -274,7 +285,7 @@ public class CheckElectorateActivity extends ListActivity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 

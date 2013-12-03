@@ -1,6 +1,5 @@
 package ch.bfh.evoting.voterapp.util;
 
-
 /**
  * Class listing local broadcast intent types that are sent in the application
  * @author Philémon von Bergen
@@ -114,6 +113,21 @@ public class BroadcastIntentTypes {
 	 * 		salt:		the salt received did not correspond to the hash contained in the password
 	 * */
 	public static final String probablyWrongDecryptionKeyUsed = "probablyWrongDecryptionKeyUsed";
+	
+	/**
+	 * Intent type sent when asking to show next activity
+	 * Extras:
+	 * - "poll" poll to use in GUI part (not always set)
+	 * - "sender" sender of the poll (=administrator) (not always set)
+	 */
+	public static final String showNextActivity = "showNextActivity";
+	
+	/**
+	 * Intent type sent when asking to show the Result activity
+	 * Extras:
+	 * - "poll" poll to use in GUI part (not always set)
+	 */
+	public static final String showResultActivity = "showResultActivity";
 
 	
 }

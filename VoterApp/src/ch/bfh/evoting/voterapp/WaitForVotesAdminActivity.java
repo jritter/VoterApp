@@ -4,6 +4,7 @@ import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.WaitForVotesFragment;
+import ch.bfh.evoting.voterapp.protocol.VoteService;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.Utility;
 import android.nfc.NfcAdapter;
@@ -68,11 +69,11 @@ public class WaitForVotesAdminActivity extends Activity implements OnClickListen
 			poll = intentPoll;
 		}
 
-		//If participant was not included in the electorate, the VoteActivity was not displayed
-		// and thus VoteService was not started, so we start it here
-		if(!isVoteServiceRunning()){
-			this.startService(new Intent(this, VoteService.class).putExtra("poll", poll));
-		}
+//		//If participant was not included in the electorate, the VoteActivity was not displayed
+//		// and thus VoteService was not started, so we start it here
+//		if(!isVoteServiceRunning()){
+//			this.startService(new Intent(this, VoteService.class).putExtra("poll", poll));
+//		}
 
 		FragmentManager fm = getFragmentManager();
 		WaitForVotesFragment fragment = new WaitForVotesFragment();
@@ -228,12 +229,7 @@ public class WaitForVotesAdminActivity extends Activity implements OnClickListen
 		// Add the buttons
 		builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int id) {
-				Intent i = new Intent(BroadcastIntentTypes.stopVote);
-				LocalBroadcastManager.getInstance(WaitForVotesAdminActivity.this).sendBroadcast(i);
-
-				//Send stop signal over the network
-				VoteMessage vm = new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_STOP_POLL, null);
-				AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);
+				AndroidApplication.getInstance().getProtocolInterface().endVotingPeriod();
 			}
 		});
 		builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -262,17 +258,17 @@ public class WaitForVotesAdminActivity extends Activity implements OnClickListen
 		stopPollDialog.show();
 	}
 
-	/**
-	 * Helper method checking if the vote service is running
-	 * @return true if the service is running, false otherwise
-	 */
-	private boolean isVoteServiceRunning() {
-		ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-			if (VoteService.class.getName().equals(service.service.getClassName())) {
-				return true;
-			}
-		}
-		return false;
-	}
+//	/**
+//	 * Helper method checking if the vote service is running
+//	 * @return true if the service is running, false otherwise
+//	 */
+//	private boolean isVoteServiceRunning() {
+//		ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+//		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+//			if (VoteService.class.getName().equals(service.service.getClassName())) {
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
 }

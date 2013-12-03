@@ -1,4 +1,4 @@
-package ch.bfh.evoting.voterapp;
+package ch.bfh.evoting.voterapp.protocol;
 
 import java.io.Serializable;
 
@@ -12,6 +12,7 @@ import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
@@ -24,6 +25,7 @@ public class VoteService extends Service{
 	private AsyncTask<Object, Object, Object> sendVotesTask;
 	private int votesReceived = 0;
 	private Poll poll;
+	private BroadcastReceiver stopReceiver;
 	private static VoteService instance;
 
 	@Override
@@ -67,6 +69,14 @@ public class VoteService extends Service{
 					votesReceived++;
 					poll.getParticipants().get(voter).setHasVoted(true);
 				}
+				
+				if(votesReceived>=poll.getNumberOfParticipants()){
+					Intent i = new Intent(BroadcastIntentTypes.newIncomingVote);
+					i.putExtra("votes", votesReceived);
+					i.putExtra("options", (Serializable)poll.getOptions());
+					i.putExtra("participants", (Serializable)poll.getParticipants());
+					AndroidApplication.getInstance().getProtocolInterface().computeResult(poll, votesReceived);
+				}
 
 				sendVotesTask = new AsyncTask<Object, Object, Object>(){
 
@@ -87,6 +97,22 @@ public class VoteService extends Service{
 			}
 		};
 		LocalBroadcastManager.getInstance(this).registerReceiver(voteReceiver, new IntentFilter(BroadcastIntentTypes.newVote));
+		
+		//Register a BroadcastReceiver on stop poll order events
+		stopReceiver = new BroadcastReceiver(){
+
+			@Override
+			public void onReceive(Context arg0, Intent intent) {
+				Intent i = new Intent(BroadcastIntentTypes.newIncomingVote);
+				i.putExtra("votes", votesReceived);
+				i.putExtra("options", (Serializable)poll.getOptions());
+				i.putExtra("participants", (Serializable)poll.getParticipants());
+				AndroidApplication.getInstance().getProtocolInterface().computeResult(poll, votesReceived);
+			}
+		};
+		LocalBroadcastManager.getInstance(this).registerReceiver(stopReceiver, new IntentFilter(BroadcastIntentTypes.stopVote));
+
+		
 		return super.onStartCommand(intent, flags, startId);
 	}
 

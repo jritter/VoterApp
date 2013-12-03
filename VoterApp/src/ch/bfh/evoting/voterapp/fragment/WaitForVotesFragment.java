@@ -1,13 +1,11 @@
 package ch.bfh.evoting.voterapp.fragment;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import ch.bfh.evoting.voterapp.DisplayResultActivity;
 import ch.bfh.evoting.voterapp.R;
-import ch.bfh.evoting.voterapp.VoteService;
 import ch.bfh.evoting.voterapp.adapters.WaitParticipantListAdapter;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Participant;
@@ -39,10 +37,9 @@ public class WaitForVotesFragment extends ListFragment {
 	private ProgressBar pb;
 	private WaitParticipantListAdapter wpAdapter;
 	private TextView tvCastVotes;
-	private int votesReceived = 0;
 
-	private BroadcastReceiver stopReceiver;
 	private BroadcastReceiver updateVoteReceiver;
+	private BroadcastReceiver showNextActivityListener;
 
 
 	@Override
@@ -55,6 +52,13 @@ public class WaitForVotesFragment extends ListFragment {
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 	}
+
+	@Override
+	public void onDetach() {
+		LocalBroadcastManager.getInstance(this.getActivity()).unregisterReceiver(updateVoteReceiver);
+		super.onDetach();
+	}
+
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -82,37 +86,37 @@ public class WaitForVotesFragment extends ListFragment {
 		tvCastVotes = (TextView)v.findViewById(R.id.textview_cast_votes);
 		tvCastVotes.setText(getString(R.string.cast_votes, 0, participants.size()));
 
-		//TODO for demo only
-		votesReceived = 0;
-
 		//Register a BroadcastReceiver on new incoming vote events
-		//TODO see if needed after simulation
 		updateVoteReceiver = new BroadcastReceiver(){
 			@SuppressWarnings("unchecked")
 			@Override
 			public void onReceive(Context arg0, Intent intent) {
 				poll.setOptions((List<Option>)intent.getSerializableExtra("options"));
 				poll.setParticipants((Map<String,Participant>)intent.getSerializableExtra("participants"));
-				votesReceived=intent.getIntExtra("votes", 0);
-				updateStatus(intent.getIntExtra("votes", 0), false);
+				updateStatus(intent.getIntExtra("votes", 0));
 			}
 		};
 		LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(updateVoteReceiver, new IntentFilter(BroadcastIntentTypes.newIncomingVote));
 
-		//Register a BroadcastReceiver on stop poll order events
-		stopReceiver = new BroadcastReceiver(){
-
+		// Subscribing to the showNextActivity request to show ResultActivity
+		showNextActivityListener = new BroadcastReceiver() {
 			@Override
-			public void onReceive(Context arg0, Intent intent) {
-				updateStatus(votesReceived, true);
+			public void onReceive(Context context, Intent intent) {
+				LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(this);
+
+				//start Review activity
+				Intent i = new Intent(context, DisplayResultActivity.class);
+				i.putExtras(intent.getExtras());
+				i.putExtra("saveToDb", true);
+				startActivity(i);
 			}
 		};
-		LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(stopReceiver, new IntentFilter(BroadcastIntentTypes.stopVote));
+		LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(showNextActivityListener, new IntentFilter(BroadcastIntentTypes.showResultActivity));
 
 		return v;
 	}
-	
-	
+
+
 	/*--------------------------------------------------------------------------------------------
 	 * Helper Methods
 	--------------------------------------------------------------------------------------------*/
@@ -121,9 +125,8 @@ public class WaitForVotesFragment extends ListFragment {
 	 * Update the state of the progress bar, change the image of the participants when they have voted
 	 * and start the activity which displays the results
 	 * @param progress
-	 * @param stopOrder order sent from admin to stop the poll
 	 */
-	private void updateStatus(int numberOfReceivedVotes, boolean stopOrder){
+	private void updateStatus(int numberOfReceivedVotes){
 		//update progress bar and participants list
 		int progress = 0;
 		if(poll.getParticipants().size()!=0){
@@ -136,28 +139,5 @@ public class WaitForVotesFragment extends ListFragment {
 		wpAdapter.notifyDataSetChanged();
 		tvCastVotes.setText(getString(R.string.cast_votes, numberOfReceivedVotes, participants.size()));
 
-
-		if(progress>=100 || stopOrder){
-			this.getActivity().stopService(new Intent(this.getActivity(), VoteService.class));
-			//go through compute result and set percentage result
-			List<Option> options = poll.getOptions();
-			for(Option option : options){
-				if(numberOfReceivedVotes!=0){
-					option.setPercentage(option.getVotes()*100/numberOfReceivedVotes);
-				} else {
-					option.setPercentage(0);
-				}
-			}
-
-			poll.setTerminated(true);
-
-			//start to result activity
-			Intent intent = new Intent(this.getActivity(), DisplayResultActivity.class);
-			intent.putExtra("poll", (Serializable)poll);
-			intent.putExtra("saveToDb", true);
-			startActivity(intent);
-			LocalBroadcastManager.getInstance(this.getActivity()).unregisterReceiver(stopReceiver);
-			LocalBroadcastManager.getInstance(this.getActivity()).unregisterReceiver(updateVoteReceiver);
-		}
 	}
 }

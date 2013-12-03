@@ -1,10 +1,10 @@
 package ch.bfh.evoting.voterapp;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
-import ch.bfh.evoting.voterapp.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.PollReviewFragment;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
@@ -14,7 +14,10 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.support.v4.app.NavUtils;
@@ -34,7 +37,7 @@ import android.widget.Toast;
  * 
  */
 public class ReviewPollAdminActivity extends Activity implements OnClickListener {
-	
+
 	private NfcAdapter nfcAdapter;
 	private boolean nfcAvailable;
 	private PendingIntent pendingIntent;
@@ -46,6 +49,7 @@ public class ReviewPollAdminActivity extends Activity implements OnClickListener
 	private String sender;
 
 	private PollReviewFragment fragment;
+	private BroadcastReceiver showNextActivityListener;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -72,13 +76,13 @@ public class ReviewPollAdminActivity extends Activity implements OnClickListener
 			poll = (Poll) savedInstanceState.getSerializable("poll");
 			sender = savedInstanceState.getString("sender");
 		}
-		
+
 		Poll intentPoll = (Poll) getIntent().getSerializableExtra("poll");
 		if (intentPoll != null) {
 			poll = intentPoll;
 			sender = getIntent().getStringExtra("sender");
 		}
-		
+
 		FragmentManager fm = getFragmentManager();
 		fragment = new PollReviewFragment();
 		Bundle bundle = new Bundle();
@@ -87,7 +91,7 @@ public class ReviewPollAdminActivity extends Activity implements OnClickListener
 		fragment.setArguments(bundle);
 
 		fm.beginTransaction().replace(R.id.fragment_container, fragment, "review").commit();
-		
+
 		// Is NFC available on this device?
 		nfcAvailable = this.getPackageManager().hasSystemFeature(
 				PackageManager.FEATURE_NFC);
@@ -102,14 +106,36 @@ public class ReviewPollAdminActivity extends Activity implements OnClickListener
 				// is tapped on the back
 				pendingIntent = PendingIntent.getActivity(this, 0, new Intent(
 						this, getClass())
-						.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+				.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 			} else {
 				nfcAvailable = false;
 			}
 		}
 
+		// Subscribing to the showNextActivity request
+		showNextActivityListener = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				LocalBroadcastManager.getInstance(ReviewPollAdminActivity.this).unregisterReceiver(this);
+				
+				Poll poll = (Poll)intent.getSerializableExtra("poll");
+				
+				if (isContainedInParticipants(AndroidApplication.getInstance()
+						.getNetworkInterface().getMyUniqueId(), poll.getParticipants().values())) {
+					Intent i = new Intent(context, VoteActivity.class);
+					i.putExtras(intent.getExtras());
+					AndroidApplication.getInstance().getCurrentActivity().startActivity(i);
+				} else {
+					Intent i = new Intent(context, WaitForVotesAdminActivity.class);
+					i.putExtras(intent.getExtras());
+					AndroidApplication.getInstance().getCurrentActivity().startActivity(i);
+				}
+			}
+		};
+		LocalBroadcastManager.getInstance(this).registerReceiver(showNextActivityListener, new IntentFilter(BroadcastIntentTypes.showNextActivity));
+
 	}
-	
+
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -117,11 +143,11 @@ public class ReviewPollAdminActivity extends Activity implements OnClickListener
 			nfcAdapter.disableForegroundDispatch(this);
 		}
 	}
-	
+
 	@Override
 	protected void onResume() {
 		AndroidApplication.getInstance().setCurrentActivity(this);
-		
+
 		if (nfcAdapter != null && nfcAdapter.isEnabled()) {
 			nfcAvailable = true;
 		}
@@ -132,7 +158,7 @@ public class ReviewPollAdminActivity extends Activity implements OnClickListener
 			nfcAdapter.enableForegroundDispatch(this, pendingIntent,
 					Utility.getNFCIntentFilters(), null);
 		}
-		
+
 		super.onResume();
 	}
 
@@ -154,15 +180,15 @@ public class ReviewPollAdminActivity extends Activity implements OnClickListener
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.review_poll, menu);
-		
+
 		if(getResources().getBoolean(R.bool.display_bottom_bar)){
 			menu.findItem(R.id.action_start_voteperiod).setVisible(false);
-	    }
-		
+		}
+
 		return true;
 	}
 
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -189,7 +215,7 @@ public class ReviewPollAdminActivity extends Activity implements OnClickListener
 			startVotePeriod();
 		}
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -202,33 +228,19 @@ public class ReviewPollAdminActivity extends Activity implements OnClickListener
 		LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
 	}
 
-	
+
 	/*--------------------------------------------------------------------------------------------
 	 * Helper Methods
 	--------------------------------------------------------------------------------------------*/
-	
-	
+
+
 	/**
 	 * Set up the {@link android.app.ActionBar}.
 	 */
 	private void setupActionBar() {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
-	
-	/**
-	 * Indicate if the peer identified with the given string is contained in the list of participants
-	 * @param uniqueId identifier of the peer
-	 * @return true if it is contained in the list of participants, false otherwise
-	 */
-	private boolean isContainedInParticipants(String uniqueId) {
-		for (Participant p : poll.getParticipants().values()) {
-			if (p.getUniqueId().equals(uniqueId)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
+
 	/**
 	 * Start the vote phase
 	 */
@@ -240,23 +252,23 @@ public class ReviewPollAdminActivity extends Activity implements OnClickListener
 				return;
 			}
 		}
-		// Send start poll signal over the network
-		VoteMessage vm = new VoteMessage(
-				VoteMessage.Type.VOTE_MESSAGE_START_POLL, null);
-		AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);
-
 		poll.setStartTime(System.currentTimeMillis());
 		poll.setNumberOfParticipants(poll.getParticipants().values().size());
 
-		if (isContainedInParticipants(AndroidApplication.getInstance()
-				.getNetworkInterface().getMyUniqueId())) {
-			Intent intent = new Intent(this, VoteActivity.class);
-			intent.putExtra("poll", (Serializable) poll);
-			startActivity(intent);
-		} else {
-			Intent intent = new Intent(this, WaitForVotesAdminActivity.class);
-			intent.putExtra("poll", (Serializable) poll);
-			startActivity(intent);
+		AndroidApplication.getInstance().getProtocolInterface().beginVotingPeriod(poll);
+	}
+	
+	/**
+	 * Indicate if the peer identified with the given string is contained in the list of participants
+	 * @param uniqueId identifier of the peer
+	 * @return true if it is contained in the list of participants, false otherwise
+	 */
+	private boolean isContainedInParticipants(String uniqueId, Collection<Participant> participants) {
+		for (Participant p : participants) {
+			if (p.getUniqueId().equals(uniqueId)) {
+				return true;
+			}
 		}
+		return false;
 	}
 }

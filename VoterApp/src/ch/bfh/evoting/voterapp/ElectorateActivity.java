@@ -46,7 +46,7 @@ import android.widget.Toast;
  *
  */
 public class ElectorateActivity extends Activity implements OnClickListener {
-	
+
 	private NfcAdapter nfcAdapter;
 	private boolean nfcAvailable;
 	private PendingIntent pendingIntent;
@@ -62,26 +62,27 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 	private AsyncTask<Object, Object, Object> resendElectorate;
 	private BroadcastReceiver participantsDiscoverer;
 	private AlertDialog dialogBack;
+	private BroadcastReceiver showNextActivityListener;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		if(getResources().getBoolean(R.bool.portrait_only)){
-	        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-	    }
-		
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		}
+
 		setContentView(R.layout.activity_electorate);
 		setupActionBar();
-		
+
 		if(getResources().getBoolean(R.bool.display_bottom_bar) == false){
-	        findViewById(R.id.layout_bottom_bar).setVisibility(View.GONE);
-	    }
-		
+			findViewById(R.id.layout_bottom_bar).setVisibility(View.GONE);
+		}
+
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		AndroidApplication.getInstance().setVoteRunning(true);
 		AndroidApplication.getInstance().getNetworkInterface().unlockGroup();
-		
+
 		btnNext = (Button) findViewById(R.id.button_next);
 		btnNext.setOnClickListener(this);
 
@@ -111,6 +112,20 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		};
 		LocalBroadcastManager.getInstance(this).registerReceiver(participantsDiscoverer, new IntentFilter(BroadcastIntentTypes.participantStateUpdate));
 
+		// Subscribing to the showNextActivity request
+		showNextActivityListener = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				LocalBroadcastManager.getInstance(ElectorateActivity.this).unregisterReceiver(this);
+
+				//start Review activity
+				Intent i = new Intent(context, ReviewPollAdminActivity.class);
+				i.putExtras(intent.getExtras());
+				startActivity(i);
+			}
+		};
+		LocalBroadcastManager.getInstance(this).registerReceiver(showNextActivityListener, new IntentFilter(BroadcastIntentTypes.showNextActivity));
+
 		active = true;
 		startPeriodicSend();
 
@@ -118,7 +133,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		//Send the list of participants in the network over the network
 		VoteMessage vm = new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_ELECTORATE, (Serializable)participants);
 		AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);
-		
+
 		// Is NFC available on this device?
 		nfcAvailable = this.getPackageManager().hasSystemFeature(
 				PackageManager.FEATURE_NFC);
@@ -133,7 +148,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 				// is tapped on the back
 				pendingIntent = PendingIntent.getActivity(this, 0, new Intent(
 						this, getClass())
-						.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+				.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 			} else {
 				nfcAvailable = false;
 			}
@@ -149,13 +164,13 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		if(serializedPoll!=null){
 			poll = serializedPoll;
 		}
-		
+
 		if (intent.getParcelableExtra(NfcAdapter.EXTRA_TAG) != null){
 			Intent broadcastIntent = new Intent(BroadcastIntentTypes.nfcTagTapped);
 			broadcastIntent.putExtra(NfcAdapter.EXTRA_TAG, intent.getParcelableExtra(NfcAdapter.EXTRA_TAG));
 			LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
 		}
-		
+
 		super.onNewIntent(intent);
 	}
 
@@ -176,7 +191,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);
 
 		startPeriodicSend();
-		
+
 		if (nfcAdapter != null && nfcAdapter.isEnabled()) {
 			nfcAvailable = true;
 		}
@@ -195,7 +210,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 	protected void onPause() {
 		active = false;
 		super.onPause();
-		
+
 		if (nfcAvailable) {
 			nfcAdapter.disableForegroundDispatch(this);
 		}
@@ -212,7 +227,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		super.onRestoreInstanceState(savedInstanceState);
 		poll = (Poll)savedInstanceState.getSerializable("poll");
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		//Show a dialog to ask confirmation to quit vote 
@@ -235,8 +250,8 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 
 		// Create the AlertDialog
 		dialogBack = builder.create();
-		
-		
+
+
 		dialogBack.setOnShowListener(new DialogInterface.OnShowListener() {
 			@Override
 			public void onShow(DialogInterface dialog) {
@@ -245,10 +260,10 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 						R.drawable.selectable_background_votebartheme);
 				dialogBack.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundResource(
 						R.drawable.selectable_background_votebartheme);
-				
+
 			}
 		});
-		
+
 		dialogBack.show();
 	}
 
@@ -287,8 +302,8 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 
 		if(getResources().getBoolean(R.bool.display_bottom_bar)){
 			menu.findItem(R.id.action_next).setVisible(false);
-	    }
-		
+		}
+
 		return true;
 	}
 
@@ -298,8 +313,8 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 			next();
 		}	
 	}
-	
-	
+
+
 	/*--------------------------------------------------------------------------------------------
 	 * Helper Methods
 	--------------------------------------------------------------------------------------------*/
@@ -355,7 +370,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		if(resendElectorate!=null && !resendElectorate.isCancelled()){
 			return;
 		}
-		
+
 		resendElectorate = new AsyncTask<Object, Object, Object>(){
 
 			@Override
@@ -374,7 +389,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
-	
+
 	/**
 	 * Method called when pushing on the Next button
 	 */
@@ -400,14 +415,8 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		active = false;
 		resendElectorate.cancel(true);
 
-		//Send poll to other participants
-		VoteMessage vm = new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_POLL_TO_REVIEW, (Serializable)poll);
-		AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);
+		AndroidApplication.getInstance().getProtocolInterface().showReview(poll);
 
-		Intent intent = new Intent(this, ReviewPollAdminActivity.class);
-		intent.putExtra("poll", (Serializable)poll);
-		intent.putExtra("sender", AndroidApplication.getInstance().getNetworkInterface().getMyUniqueId());
-		startActivity(intent);
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(participantsDiscoverer);
 	}
 

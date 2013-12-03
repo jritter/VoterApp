@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -35,7 +34,6 @@ public class ReviewPollVoterActivity extends Activity {
 	private boolean nfcAvailable;
 	private PendingIntent pendingIntent;
 
-	private BroadcastReceiver pollReceiver;
 	private AlertDialog dialogBack;
 
 	private Fragment fragment;
@@ -151,7 +149,6 @@ public class ReviewPollVoterActivity extends Activity {
 
 	@Override
 	protected void onDestroy() {
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(pollReceiver);
 		super.onDestroy();
 	}
 

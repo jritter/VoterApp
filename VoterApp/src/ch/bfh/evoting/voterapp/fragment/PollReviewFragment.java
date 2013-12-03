@@ -24,6 +24,7 @@ import ch.bfh.evoting.voterapp.adapters.ReviewPollAdapter;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
+import ch.bfh.evoting.voterapp.util.Utility;
 
 /**
  * Fragment displaying the review of a poll
@@ -80,13 +81,16 @@ public class PollReviewFragment extends Fragment {
 				public void onReceive(Context context, Intent intent) {
 
 					if(isContainedInParticipants(AndroidApplication.getInstance().getNetworkInterface().getMyUniqueId())){
-						Intent i = new Intent(PollReviewFragment.this.getActivity(), VoteActivity.class);
+						AndroidApplication.getInstance().getProtocolInterface().beginVotingPeriod(poll);
+
+						Intent i = new Intent(getActivity(), VoteActivity.class);
 						poll.setStartTime(System.currentTimeMillis());
 						poll.setNumberOfParticipants(poll.getParticipants().values().size());
 						i.putExtra("poll", (Serializable) poll);
 						startActivity(i);
+						
 						LocalBroadcastManager.getInstance(PollReviewFragment.this.getActivity()).unregisterReceiver(this);
-						LocalBroadcastManager.getInstance(PollReviewFragment.this.getActivity()).unregisterReceiver(pollReceiver);
+//						LocalBroadcastManager.getInstance(PollReviewFragment.this.getActivity()).unregisterReceiver(pollReceiver);
 					} else {
 						AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 						// Add the buttons
@@ -98,30 +102,40 @@ public class PollReviewFragment extends Fragment {
 
 						builder.setTitle(R.string.dialog_not_included_title);
 						builder.setMessage(R.string.dialog_not_included);
+						
+						
 
 						// Create the AlertDialog
-						AlertDialog dialog = builder.create();
-						dialog.show();
+						final AlertDialog alertDialog = builder.create();
+						alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+							@Override
+							public void onShow(DialogInterface dialog) {
+								Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+								alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
+										R.drawable.selectable_background_votebartheme);
+							}
+						});
+						alertDialog.show();
 					}
 				}
 			};
 			LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(startVoteReceiver, new IntentFilter(BroadcastIntentTypes.startVote));
 
-			//broadcast receiving the poll if it was modified
-			pollReceiver = new BroadcastReceiver() {
-
-				@Override
-				public void onReceive(Context context, Intent intent) {
-
-					poll = (Poll)intent.getSerializableExtra("poll");
-					//Poll is not in the DB, so reset the id
-					poll.setId(-1);
-					String sender = intent.getStringExtra("sender");
-					poll.getParticipants().get(sender).setHasAcceptedReview(true);
-					adapter.notifyDataSetChanged();
-				}
-			};
-			LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(pollReceiver, new IntentFilter(BroadcastIntentTypes.pollToReview));
+//			//broadcast receiving the poll if it was modified
+//			pollReceiver = new BroadcastReceiver() {
+//
+//				@Override
+//				public void onReceive(Context context, Intent intent) {
+//
+//					poll = (Poll)intent.getSerializableExtra("poll");
+//					//Poll is not in the DB, so reset the id
+//					poll.setId(-1);
+//					String sender = intent.getStringExtra("sender");
+//					poll.getParticipants().get(sender).setHasAcceptedReview(true);
+//					adapter.notifyDataSetChanged();
+//				}
+//			};
+//			LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(pollReceiver, new IntentFilter(BroadcastIntentTypes.pollToReview));
 		}
 
 
