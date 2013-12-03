@@ -14,6 +14,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -61,12 +62,12 @@ public class AndroidApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		
+
 		//TODO remove when not used anymore
-//				SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-//				settings.edit().putBoolean("first_run_ReviewPollVoterActivity", true).commit();
-//				settings.edit().putBoolean("first_run_NetworkConfigActivity", true).commit();
-//				settings.edit().putBoolean("first_run", true).commit();
+		SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+		settings.edit().putBoolean("first_run_ReviewPollVoterActivity", true).commit();
+		settings.edit().putBoolean("first_run_NetworkConfigActivity", true).commit();
+		settings.edit().putBoolean("first_run", true).commit();
 
 
 		WifiManager wm = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
@@ -116,7 +117,7 @@ public class AndroidApplication extends Application {
 
 		//initialize ICE for AllJoyn
 		//This must be done on the main thread
-        org.alljoyn.bus.alljoyn.DaemonInit.PrepareDaemon(this); 
+		org.alljoyn.bus.alljoyn.DaemonInit.PrepareDaemon(this); 
 
 		new AsyncTask<Object, Object, Object>() {
 
@@ -133,7 +134,7 @@ public class AndroidApplication extends Application {
 	}
 
 
-	
+
 
 	/*--------------------------------------------------------------------------------------------
 	 * Getters/Setters
@@ -341,7 +342,7 @@ public class AndroidApplication extends Application {
 			}
 		}
 	};
-	
+
 	/**
 	 * this broadcast receiver listens for messages indicating that many decryptions failed
 	 */
@@ -350,7 +351,7 @@ public class AndroidApplication extends Application {
 		public void onReceive(Context context, Intent intent) {
 			if(currentActivity!=null){
 				AlertDialog.Builder builder = new AlertDialog.Builder(currentActivity);
-				
+
 				// Add the buttons
 				builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
@@ -360,10 +361,10 @@ public class AndroidApplication extends Application {
 
 				builder.setTitle(R.string.dialog_title_wrong_key);
 				builder.setMessage(R.string.dialog_wrong_key_pwd);
-				
+
 				// Create the AlertDialog
 				dialogWrongKey = builder.create(); 
-				
+
 				dialogWrongKey.setOnShowListener(new DialogInterface.OnShowListener() {
 					@Override
 					public void onShow(DialogInterface dialog) {
