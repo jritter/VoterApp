@@ -77,7 +77,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 			if(mBusHandler.getPeerWellKnownName(s)!=null){
 				wellKnownName = mBusHandler.getPeerWellKnownName(s);
 			}
-			parts.put(s, new Participant(wellKnownName, s, false, false));
+			parts.put(s, new Participant(wellKnownName, s, false, false, false));
 		}
 		return parts;
 	}

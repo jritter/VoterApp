@@ -196,63 +196,63 @@ public class NetworkSimulator {
 	public Map<String,Participant> createDummyParticipants(){
 		List<Participant> participants = new ArrayList<Participant>();
 		if(excludeParticipant != 1){
-			Participant p1 = new Participant("Administrator 1 with very very very very very very very very very very very very long name", "192.168.1.1", false, false);
+			Participant p1 = new Participant("Administrator 1 with very very very very very very very very very very very very long name", "192.168.1.1", false, false, false);
 			participants.add(p1);
 		}
 		if(excludeParticipant != 2){
-			Participant p2 = new Participant("Participant 2 with very very very very very very very very very very very very long name", "192.168.1.2", false, false);
+			Participant p2 = new Participant("Participant 2 with very very very very very very very very very very very very long name", "192.168.1.2", false, false, false);
 			participants.add(p2);
 		}
 		if(excludeParticipant != 3){
-			Participant p3 = new Participant("Participant 3 with very very very very very very very very very very very very long name", "192.168.1.3", false, false);
+			Participant p3 = new Participant("Participant 3 with very very very very very very very very very very very very long name", "192.168.1.3", false, false, false);
 			participants.add(p3);
 		}
 		if(excludeParticipant != 4){
-			Participant p4 = new Participant("Participant 4 with very very very very very very very very very very very very long name", "192.168.1.4", false, false);
+			Participant p4 = new Participant("Participant 4 with very very very very very very very very very very very very long name", "192.168.1.4", false, false, false);
 			participants.add(p4);
 		}
 		if(excludeParticipant != 5){
-			Participant p5 = new Participant("Participant 5 with very very very very very very very very very very very very long name", "192.168.1.5", false, false);
+			Participant p5 = new Participant("Participant 5 with very very very very very very very very very very very very long name", "192.168.1.5", false, false, false);
 			participants.add(p5);
 		}
 		if(excludeParticipant != 6){
-			Participant p6 = new Participant("Participant 6 with very very very very very very very very very very very very long name", "192.168.1.6", false, false);
+			Participant p6 = new Participant("Participant 6 with very very very very very very very very very very very very long name", "192.168.1.6", false, false, false);
 			participants.add(p6);
 		}
 		if(excludeParticipant != 7){
-			Participant p7 = new Participant("Participant 7 with very very very very very very very very very very very very long name", "192.168.1.7", false, false);
+			Participant p7 = new Participant("Participant 7 with very very very very very very very very very very very very long name", "192.168.1.7", false, false, false);
 			participants.add(p7);
 		}
 		if(excludeParticipant != 8){
-			Participant p8 = new Participant("Participant 8 with very very very very very very very very very very very very long name", "192.168.1.8", false, false);
+			Participant p8 = new Participant("Participant 8 with very very very very very very very very very very very very long name", "192.168.1.8", false, false, false);
 			participants.add(p8);
 		}
 		if(excludeParticipant != 9){
-			Participant p9 = new Participant("Participant 9 with very very very very very very very very very very very very long name", "192.168.1.9", false, false);
+			Participant p9 = new Participant("Participant 9 with very very very very very very very very very very very very long name", "192.168.1.9", false, false, false);
 			participants.add(p9);
 		}
 		if(excludeParticipant != 10){
-			Participant p10 = new Participant("Participant 10 with very very very very very very very very very very very very long name", "192.168.1.10", false, false);
+			Participant p10 = new Participant("Participant 10 with very very very very very very very very very very very very long name", "192.168.1.10", false, false, false);
 			participants.add(p10);
 		}
 		if(excludeParticipant != 11){
-			Participant p11 = new Participant("Participant 11 with very very very very very very very very very very very very long name", "192.168.1.11", false, false);
+			Participant p11 = new Participant("Participant 11 with very very very very very very very very very very very very long name", "192.168.1.11", false, false, false);
 			participants.add(p11);
 		}
 		if(excludeParticipant != 12){
-			Participant p12 = new Participant("Participant 12 with very very very very very very very very very very very very long name", "192.168.1.12", false, false);
+			Participant p12 = new Participant("Participant 12 with very very very very very very very very very very very very long name", "192.168.1.12", false, false, false);
 			participants.add(p12);
 		}
 		if(excludeParticipant != 13){
-			Participant p13 = new Participant("Participant 13 with very very very very very very very very very very very very long name", "192.168.1.13", false, false);
+			Participant p13 = new Participant("Participant 13 with very very very very very very very very very very very very long name", "192.168.1.13", false, false, false);
 			participants.add(p13);
 		}
 		if(excludeParticipant != 14){
-			Participant p14 = new Participant("Participant 14 with very very very very very very very very very very very very long name", "192.168.1.14", false, false);
+			Participant p14 = new Participant("Participant 14 with very very very very very very very very very very very very long name", "192.168.1.14", false, false, false);
 			participants.add(p14);
 		}
 		if(excludeParticipant != 15){
-			Participant p15 = new Participant("Participant 15 with very very very very very very very very very very very very long name", "192.168.1.15", false, false);
+			Participant p15 = new Participant("Participant 15 with very very very very very very very very very very very very long name", "192.168.1.15", false, false, false);
 			participants.add(p15);
 		}	
 

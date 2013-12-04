@@ -21,13 +21,15 @@ public class Participant implements Serializable{
 	 * @param identification the identification of the participant
 	 * @param uniqueId the IP address of the participant
 	 * @param isSelected indicate if the participant in the network is selected as member of the electorate
-	 * @param hasVoted indicated if the participant already has submitted a vote
+	 * @param hasVoted indicate if the participant already has submitted a vote
+	 * @param hasAcceptedReview indicate if the participant already has accepted the review
 	 */
-	public Participant(String identification, String uniqueId, boolean isSelected, boolean hasVoted){
+	public Participant(String identification, String uniqueId, boolean isSelected, boolean hasVoted, boolean hasAcceptedReview){
 		this.identification = identification;
 		this.uniqueId = uniqueId;
 		this.hasVoted = hasVoted;
 		this.isSelected = isSelected;
+		this.hasAcceptedReview = hasAcceptedReview;
 	}
 	
 	/**
