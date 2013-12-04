@@ -132,7 +132,6 @@ public class ReviewPollVoterActivity extends Activity {
 
 			if(isContainedInParticipants(AndroidApplication.getInstance().getNetworkInterface().getMyUniqueId())){
 				poll.setStartTime(System.currentTimeMillis());
-				poll.setNumberOfParticipants(poll.getParticipants().values().size());
 
 				AndroidApplication.getInstance().getProtocolInterface().beginVotingPeriod(poll);
 
