@@ -30,6 +30,8 @@ public class VoteService extends Service{
 
 	@Override
 	public void onCreate() {
+		Log.e(TAG, "VoteService started" + votesReceived);
+		if(instance!=null) instance.stopSelf();
 		instance = this;
 		super.onCreate();
 	}
@@ -51,31 +53,34 @@ public class VoteService extends Service{
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-
+		if(intent==null){
+			this.stopSelf();
+			return 0;
+		}
+		
 		this.poll = (Poll) intent.getSerializableExtra("poll");
 
 		voteReceiver = new BroadcastReceiver(){
 
 			@Override
 			public void onReceive(Context arg0, Intent intent) {
-				Option vote = (Option)intent.getSerializableExtra("vote");
-				for(Option op : poll.getOptions()){
-					if(op.equals(vote)){
-						op.setVotes(op.getVotes()+1);
-					}
-				}
+				Log.e("VoteService", "called");
+				
 				String voter = intent.getStringExtra("voter");
-				if(poll.getParticipants().containsKey(voter)){
+				if(poll.getParticipants().containsKey(voter) && !poll.getParticipants().get(voter).hasVoted()){
+					Log.e("VoteService", "vote++");
 					votesReceived++;
+					Option vote = (Option)intent.getSerializableExtra("vote");
+					for(Option op : poll.getOptions()){
+						if(op.equals(vote)){
+							op.setVotes(op.getVotes()+1);
+						}
+					}
 					poll.getParticipants().get(voter).setHasVoted(true);
 				}
-				
+								
 				if(votesReceived>=poll.getNumberOfParticipants()){
-					Intent i = new Intent(BroadcastIntentTypes.newIncomingVote);
-					i.putExtra("votes", votesReceived);
-					i.putExtra("options", (Serializable)poll.getOptions());
-					i.putExtra("participants", (Serializable)poll.getParticipants());
-					AndroidApplication.getInstance().getProtocolInterface().computeResult(poll, votesReceived);
+					((DummyProtocolInterface)AndroidApplication.getInstance().getProtocolInterface()).computeResult(poll);
 				}
 
 				sendVotesTask = new AsyncTask<Object, Object, Object>(){
@@ -100,14 +105,9 @@ public class VoteService extends Service{
 		
 		//Register a BroadcastReceiver on stop poll order events
 		stopReceiver = new BroadcastReceiver(){
-
 			@Override
 			public void onReceive(Context arg0, Intent intent) {
-				Intent i = new Intent(BroadcastIntentTypes.newIncomingVote);
-				i.putExtra("votes", votesReceived);
-				i.putExtra("options", (Serializable)poll.getOptions());
-				i.putExtra("participants", (Serializable)poll.getParticipants());
-				AndroidApplication.getInstance().getProtocolInterface().computeResult(poll, votesReceived);
+				((DummyProtocolInterface)AndroidApplication.getInstance().getProtocolInterface()).computeResult(poll);
 			}
 		};
 		LocalBroadcastManager.getInstance(this).registerReceiver(stopReceiver, new IntentFilter(BroadcastIntentTypes.stopVote));
@@ -123,10 +123,6 @@ public class VoteService extends Service{
 
 	public static VoteService getInstance(){
 		return instance;
-	}
-
-	public int getVotes(){
-		return this.votesReceived;
 	}
 
 }

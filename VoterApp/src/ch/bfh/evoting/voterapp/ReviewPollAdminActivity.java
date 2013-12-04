@@ -49,7 +49,6 @@ public class ReviewPollAdminActivity extends Activity implements OnClickListener
 	private String sender;
 
 	private PollReviewFragment fragment;
-	private BroadcastReceiver showNextActivityListener;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -112,32 +111,34 @@ public class ReviewPollAdminActivity extends Activity implements OnClickListener
 			}
 		}
 
-		// Subscribing to the showNextActivity request
-		showNextActivityListener = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				LocalBroadcastManager.getInstance(ReviewPollAdminActivity.this).unregisterReceiver(this);
-				
-				Poll poll = (Poll)intent.getSerializableExtra("poll");
-				
-				if (isContainedInParticipants(AndroidApplication.getInstance()
-						.getNetworkInterface().getMyUniqueId(), poll.getParticipants().values())) {
-					Intent i = new Intent(context, VoteActivity.class);
-					i.putExtras(intent.getExtras());
-					AndroidApplication.getInstance().getCurrentActivity().startActivity(i);
-				} else {
-					Intent i = new Intent(context, WaitForVotesAdminActivity.class);
-					i.putExtras(intent.getExtras());
-					AndroidApplication.getInstance().getCurrentActivity().startActivity(i);
-				}
-			}
-		};
 		LocalBroadcastManager.getInstance(this).registerReceiver(showNextActivityListener, new IntentFilter(BroadcastIntentTypes.showNextActivity));
 
 	}
 
+	// Subscribing to the showNextActivity request
+	private BroadcastReceiver showNextActivityListener = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			LocalBroadcastManager.getInstance(ReviewPollAdminActivity.this).unregisterReceiver(this);
+
+			Poll poll = (Poll)intent.getSerializableExtra("poll");
+
+			if (isContainedInParticipants(AndroidApplication.getInstance()
+					.getNetworkInterface().getMyUniqueId(), poll.getParticipants().values())) {
+				Intent i = new Intent(context, VoteActivity.class);
+				i.putExtras(intent.getExtras());
+				AndroidApplication.getInstance().getCurrentActivity().startActivity(i);
+			} else {
+				Intent i = new Intent(context, WaitForVotesAdminActivity.class);
+				i.putExtras(intent.getExtras());
+				AndroidApplication.getInstance().getCurrentActivity().startActivity(i);
+			}
+		}
+	};
+
 	@Override
 	protected void onPause() {
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(showNextActivityListener);
 		super.onPause();
 		if (nfcAvailable) {
 			nfcAdapter.disableForegroundDispatch(this);
@@ -147,6 +148,7 @@ public class ReviewPollAdminActivity extends Activity implements OnClickListener
 	@Override
 	protected void onResume() {
 		AndroidApplication.getInstance().setCurrentActivity(this);
+		LocalBroadcastManager.getInstance(this).registerReceiver(showNextActivityListener, new IntentFilter(BroadcastIntentTypes.showNextActivity));
 
 		if (nfcAdapter != null && nfcAdapter.isEnabled()) {
 			nfcAvailable = true;
@@ -257,7 +259,7 @@ public class ReviewPollAdminActivity extends Activity implements OnClickListener
 
 		AndroidApplication.getInstance().getProtocolInterface().beginVotingPeriod(poll);
 	}
-	
+
 	/**
 	 * Indicate if the peer identified with the given string is contained in the list of participants
 	 * @param uniqueId identifier of the peer

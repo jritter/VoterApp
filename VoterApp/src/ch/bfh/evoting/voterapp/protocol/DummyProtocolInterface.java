@@ -74,6 +74,7 @@ public class DummyProtocolInterface extends ProtocolInterface {
 		//send broadcast containing the stop voting period event
 		Intent i = new Intent(BroadcastIntentTypes.stopVote);
 		LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+		//The VoteService listens to this broadcast and a calls the computeResult method
 	}
 
 	@Override
@@ -89,17 +90,24 @@ public class DummyProtocolInterface extends ProtocolInterface {
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 	}
 
-	@Override
-	public void computeResult(Poll poll, int numberOfReceivedVotes){
+	/**
+	 * Method called when the result must be computed (all votes received or stop asked by the admin)
+	 * @param poll poll object
+	 */
+	public void computeResult(Poll poll){
 
 		context.stopService(new Intent(context, VoteService.class));
 
 		//do some protocol specific stuff
 		//go through compute result and set percentage result
 		List<Option> options = poll.getOptions();
+		int votesReceived = 0;
 		for(Option option : options){
-			if(numberOfReceivedVotes!=0){
-				option.setPercentage(option.getVotes()*100/numberOfReceivedVotes);
+			votesReceived += option.getVotes();
+		}
+		for(Option option : options){
+			if(votesReceived!=0){
+				option.setPercentage(option.getVotes()*100/votesReceived);
 			} else {
 				option.setPercentage(0);
 			}

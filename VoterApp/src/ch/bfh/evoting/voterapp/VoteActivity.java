@@ -1,17 +1,10 @@
 package ch.bfh.evoting.voterapp;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
 
-import ch.bfh.evoting.voterapp.adapters.ResultAdapter;
 import ch.bfh.evoting.voterapp.adapters.VoteOptionListAdapter;
 import ch.bfh.evoting.voterapp.entities.Option;
-import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
-import ch.bfh.evoting.voterapp.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
-import ch.bfh.evoting.voterapp.protocol.VoteService;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.Utility;
 import android.nfc.NfcAdapter;
@@ -54,11 +47,9 @@ public class VoteActivity extends Activity {
 	private boolean demoScrollDone = false;
 
 	private ListView lvChoices;
-	private BroadcastReceiver stopReceiver;
 	private PendingIntent pendingIntent;
 
 	private AlertDialog dialogBack;
-	private BroadcastReceiver updateVoteReceiver;
 	private BroadcastReceiver showNextActivityListener;
 	private BroadcastReceiver showNextActivityListener2;
 
@@ -112,7 +103,6 @@ public class VoteActivity extends Activity {
 
 			@Override
 			public void run() {
-				Log.e("VoteActivity", "Scroll: LastVisible item="+lvChoices.getLastVisiblePosition()+" lvChoices.getCount()-2="+(lvChoices.getCount()-2));
 				if(lvChoices.getLastVisiblePosition() < lvChoices.getCount()-1){
 
 					//animate scroll
@@ -141,50 +131,6 @@ public class VoteActivity extends Activity {
 
 		});
 
-
-		//		//Register a BroadcastReceiver on stop poll order events
-		//		stopReceiver = new BroadcastReceiver(){
-		//
-		//			private int numberOfVotes = 0;
-		//			@Override
-		//			public void onReceive(Context arg0, Intent intent) {
-		//				stopService(new Intent(VoteActivity.this, VoteService.class));
-		//				//go through compute result and set percentage result
-		//				List<Option> options = poll.getOptions();
-		//				for(Option option : options){
-		//					numberOfVotes += option.getVotes();	
-		//				}
-		//				for(Option option : options){
-		//					if(numberOfVotes!=0){
-		//						option.setPercentage(option.getVotes()*100/numberOfVotes);
-		//					} else {
-		//						option.setPercentage(0);
-		//					}
-		//				}
-		//
-		//				poll.setTerminated(true);
-		//
-		//				//start to result activity
-		//				Intent i = new Intent(VoteActivity.this, DisplayResultActivity.class);
-		//				i.putExtra("poll", (Serializable)poll);
-		//				i.putExtra("saveToDb", true);
-		//				startActivity(i);
-		//				LocalBroadcastManager.getInstance(VoteActivity.this).unregisterReceiver(this);
-		//				LocalBroadcastManager.getInstance(VoteActivity.this).unregisterReceiver(updateVoteReceiver);
-		//			}
-		//		};
-		//		LocalBroadcastManager.getInstance(this).registerReceiver(stopReceiver, new IntentFilter(BroadcastIntentTypes.stopVote));
-
-		//		//Register a BroadcastReceiver on new incoming vote events
-		//		updateVoteReceiver = new BroadcastReceiver(){
-		//			@SuppressWarnings("unchecked")
-		//			@Override
-		//			public void onReceive(Context arg0, Intent intent) {
-		//				poll.setOptions((List<Option>)intent.getSerializableExtra("options"));
-		//				poll.setParticipants((Map<String,Participant>)intent.getSerializableExtra("participants"));
-		//			}
-		//		};
-		//		LocalBroadcastManager.getInstance(this).registerReceiver(updateVoteReceiver, new IntentFilter(BroadcastIntentTypes.newIncomingVote));
 
 		// Is NFC available on this device?
 		nfcAvailable = this.getPackageManager().hasSystemFeature(
@@ -217,15 +163,11 @@ public class VoteActivity extends Activity {
 				if(AndroidApplication.getInstance().isAdmin()){
 					Intent i = new Intent(context, WaitForVotesAdminActivity.class);
 					i.putExtras(intent.getExtras());
-					//TODO needed?
-					i.putExtra("votes", VoteService.getInstance().getVotes());
-					AndroidApplication.getInstance().getCurrentActivity().startActivity(i);
+					startActivity(i);
 				} else {
 					Intent i = new Intent(context, WaitForVotesVoterActivity.class);
 					i.putExtras(intent.getExtras());
-					//TODO needed?
-					i.putExtra("votes", VoteService.getInstance().getVotes());
-					AndroidApplication.getInstance().getCurrentActivity().startActivity(i);
+					startActivity(i);
 				}
 			}
 		};

@@ -1,5 +1,8 @@
 package ch.bfh.evoting.voterapp.util;
-
+/*
+ * This class was used at the beginning of the project to simulate the network
+ * It is no more needed but we keep it for development reasons
+ */
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;

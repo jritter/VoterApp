@@ -85,8 +85,7 @@ public class CheckElectorateActivity extends ListActivity {
 				new ArrayList<Participant>(participants.values()));
 		setListAdapter(npa);
 
-		// Until the electorate is received from the administrator, the list is
-		// filled
+		// Until the electorate is received from the administrator, the list is filled
 		// with the participant in the network
 		networkParticipantUpdater = new BroadcastReceiver() {
 
@@ -123,27 +122,6 @@ public class CheckElectorateActivity extends ListActivity {
 				electorateReceiver,
 				new IntentFilter(BroadcastIntentTypes.electorate));
 
-//		// broadcast receiving the info to go to next view
-//		LocalBroadcastManager.getInstance(this).registerReceiver(
-//				new BroadcastReceiver() {
-//
-//					@Override
-//					public void onReceive(Context context, Intent intent) {
-//
-//						//TODO remove if modification works
-//						//						Poll poll = (Poll) intent.getSerializableExtra("poll");
-//						//						// Poll is not in the DB, so reset the id
-//						//						poll.setId(-1);
-//						//						Intent i = new Intent(CheckElectorateActivity.this,
-//						//								ReviewPollVoterActivity.class);
-//						//						i.putExtra("poll", (Serializable) poll);
-//						//						i.putExtra("sender", intent.getStringExtra("sender"));
-//						//						startActivity(i);
-//						
-//					}
-//				}, new IntentFilter(BroadcastIntentTypes.pollToReview));
-
-		
 		// Subscribing to the showNextActivity request
 		showNextActivityListener = new BroadcastReceiver() {
 			@Override

@@ -68,13 +68,7 @@ public abstract class ProtocolInterface {
 	 */
 	public abstract void vote(Option selectedOption, Poll poll);
 
-	/**
-	 * TODO must this method really be in the interface ???
-	 * Method called when the result must be computed (all votes received or stop asked by the admin)
-	 * @param poll poll object
-	 * @param numberOfReceivedVotes number of incomed votes
-	 */
-	public abstract void computeResult(Poll poll, int numberOfReceivedVotes);
+	
 
 
 }

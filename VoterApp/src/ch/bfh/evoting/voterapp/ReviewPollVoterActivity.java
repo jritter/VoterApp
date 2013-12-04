@@ -1,12 +1,17 @@
 package ch.bfh.evoting.voterapp;
 
+import java.io.Serializable;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -17,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
+import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.PollReviewFragment;
@@ -113,11 +119,63 @@ public class ReviewPollVoterActivity extends Activity {
 				nfcAvailable = false;
 			}
 		}
+		
+		LocalBroadcastManager.getInstance(this).registerReceiver(showNextActivityListener, new IntentFilter(BroadcastIntentTypes.startVote));
+
 	}
+		
+	//register the startvote signal receiver
+	private BroadcastReceiver showNextActivityListener = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			if(isContainedInParticipants(AndroidApplication.getInstance().getNetworkInterface().getMyUniqueId())){
+				poll.setStartTime(System.currentTimeMillis());
+				poll.setNumberOfParticipants(poll.getParticipants().values().size());
+
+				AndroidApplication.getInstance().getProtocolInterface().beginVotingPeriod(poll);
+
+				Intent i = new Intent(ReviewPollVoterActivity.this, VoteActivity.class);
+				i.putExtra("poll", (Serializable) poll);
+				startActivity(i);
+				
+				LocalBroadcastManager.getInstance(ReviewPollVoterActivity.this).unregisterReceiver(this);
+			} else {
+				AlertDialog.Builder builder = new AlertDialog.Builder(ReviewPollVoterActivity.this);
+				// Add the buttons
+				builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						startActivity(new Intent(ReviewPollVoterActivity.this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK));
+					}
+				});
+
+				builder.setTitle(R.string.dialog_not_included_title);
+				builder.setMessage(R.string.dialog_not_included);
+				
+				
+
+				// Create the AlertDialog
+				final AlertDialog alertDialog = builder.create();
+				alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+					@Override
+					public void onShow(DialogInterface dialog) {
+						Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+						alertDialog.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
+								R.drawable.selectable_background_votebartheme);
+					}
+				});
+				alertDialog.show();
+			}
+		}
+	};
+
 	
 	@Override
 	protected void onPause() {
 		super.onPause();
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(showNextActivityListener);
+
 		if (nfcAvailable) {
 			nfcAdapter.disableForegroundDispatch(this);
 		}
@@ -126,6 +184,8 @@ public class ReviewPollVoterActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		LocalBroadcastManager.getInstance(this).registerReceiver(showNextActivityListener, new IntentFilter(BroadcastIntentTypes.startVote));
+
 		AndroidApplication.getInstance().setCurrentActivity(this);
 		
 		if (nfcAdapter != null && nfcAdapter.isEnabled()) {
@@ -220,4 +280,21 @@ public class ReviewPollVoterActivity extends Activity {
 		LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
 	}
 
+	/*--------------------------------------------------------------------------------------------
+	 * Helper Methods
+	--------------------------------------------------------------------------------------------*/
+
+	/**
+	 * Indicate if the peer identified with the given string is contained in the list of participants
+	 * @param uniqueId identifier of the peer
+	 * @return true if it is contained in the list of participants, false otherwise
+	 */
+	private boolean isContainedInParticipants(String uniqueId){
+		for(Participant p : poll.getParticipants().values()){
+			if(p.getUniqueId().equals(uniqueId)){
+				return true;
+			}
+		}
+		return false;
+	}
 }

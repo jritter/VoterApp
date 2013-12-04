@@ -1,18 +1,14 @@
 package ch.bfh.evoting.voterapp;
 
 import ch.bfh.evoting.voterapp.entities.Poll;
-import ch.bfh.evoting.voterapp.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.WaitForVotesFragment;
-import ch.bfh.evoting.voterapp.protocol.VoteService;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.Utility;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.PendingIntent;
-import android.app.ActivityManager.RunningServiceInfo;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.content.DialogInterface;
@@ -68,12 +64,6 @@ public class WaitForVotesAdminActivity extends Activity implements OnClickListen
 		if(intentPoll!=null){
 			poll = intentPoll;
 		}
-
-//		//If participant was not included in the electorate, the VoteActivity was not displayed
-//		// and thus VoteService was not started, so we start it here
-//		if(!isVoteServiceRunning()){
-//			this.startService(new Intent(this, VoteService.class).putExtra("poll", poll));
-//		}
 
 		FragmentManager fm = getFragmentManager();
 		WaitForVotesFragment fragment = new WaitForVotesFragment();
@@ -258,17 +248,4 @@ public class WaitForVotesAdminActivity extends Activity implements OnClickListen
 		stopPollDialog.show();
 	}
 
-//	/**
-//	 * Helper method checking if the vote service is running
-//	 * @return true if the service is running, false otherwise
-//	 */
-//	private boolean isVoteServiceRunning() {
-//		ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-//		for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-//			if (VoteService.class.getName().equals(service.service.getClassName())) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
 }
