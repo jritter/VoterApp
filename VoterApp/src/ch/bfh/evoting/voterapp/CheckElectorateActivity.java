@@ -1,6 +1,5 @@
 package ch.bfh.evoting.voterapp;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
@@ -23,7 +22,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import ch.bfh.evoting.voterapp.adapters.NetworkParticipantListAdapter;
 import ch.bfh.evoting.voterapp.entities.Participant;
-import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
@@ -73,7 +71,7 @@ public class CheckElectorateActivity extends ListActivity {
 					.getNetworkInterface().getGroupParticipants();
 			if (participants.size() == 0)
 				participants.put("", new Participant("Please wait...", "",
-						false, false));
+						false, false,false));
 		} else {
 			participants = (Map<String, Participant>) this.getIntent()
 					.getSerializableExtra("participants");
