@@ -22,6 +22,10 @@ public class ProtocolParticipant extends Participant {
 	private Element hiHatPowXi = null;
 	private Element proofForHiHat = null;
 
+	/**
+	 * Create a ProtocolParticipant by giving a Participant object
+	 * @param p the participant object to use in this ProtocolParticipant
+	 */
 	public ProtocolParticipant(Participant p){
 		super(p.getIdentification(), p.getUniqueId(), p.isSelected(), p.hasVoted(), p.hasAcceptedReview());
 	}
