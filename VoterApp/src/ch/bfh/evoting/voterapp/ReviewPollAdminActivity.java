@@ -255,7 +255,6 @@ public class ReviewPollAdminActivity extends Activity implements OnClickListener
 			}
 		}
 		poll.setStartTime(System.currentTimeMillis());
-		poll.setNumberOfParticipants(poll.getParticipants().values().size());
 
 		AndroidApplication.getInstance().getProtocolInterface().beginVotingPeriod(poll);
 	}

@@ -107,6 +107,7 @@ public class Poll implements Serializable {
 	 */
 	public void setParticipants(Map<String,Participant> participants) {
 		this.participants = participants;
+		this.numberParticipants = this.participants.size();
 	}
 	
 	/**
