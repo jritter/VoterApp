@@ -3,6 +3,7 @@ package ch.bfh.evoting.voterapp.network;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
@@ -28,7 +29,7 @@ public abstract class AbstractNetworkInterface implements NetworkInterface {
 		this.context = context;
 		su = AndroidApplication.getInstance().getSerializationUtil();		
 	}
-	
+
 	/**
 	 * This method checks the message type and inform the application of the new incoming message.
 	 * 
@@ -36,7 +37,7 @@ public abstract class AbstractNetworkInterface implements NetworkInterface {
 	 */
 	protected final void transmitReceivedMessage(VoteMessage voteMessage) {
 		if(voteMessage==null) return;
-		
+		Log.d("AbstractNetworkInterface", "VoteMessage of type "+voteMessage.getMessageType()+" arrived.");
 		Intent messageArrivedIntent;
 		switch(voteMessage.getMessageType()){
 		case VOTE_MESSAGE_ELECTORATE:
@@ -71,13 +72,36 @@ public abstract class AbstractNetworkInterface implements NetworkInterface {
 		case VOTE_MESSAGE_VOTE:
 			// notify the UI that new message has arrived
 			messageArrivedIntent = new Intent(BroadcastIntentTypes.newVote);
-			messageArrivedIntent.putExtra("vote", voteMessage.getMessageContent());
-			messageArrivedIntent.putExtra("voter", voteMessage.getSenderUniqueId());
+			messageArrivedIntent.putExtra("message", voteMessage.getMessageContent());
+			messageArrivedIntent.putExtra("sender", voteMessage.getSenderUniqueId());
 			LocalBroadcastManager.getInstance(context).sendBroadcast(messageArrivedIntent);
+			break;
+		case VOTE_MESSAGE_COMMIT:
+			// notify the UI that new message has arrived
+			messageArrivedIntent = new Intent(BroadcastIntentTypes.commitMessage);
+			messageArrivedIntent.putExtra("message", voteMessage.getMessageContent());
+			messageArrivedIntent.putExtra("sender", voteMessage.getSenderUniqueId());
+			LocalBroadcastManager.getInstance(context).sendBroadcast(messageArrivedIntent);
+			break;
+		case VOTE_MESSAGE_RECOVERY:
+			// notify the UI that new message has arrived
+			messageArrivedIntent = new Intent(BroadcastIntentTypes.recoveryMessage);
+			messageArrivedIntent.putExtra("message", voteMessage.getMessageContent());
+			messageArrivedIntent.putExtra("sender", voteMessage.getSenderUniqueId());
+			LocalBroadcastManager.getInstance(context).sendBroadcast(messageArrivedIntent);
+			break;
+		case VOTE_MESSAGE_SETUP:
+			// notify the UI that new message has arrived
+			messageArrivedIntent = new Intent(BroadcastIntentTypes.setupMessage);
+			messageArrivedIntent.putExtra("message", voteMessage.getMessageContent());
+			messageArrivedIntent.putExtra("sender", voteMessage.getSenderUniqueId());
+			LocalBroadcastManager.getInstance(context).sendBroadcast(messageArrivedIntent);
+			break;
+		default:
 			break;
 		}
 	}
 
-	
+
 
 }

@@ -1,5 +1,7 @@
 package ch.bfh.evoting.voterapp.util;
 
+import android.content.Intent;
+
 /**
  * Class listing local broadcast intent types that are sent in the application
  * @author Philémon von Bergen
@@ -43,11 +45,12 @@ public class BroadcastIntentTypes {
 	 * - nothing
 	 */
 	public static final String stopVote = "stopVote";
+	
 	/**
 	 * Intent type sent when a new vote is received
 	 * Extras:
-	 * - "vote": the vote
-	 * - "voter": ip address of voter
+	 * - "message": the vote
+	 * - "sender": unique id of voter
 	 */
 	public static final String newVote = "newVote";
 	
@@ -128,6 +131,40 @@ public class BroadcastIntentTypes {
 	 * - "poll" poll to use in GUI part (not always set)
 	 */
 	public static final String showResultActivity = "showResultActivity";
-
 	
+	/**
+	 * Intent type sent when a commitment message is received
+	 * Extras:
+	 * - "message": the message
+	 * - "sender": unique id of the sender
+	 */
+	public static String commitMessage = "commitMessage";
+	
+	/**
+	 * Intent type sent when a recovery message is received
+	 * Extras:
+	 * - "message": the message
+	 * - "sender": unique id of the sender
+	 */
+	public static String recoveryMessage = "recoveryMessage";
+	
+	/**
+	 * Intent type sent when a setup message is received
+	 * Extras:
+	 * - "message": the message
+	 * - "sender": unique id of the sender
+	 */
+	public static String setupMessage = "setupMessage";
+	
+	/**
+	 * Intent type sent when user has chosen his vote
+	 * Extras:
+	 * - "option" the chosen option
+	 * - "index" the index of the option in the list of options
+	 */
+	public static final String vote = "vote";
+	
+	public static final String showWaitDialog = "showWaitDialog";
+	public static final String dismissWaitDialog = "dismissWaitDialog";
+
 }

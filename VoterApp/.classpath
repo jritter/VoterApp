@@ -10,6 +10,7 @@
 	<classpathentry kind="lib" path="libs/android-logging-log4j-1.0.3.jar"/>
 	<classpathentry kind="lib" path="libs/gradle-wrapper.jar"/>
 	<classpathentry kind="lib" path="libs/android-support-v4.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/tungsten-fsm.jar"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/unicrypt"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

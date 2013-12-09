@@ -18,13 +18,16 @@ import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 import ch.bfh.evoting.voterapp.network.AllJoynNetworkInterface;
 import ch.bfh.evoting.voterapp.network.NetworkInterface;
 import ch.bfh.evoting.voterapp.network.NetworkMonitor;
 import ch.bfh.evoting.voterapp.protocol.DummyProtocolInterface;
+import ch.bfh.evoting.voterapp.protocol.HKRS12ProtocolInterface;
 import ch.bfh.evoting.voterapp.protocol.ProtocolInterface;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.JavaSerialization;
@@ -40,6 +43,7 @@ public class AndroidApplication extends Application {
 
 	public static final String PREFS_NAME = "network_preferences";
 	public static final Level LEVEL = Level.DEBUG;
+	private static final String TAG = null;
 
 	private static AndroidApplication instance;
 	private SerializationUtil su;
@@ -53,6 +57,8 @@ public class AndroidApplication extends Application {
 	private AlertDialog dialogNetworkLost;
 	private AlertDialog dialogWrongKey;
 	private NetworkMonitor networkMonitor;
+	private AlertDialog waitDialog;
+	private long showingTime;
 
 	/**
 	 * Return the single instance of this class
@@ -67,10 +73,10 @@ public class AndroidApplication extends Application {
 		super.onCreate();
 
 		//TODO remove when not used anymore
-//		SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-//		settings.edit().putBoolean("first_run_ReviewPollVoterActivity", true).commit();
-//		settings.edit().putBoolean("first_run_NetworkConfigActivity", true).commit();
-//		settings.edit().putBoolean("first_run", true).commit();
+		//		SharedPreferences settings = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+		//		settings.edit().putBoolean("first_run_ReviewPollVoterActivity", true).commit();
+		//		settings.edit().putBoolean("first_run_NetworkConfigActivity", true).commit();
+		//		settings.edit().putBoolean("first_run", true).commit();
 
 
 		WifiManager wm = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
@@ -95,6 +101,8 @@ public class AndroidApplication extends Application {
 		LocalBroadcastManager.getInstance(this).registerReceiver(mAttackDetecter, new IntentFilter(BroadcastIntentTypes.attackDetected));
 		LocalBroadcastManager.getInstance(this).registerReceiver(startPollReceiver, new IntentFilter(BroadcastIntentTypes.electorate));
 		LocalBroadcastManager.getInstance(this).registerReceiver(wrongDecryptionKeyReceiver, new IntentFilter(BroadcastIntentTypes.probablyWrongDecryptionKeyUsed));
+		LocalBroadcastManager.getInstance(this).registerReceiver(waitDialogDismiss, new IntentFilter(BroadcastIntentTypes.dismissWaitDialog));
+		LocalBroadcastManager.getInstance(this).registerReceiver(waitDialogShow, new IntentFilter(BroadcastIntentTypes.showWaitDialog));
 	}
 
 	@Override
@@ -129,8 +137,8 @@ public class AndroidApplication extends Application {
 
 				su = new SerializationUtil(new JavaSerialization());
 				ni = new AllJoynNetworkInterface(AndroidApplication.this.getApplicationContext());///* new InstaCircleNetworkInterface(this.getApplicationContext());*/new SimulatedNetworkInterface(AndroidApplication.this.getApplicationContext());
-				pi = new DummyProtocolInterface(AndroidApplication.this.getApplicationContext());
-				
+				pi = new HKRS12ProtocolInterface(AndroidApplication.this.getApplicationContext());
+
 				return null;
 			}
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -159,7 +167,7 @@ public class AndroidApplication extends Application {
 	public NetworkInterface getNetworkInterface(){
 		return ni;
 	}
-	
+
 	/**
 	 * Get the protocol component
 	 * @return the protocol component
@@ -255,7 +263,6 @@ public class AndroidApplication extends Application {
 	public void setIsAdmin(boolean isAdmin) {
 		this.isAdmin = isAdmin;
 	}
-
 
 
 
@@ -389,6 +396,39 @@ public class AndroidApplication extends Application {
 			}
 		}
 	};
+
+	private BroadcastReceiver waitDialogDismiss = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			dismissDialog();
+		}
+	};
+
+	private BroadcastReceiver waitDialogShow = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			showDialog(currentActivity);
+		}
+	};
+
+	private void showDialog(Activity activity){
+		//Prepare wait dialog
+		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+		builder.setMessage(R.string.dialog_wait_wifi);
+		waitDialog = builder.create();
+		waitDialog.setCancelable(false);
+		Log.e(TAG, "Showing dialog");
+		waitDialog.show();
+	}
+
+	private void dismissDialog(){
+		if(waitDialog!=null){
+			waitDialog.dismiss();
+			waitDialog.dismiss();
+			waitDialog.dismiss();
+			Log.e(TAG, "Dismissing dialog");
+		}
+	}
 
 
 	private class AndroidApplicationActivityLifecycleCallbacks implements ActivityLifecycleCallbacks {

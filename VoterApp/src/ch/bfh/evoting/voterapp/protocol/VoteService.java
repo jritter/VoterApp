@@ -66,11 +66,11 @@ public class VoteService extends Service{
 			public void onReceive(Context arg0, Intent intent) {
 				Log.e("VoteService", "called");
 				
-				String voter = intent.getStringExtra("voter");
+				String voter = intent.getStringExtra("sender");
 				if(poll.getParticipants().containsKey(voter) && !poll.getParticipants().get(voter).hasVoted()){
 					Log.e("VoteService", "vote++");
 					votesReceived++;
-					Option vote = (Option)intent.getSerializableExtra("vote");
+					Option vote = (Option)intent.getSerializableExtra("message");
 					for(Option op : poll.getOptions()){
 						if(op.equals(vote)){
 							op.setVotes(op.getVotes()+1);

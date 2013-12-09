@@ -12,6 +12,8 @@ public class ProtocolParticipant extends Participant {
 	
 	private int protocolParticipantIndex;
 	
+	//transient fields are not serialized
+	//TODO exclude secret when sending poll over network
 	private Element xi = null;
 	private Element ai = null;
 	private Element proofForXi = null;
