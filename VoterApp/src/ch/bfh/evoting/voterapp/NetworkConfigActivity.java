@@ -213,10 +213,10 @@ public class NetworkConfigActivity extends Activity implements TextWatcher, Iden
 				}
 			}
 		};
-		LocalBroadcastManager.getInstance(this).registerReceiver(
-				serviceStartedListener,
-				new IntentFilter(
-						BroadcastIntentTypes.networkConnectionSuccessful));
+//		LocalBroadcastManager.getInstance(this).registerReceiver(
+//				serviceStartedListener,
+//				new IntentFilter(
+//						BroadcastIntentTypes.networkConnectionSuccessful));
 
 		wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 
