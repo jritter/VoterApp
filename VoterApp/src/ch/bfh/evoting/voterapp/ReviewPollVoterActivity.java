@@ -119,9 +119,6 @@ public class ReviewPollVoterActivity extends Activity {
 				nfcAvailable = false;
 			}
 		}
-		
-		LocalBroadcastManager.getInstance(this).registerReceiver(showNextActivityListener, new IntentFilter(BroadcastIntentTypes.startVote));
-
 	}
 		
 	//register the startvote signal receiver
