@@ -111,8 +111,6 @@ public class ReviewPollAdminActivity extends Activity implements OnClickListener
 			}
 		}
 
-		LocalBroadcastManager.getInstance(this).registerReceiver(showNextActivityListener, new IntentFilter(BroadcastIntentTypes.showNextActivity));
-
 	}
 
 	// Subscribing to the showNextActivity request
