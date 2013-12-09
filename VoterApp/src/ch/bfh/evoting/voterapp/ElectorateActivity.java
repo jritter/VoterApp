@@ -110,7 +110,6 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 				AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);
 			}
 		};
-//		LocalBroadcastManager.getInstance(this).registerReceiver(participantsDiscoverer, new IntentFilter(BroadcastIntentTypes.participantStateUpdate));
 
 		// Subscribing to the showNextActivity request
 		showNextActivityListener = new BroadcastReceiver() {
