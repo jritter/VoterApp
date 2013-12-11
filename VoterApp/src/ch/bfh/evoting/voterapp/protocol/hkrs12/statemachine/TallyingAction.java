@@ -1,42 +1,34 @@
 package ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Participant;
-import ch.bfh.evoting.voterapp.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.protocol.HKRS12ProtocolInterface;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolMessageContainer;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolOption;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolParticipant;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolPoll;
+import ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine.StateMachineManager.Round;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
-import ch.bfh.unicrypt.crypto.proofgenerator.classes.ElGamalEncryptionValidityProofGenerator;
-import ch.bfh.unicrypt.crypto.proofgenerator.classes.PreimageEqualityProofGenerator;
-import ch.bfh.unicrypt.crypto.schemes.encryption.classes.ElGamalEncryptionScheme;
-import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringElement;
-import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringMonoid;
-import ch.bfh.unicrypt.math.algebra.dualistic.classes.N;
-import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
+import ch.bfh.evoting.voterapp.util.ObservableTreeMap;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
-import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarMod;
-import ch.bfh.unicrypt.math.function.classes.CompositeFunction;
-import ch.bfh.unicrypt.math.function.classes.MultiIdentityFunction;
-import ch.bfh.unicrypt.math.function.classes.PartiallyAppliedFunction;
-import ch.bfh.unicrypt.math.function.classes.SelfApplyFunction;
-import ch.bfh.unicrypt.math.function.interfaces.Function;
-import ch.bfh.unicrypt.math.helper.Alphabet;
 
-import com.continuent.tungsten.fsm.core.Action;
 import com.continuent.tungsten.fsm.core.Entity;
 import com.continuent.tungsten.fsm.core.Event;
 import com.continuent.tungsten.fsm.core.FiniteStateException;
@@ -45,17 +37,33 @@ import com.continuent.tungsten.fsm.core.TransitionFailureException;
 import com.continuent.tungsten.fsm.core.TransitionRollbackException;
 
 /**
- * Action executed in Commit step
+ * Action executed in Tally step
  * @author Philémon von Bergen
  * 
  */
 public class TallyingAction extends AbstractAction {
 
 
+	private Map<Element, int[]> resultMap = new ConcurrentHashMap<Element, int[]>();
+	private boolean allResultsComputed = false;
+	private AsyncTask<Object, Object, Object> precomputationTask;
+
 	public TallyingAction(Context context, String messageTypeToListenTo,
-			ProtocolPoll poll) {
+			final ProtocolPoll poll) {
 		super(context, messageTypeToListenTo, poll, 0);
-		// TODO Auto-generated constructor stub
+
+		//start to compute possible results
+		precomputationTask = createPrecomputationTask(poll.getNumberOfParticipants());
+
+		((ObservableTreeMap<String, Participant>)poll.getExcludedParticipants()).addPropertyChangeListener(new PropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				precomputationTask.cancel(true);
+				resultMap.clear();
+				precomputationTask = createPrecomputationTask(poll.getNumberOfParticipants()-poll.getExcludedParticipants().size());
+			}
+		});
 	}
 
 	@Override
@@ -65,81 +73,11 @@ public class TallyingAction extends AbstractAction {
 
 		Log.d(TAG,"Tally started");
 
+		//send broadcast to dismiss the wait dialog
+		Intent intent1 = new Intent(BroadcastIntentTypes.showWaitDialog);
+		LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
+
 		long time0 = System.currentTimeMillis();
-
-		//verify proofs
-		//		for(int i=0; i<numberOfParticipants;i++){
-		//			if(missing.contains(i)) continue;
-		//
-		//			//
-		//			System.out.println("Verifying proofs for participant "+ i);
-		//
-		//			//Proof of knowledge of xi
-		//
-		//			Function f = CompositeFunction.getInstance(MultiIdentityFunction.getInstance(Z_q, 1), PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(G_q, Z_q), generator, 0));
-		//			StandardPreimageProofGenerator spg = StandardPreimageProofGenerator.getInstance(f);
-		//
-		//			//Generator and index of the participant has also to be hashed in the proof
-		//			Element index = N.getInstance().getElement(BigInteger.valueOf(i));
-		//		StringElement proverId = StringMonoid.getInstance(Alphabet.ALPHANUMERIC).getElement(me.getUniqueId().replace(":", "").replace(".", ""));
-		//			Tuple otherInput = Tuple.getInstance(generator, index, proverId);
-		//
-		//			if(!spg.verify(proofOfKnowledge[i], ai[i], otherInput).getBoolean()){
-		//				System.err.println("Knowledge proof for participant "+i+" is wrong");
-		//				return;
-		//			} else {
-		//				System.out.println("Knowledge proof for participant "+i+" is correct");
-		//			}
-		//		
-		//
-		//
-		//
-		//			//verify validity proof
-		//
-		//			
-		//			//if(validityProof[i]!=null){
-		//				ElGamalEncryptionScheme<GStarMod, Element> ees = ElGamalEncryptionScheme.getInstance(generator);
-		//				ElGamalEncryptionValidityProofGenerator vpg = ElGamalEncryptionValidityProofGenerator.getInstance(
-		//						ees, hi[i], Tuple.getInstance(possibleVotes));
-		//
-		//				//simulate the ElGamal cipher text (a,b) = (ai,bi);
-		//				Tuple publicInput = Tuple.getInstance(ai[i], bi[i]);
-		//				
-		//				if(!vpg.verify(validityProof[i], publicInput, proverId2).getBoolean()){
-		//					System.err.println("Validity proof for participant "+i+" is wrong");
-		//					return;
-		//				} else {
-		//					System.out.println("Validity proof for participant "+i+" is correct");
-		//				}
-		//			//}
-		//
-		//
-		//			//Proof of equality between discrete logs
-		//			if(recoveryNeeded){
-		//				//Function g^r
-		//				Function f1 = CompositeFunction.getInstance(MultiIdentityFunction.getInstance(Z_q, 1),
-		//						PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(G_q,Z_q), generator, 0));
-		//
-		//				//Function h_hat^r
-		//				Function f2 = CompositeFunction.getInstance(MultiIdentityFunction.getInstance(Z_q, 1),
-		//						PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(G_q,Z_q), hiHat[i], 0));
-		//
-		//
-		//				PreimageEqualityProofGenerator piepg = PreimageEqualityProofGenerator.getInstance(f1,f2);
-		//
-		//				Tuple publicInput3 = Tuple.getInstance(ai[i], hiHatPowXi[i]);
-		//				
-		//				if(!piepg.verify(proofEquality[i], publicInput3, proverId3).getBoolean()){
-		//					System.err.println("Validity proof for participant "+i+" is wrong");
-		//					return;
-		//				} else {
-		//					System.out.println("Validity proof for participant "+i+" is correct");
-		//				}
-		//			}
-		//
-		//			
-		//		}
-
 
 		//compute result
 		Element product = poll.getG_q().getElement(BigInteger.valueOf(1));
@@ -149,6 +87,7 @@ public class TallyingAction extends AbstractAction {
 		}
 		activeParticipants.removeAll(poll.getExcludedParticipants().values());
 		for(Participant p : activeParticipants){
+
 			ProtocolParticipant p2 = (ProtocolParticipant)p;
 			if(poll.getExcludedParticipants().isEmpty()){
 				product=product.apply(p2.getBi());
@@ -159,38 +98,36 @@ public class TallyingAction extends AbstractAction {
 		}
 
 		//try to find combination corresponding to the computed result
-		int[] result = computePossibleResults(activeParticipants.size(), product);
+		int[] result = compareResult(product);
+		precomputationTask.cancel(true);
 		if(result!=null){
+			Log.d(TAG, "Result is "+Arrays.toString(result));
+			float sum = arraySum(result);
 			int i=0;
 			for(Option op : poll.getOptions()){
 				op.setVotes(result[i]);
+				if(sum!=0){
+					op.setPercentage(result[i]/sum*100);
+				}
 				i++;
 			}
 		} else {
 			Log.e(TAG, "Result not found");
 		}
-		long time1 = System.currentTimeMillis();
-		
-		for(Participant p : poll.getParticipants().values()){
-			ProtocolParticipant p2 = (ProtocolParticipant)p;
-			Log.e(TAG, "Participant "+ p2.getIdentification());
-			Log.e(TAG, "xi "+ p2.getXi());
-			Log.e(TAG, "ai "+ p2.getAi());
-			Log.e(TAG, "hi "+ p2.getHi());
-			Log.e(TAG, "bi "+ p2.getBi());
-			Log.e(TAG, "hi hat "+ p2.getHiHat());
-			Log.e(TAG, "hi hat pow xi "+ p2.getHiHatPowXi());
-		}
 
+		long time1 = System.currentTimeMillis();
 		Log.e(TAG,"Time for tally round: "+(time1-time0)+" ms");
+
+		//send broadcast to dismiss the wait dialog
+		Intent intent2 = new Intent(BroadcastIntentTypes.dismissWaitDialog);
+		LocalBroadcastManager.getInstance(context).sendBroadcast(intent2);
 
 		goToNextState();
 	}
 
 	@Override
-	protected void processMessage(ProtocolMessageContainer message,
-			ProtocolParticipant senderParticipant) {
-		// nothing to do here
+	public void savedProcessedMessage(Round round, String sender, ProtocolMessageContainer message, boolean exclude){
+		//no message processed at this state
 	}
 
 	@Override
@@ -222,17 +159,16 @@ public class TallyingAction extends AbstractAction {
 	 * @param idx Index of the column (start with 0)
 	 * @param result Obtained result of votes to find
 	 */	
-	private int[] computePossibleResults(int numberOfVotes, Element searchedResult) {
+	private boolean computePossibleResults(int numberOfVotes, boolean interrupt) {
 
 		//initialize array containing possible combination and the array receiving the result
 		int[] voteForCandidates = new int[poll.getOptions().size()];
-		int[] result = null;
 		for(int i=0; i<voteForCandidates.length;i++){
 			voteForCandidates[i]=0;
 		}
 
-		return computePossibleResultsRecursion(voteForCandidates,numberOfVotes,numberOfVotes,0, searchedResult, result);
-
+		computePossibleResultsRecursion(voteForCandidates,numberOfVotes,numberOfVotes,0, interrupt);
+		return true;
 	}
 
 	/**
@@ -244,34 +180,117 @@ public class TallyingAction extends AbstractAction {
 	 * @param idx Index of the column (start with 0)
 	 * @param result Obtained result of votes to find
 	 */	
-	private int[] computePossibleResultsRecursion(int[] array, int resting, int max, int idx, Element searchedResult, int[] result) {
-
+	private void computePossibleResultsRecursion(int[] array, int resting, int max, int idx, boolean interrupt) {
+		if(interrupt) return;
+		
 		//stop condition for the recursion
 		//we have reached the last column
 		if (idx == array.length) {
 			//if the number of votes attributed < max => not interesting for us
-			if(arraySum(array)<max)return result;
+			if(arraySum(array)<max)return;
 			System.out.println("Possible combination "+Arrays.toString(array));
 			//compare combination and result of tally
 			Element tempResult = poll.getZ_q().getElement(BigInteger.ZERO);
 			for(int j=0;j<array.length;j++){
 				tempResult = tempResult.apply(((ProtocolOption)poll.getOptions().get(j)).getRepresentation().selfApply(poll.getZ_q().getElement(BigInteger.valueOf(array[j]))));
 			}
-			if(poll.getG_q().areEqual(searchedResult, poll.getGenerator().selfApply(tempResult))){
-				result=array;
-				System.out.println("Result is "+Arrays.toString(array));
-			}
-			return result;
+			resultMap.put(poll.getGenerator().selfApply(tempResult), array.clone());
+			return;
 		}
 		//else put a value at the index and call recursion for the other columns
 		for (int i = resting; i >= 0; i--) { 
+			if(interrupt) return;
 			array[idx] = i;
-			result = computePossibleResultsRecursion(array, resting-i, max, idx+1, searchedResult, result);
-			//if result was already found, we don't try other combinations
-			if(result!=null) return result;
+			computePossibleResultsRecursion(array, resting-i, max, idx+1, interrupt);
 		}
-		return result;
+		return;
 	}
+
+	private int[] compareResult(Element searchedResult){
+		do{
+			int[] result = resultMap.get(searchedResult);
+			if(result!=null){
+				precomputationTask.cancel(true);
+				return result;
+			}
+			SystemClock.sleep(1000);
+		}while(!allResultsComputed);
+		return null;
+	}
+
+	private AsyncTask<Object, Object, Object> createPrecomputationTask(final int numberOfParticipants){
+		return new AsyncTask<Object, Object, Object>() {
+
+			@Override
+			protected Object doInBackground(Object... params) {
+				long startTime = SystemClock.currentThreadTimeMillis();
+				computePossibleResults(numberOfParticipants, this.isCancelled());
+				allResultsComputed = true;
+				Log.e(TAG, "***** All possible results computed in "+(SystemClock.currentThreadTimeMillis()-startTime)+" ms *****");
+				return null;
+			}
+
+		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+	}
+	//	/**
+	//	 * Compute all combination of divide up MAX votes between Array.length candidate 
+	//	 * Optimized for most of the votes in first columns
+	//	 * @param array Array containing the possible combination
+	//	 * @param resting Resting number of vote to divide up
+	//	 * @param max Number of vote to divide up in total
+	//	 * @param idx Index of the column (start with 0)
+	//	 * @param result Obtained result of votes to find
+	//	 */	
+	//	private int[] computePossibleResults(int numberOfVotes, Element searchedResult) {
+	//
+	//		//initialize array containing possible combination and the array receiving the result
+	//		int[] voteForCandidates = new int[poll.getOptions().size()];
+	//		int[] result = null;
+	//		for(int i=0; i<voteForCandidates.length;i++){
+	//			voteForCandidates[i]=0;
+	//		}
+	//
+	//		return computePossibleResultsRecursion(voteForCandidates,numberOfVotes,numberOfVotes,0, searchedResult, result);
+	//
+	//	}
+	//	
+	//	/**
+	//	 * Compute all combination of divide up MAX votes between Array.length candidate 
+	//	 * Optimized for most of the votes in first columns
+	//	 * @param array Array containing the possible combination
+	//	 * @param resting Resting number of vote to divide up
+	//	 * @param max Number of vote to divide up in total
+	//	 * @param idx Index of the column (start with 0)
+	//	 * @param result Obtained result of votes to find
+	//	 */	
+	//	private int[] computePossibleResultsRecursion(int[] array, int resting, int max, int idx, Element searchedResult, int[] result) {
+	//
+	//		//stop condition for the recursion
+	//		//we have reached the last column
+	//		if (idx == array.length) {
+	//			//if the number of votes attributed < max => not interesting for us
+	//			if(arraySum(array)<max)return result;
+	//			System.out.println("Possible combination "+Arrays.toString(array));
+	//			//compare combination and result of tally
+	//			Element tempResult = poll.getZ_q().getElement(BigInteger.ZERO);
+	//			for(int j=0;j<array.length;j++){
+	//				tempResult = tempResult.apply(((ProtocolOption)poll.getOptions().get(j)).getRepresentation().selfApply(poll.getZ_q().getElement(BigInteger.valueOf(array[j]))));
+	//			}
+	//			if(poll.getG_q().areEqual(searchedResult, poll.getGenerator().selfApply(tempResult))){
+	//				result=array;
+	//				System.out.println("Result is "+Arrays.toString(array));
+	//			}
+	//			return result;
+	//		}
+	//		//else put a value at the index and call recursion for the other columns
+	//		for (int i = resting; i >= 0; i--) { 
+	//			array[idx] = i;
+	//			result = computePossibleResultsRecursion(array, resting-i, max, idx+1, searchedResult, result);
+	//			//if result was already found, we don't try other combinations
+	//			if(result!=null) return result;
+	//		}
+	//		return result;
+	//	}
 
 	/**
 	 * Make the sum of each element of the array

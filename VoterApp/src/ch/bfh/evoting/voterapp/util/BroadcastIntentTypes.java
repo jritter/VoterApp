@@ -1,6 +1,5 @@
 package ch.bfh.evoting.voterapp.util;
 
-import android.content.Intent;
 
 /**
  * Class listing local broadcast intent types that are sent in the application
@@ -164,7 +163,18 @@ public class BroadcastIntentTypes {
 	 */
 	public static final String vote = "vote";
 	
+	/**
+	 * Intent type sent when asking GUI to show a wait dialog
+	 * Extras:
+	 * - nothing
+	 */
 	public static final String showWaitDialog = "showWaitDialog";
+	
+	/**
+	 * Intent type sent when asking GUI to dismiss the wait dialog
+	 * Extras:
+	 * - nothing
+	 */
 	public static final String dismissWaitDialog = "dismissWaitDialog";
 
 }

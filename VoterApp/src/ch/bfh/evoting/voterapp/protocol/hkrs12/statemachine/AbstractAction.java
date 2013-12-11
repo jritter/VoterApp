@@ -4,29 +4,25 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import org.apache.log4j.Logger;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.entities.VoteMessage.Type;
-import ch.bfh.evoting.voterapp.protocol.ProtocolInterface;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolMessageContainer;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolParticipant;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolPoll;
+import ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine.StateMachineManager.Round;
+import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 
 import com.continuent.tungsten.fsm.core.Action;
 import com.continuent.tungsten.fsm.core.Entity;
@@ -64,8 +60,11 @@ public abstract class AbstractAction implements Action {
 	/**
 	 * Create an  Action object
 	 * 
+	 * @param context Android context
 	 * @param messageTypeToListenTo the type of message that concern this action
-	 * @param 
+	 * @param poll the poll to fill in this action
+	 * @param timeOut the maximum time in millisecond that this action can last
+	 * 
 	 */
 	public AbstractAction(Context context, String messageTypeToListenTo, ProtocolPoll poll, long timeOut) {
 
@@ -115,11 +114,7 @@ public abstract class AbstractAction implements Action {
 			ProtocolMessageContainer message = (ProtocolMessageContainer) intent.getSerializableExtra("message");
 			String sender = intent.getStringExtra("sender");
 
-			if(!messagesReceived.containsKey(sender)){
-				messagesReceived.put(sender, message);
-				Log.d(TAG, "Message received from "+sender);
-			}
-			else if (!messagesReceived.get(sender).equals(message)){
+			if (messagesReceived.get(sender)!=null && messagesReceived.get(sender).equals(message)){
 				//when resending message, check if message differs from one received previously
 				Log.w(TAG, "Seems to receive a different message from same source !!!");
 				return;
@@ -129,24 +124,42 @@ public abstract class AbstractAction implements Action {
 			if(actionTerminated){
 				Log.w(TAG,"Action was called by an incoming message, but was already terminated");
 				return;
-			}
-			
-			ProtocolParticipant senderParticipant = findParticipant(sender);
-			
-			Log.e(TAG, "sender is "+senderParticipant + " while participants size in poll is "+poll.getParticipants().size() +" and unique id is "+sender);
+			}			
 
-			if(poll.getExcludedParticipants().containsKey(senderParticipant.getUniqueId())){
+			if(poll.getExcludedParticipants().containsKey(/*senderParticipant.getUniqueId()*/sender)){
 				Log.w(TAG, "Ignoring message from previously excluded participant!");
 				return;
 			}
 			
-			if(senderParticipant.equals(me)){
+			if(sender.equals(me.getUniqueId())){
 				Log.d(TAG, "Message received from myself, not needed to process it.");
+				if(!messagesReceived.containsKey(sender)){
+					messagesReceived.put(sender, message);
+					Log.d(TAG, "Message received from "+sender);
+				}
+				
 				if(readyToGoToNextState()) goToNextState();
 				return;
 			}
 			
-			processMessage(message, senderParticipant);
+			Round round = null;
+			
+			if(AbstractAction.this instanceof SetupRoundAction){
+				round = Round.setup;
+			} else if(AbstractAction.this instanceof CommitmentRoundAction){
+				round = Round.commit;
+			} else if(AbstractAction.this instanceof VotingRoundAction){
+				round = Round.voting;
+			} else if(AbstractAction.this instanceof RecoveryRoundAction){
+				round = Round.recovery;
+			}
+			
+			Intent intent2 = new Intent(context, ProcessingService.class);
+			intent2.putExtra("round", (Serializable) round);
+			intent2.putExtra("message", (Serializable) message);
+			intent2.putExtra("sender", sender);
+			context.startService(intent2);
+			
 		}
 	};
 
@@ -167,11 +180,19 @@ public abstract class AbstractAction implements Action {
 	};
 
 	/**
-	 * Method called when a new message come in
-	 * @param message message that comes in
-	 * @param senderParticipant 
+	 * Method called when a received message has been processed and values contained in the message must be saved
+	 * @param round Round to which the received message belongs
+	 * @param sender the sender of the message
+	 * @param message the message received
+	 * @param exclude if the processing of the message done imply the exclusion of the participant
 	 */
-	protected abstract void processMessage(ProtocolMessageContainer message, ProtocolParticipant senderParticipant);
+	public void savedProcessedMessage(Round round, String sender, ProtocolMessageContainer message, boolean exclude){
+		
+		if(!messagesReceived.containsKey(sender)){
+			messagesReceived.put(sender, message);
+			Log.d(TAG, "Message received from "+sender);
+		}
+	}
 
 	/**
 	 * Indicate if conditions to go to next step are fulfilled
@@ -212,17 +233,6 @@ public abstract class AbstractAction implements Action {
 	protected void sendMessage(ProtocolMessageContainer message, Type type) {
 		VoteMessage m = new VoteMessage(type, (Serializable)message);
 		AndroidApplication.getInstance().getNetworkInterface().sendMessage(m);
-	}
-	
-	protected ProtocolParticipant findParticipant(String uniqueId){
-		ProtocolParticipant senderParticipant = null;
-		for(Participant p:poll.getParticipants().values()){
-			if(p.getUniqueId().equals(uniqueId)){
-				senderParticipant = (ProtocolParticipant)p;
-				return senderParticipant;
-			}
-		}
-		return null;
 	}
 
 	/* Timer methods */
@@ -274,6 +284,9 @@ public abstract class AbstractAction implements Action {
 		}
 	};
 
+	public ProtocolPoll getPoll(){
+		return this.poll;
+	}
 
 	/**
 	 * Unregister LocalBoradcastReceivers
@@ -282,6 +295,8 @@ public abstract class AbstractAction implements Action {
 		LocalBroadcastManager.getInstance(context).unregisterReceiver(voteMessageReceiver);
 		//		LocalBroadcastManager.getInstance(context).unregisterReceiver(participantsLeaved);
 	}
+
+	
 
 	
 

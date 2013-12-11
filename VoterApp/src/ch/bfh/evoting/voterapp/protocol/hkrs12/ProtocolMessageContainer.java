@@ -12,10 +12,17 @@ public class ProtocolMessageContainer implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Element value;
 	private Element proof;
+	private Element complementaryValue;
 
 	public ProtocolMessageContainer(Element value, Element proof){
 		this.value = value;
 		this.proof = proof;
+	}
+	
+	public ProtocolMessageContainer(Element value, Element proof, Element complementaryValue){
+		this.value = value;
+		this.proof = proof;
+		this.complementaryValue = complementaryValue;
 	}
 
 	public Element getValue() {
@@ -25,11 +32,19 @@ public class ProtocolMessageContainer implements Serializable {
 	public Element getProof() {
 		return proof;
 	}
+	
+	public Element getComplementaryValue() {
+		return complementaryValue;
+	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime
+				* result
+				+ ((complementaryValue == null) ? 0 : complementaryValue.getValue()
+						.hashCode());
 		result = prime * result + ((proof == null) ? 0 : proof.getValue().hashCode());
 		result = prime * result + ((value == null) ? 0 : value.getValue().hashCode());
 		return result;
@@ -44,6 +59,11 @@ public class ProtocolMessageContainer implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		ProtocolMessageContainer other = (ProtocolMessageContainer) obj;
+		if (complementaryValue == null) {
+			if (other.complementaryValue != null)
+				return false;
+		} else if (!complementaryValue.getValue().equals(other.complementaryValue.getValue()))
+			return false;
 		if (proof == null) {
 			if (other.proof != null)
 				return false;
@@ -56,6 +76,6 @@ public class ProtocolMessageContainer implements Serializable {
 			return false;
 		return true;
 	}
-	
+
 	
 }

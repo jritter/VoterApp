@@ -30,6 +30,7 @@
 
         <!-- TODO remove when no more needed -->
         <service android:name="ch.bfh.evoting.voterapp.protocol.VoteService" />
+         <service android:name="ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine.ProcessingService" />
 
         <activity
             android:name="ch.bfh.evoting.voterapp.MainActivity"

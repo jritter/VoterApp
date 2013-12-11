@@ -14,11 +14,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.WindowManager;
@@ -26,7 +24,6 @@ import android.widget.Toast;
 import ch.bfh.evoting.voterapp.network.AllJoynNetworkInterface;
 import ch.bfh.evoting.voterapp.network.NetworkInterface;
 import ch.bfh.evoting.voterapp.network.NetworkMonitor;
-import ch.bfh.evoting.voterapp.protocol.DummyProtocolInterface;
 import ch.bfh.evoting.voterapp.protocol.HKRS12ProtocolInterface;
 import ch.bfh.evoting.voterapp.protocol.ProtocolInterface;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
@@ -58,7 +55,8 @@ public class AndroidApplication extends Application {
 	private AlertDialog dialogWrongKey;
 	private NetworkMonitor networkMonitor;
 	private AlertDialog waitDialog;
-	private long showingTime;
+	private boolean dialogShown;
+
 
 	/**
 	 * Return the single instance of this class
@@ -412,6 +410,7 @@ public class AndroidApplication extends Application {
 	};
 
 	private void showDialog(Activity activity){
+		if(waitDialog!=null && waitDialog.isShowing()) return;
 		//Prepare wait dialog
 		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 		builder.setMessage(R.string.dialog_wait_wifi);
@@ -419,13 +418,13 @@ public class AndroidApplication extends Application {
 		waitDialog.setCancelable(false);
 		Log.e(TAG, "Showing dialog");
 		waitDialog.show();
+		dialogShown = true;
 	}
 
 	private void dismissDialog(){
-		if(waitDialog!=null){
+		if(waitDialog!=null && waitDialog.isShowing()){
 			waitDialog.dismiss();
-			waitDialog.dismiss();
-			waitDialog.dismiss();
+			dialogShown = false;
 			Log.e(TAG, "Dismissing dialog");
 		}
 	}
@@ -439,6 +438,9 @@ public class AndroidApplication extends Application {
 			if(isVoteRunning()){
 				activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 				activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+			}
+			if(dialogShown){
+				showDialog(activity);
 			}
 		}
 
@@ -454,6 +456,9 @@ public class AndroidApplication extends Application {
 			if(!this.connectedSSID.equals(networkMonitor.getConnectedSSID())){
 				Intent intent = new Intent(BroadcastIntentTypes.networkGroupDestroyedEvent);
 				LocalBroadcastManager.getInstance(AndroidApplication.this).sendBroadcast(intent);
+			}
+			if(dialogShown){
+				showDialog(activity);
 			}
 		}
 

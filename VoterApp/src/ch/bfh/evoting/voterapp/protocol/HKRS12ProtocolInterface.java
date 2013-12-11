@@ -7,15 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import ch.bfh.evoting.voterapp.AndroidApplication;
-import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
@@ -31,7 +27,6 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 
 	private Context context;
 	private StateMachineManager stateMachineManager;
-	private AlertDialog waitDialog;
 
 	public HKRS12ProtocolInterface(Context context) {
 		super(context);
@@ -40,11 +35,11 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 
 	@Override
 	public void showReview(final Poll poll) {
-		
+
 		//send broadcast to dismiss the wait dialog
 		Intent intent1 = new Intent(BroadcastIntentTypes.showWaitDialog);
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
-		
+
 		new AsyncTask<Object, Object, Object>(){
 
 			@Override
@@ -59,12 +54,12 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 				for(int i=0; i<Integer.MAX_VALUE;i++){
 					BigInteger pow2i = two.getValue().pow(i);
 					//if 2^i > n
-					if(pow2i.compareTo(BigInteger.valueOf(newPoll.getNumberOfParticipants()))==1){
+					if(pow2i.compareTo(BigInteger.valueOf(poll.getNumberOfParticipants()))==1){
 						m=i;
 						break;
 					}
 				}
-				
+
 				//transform options in protocol options and create a "generator" for each option
 				//TODO generator dependant of the text...
 				int j=0;
@@ -93,29 +88,36 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 				AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);
 
 
-				//send broadcast to dismiss the wait dialog
-				Intent intent1 = new Intent(BroadcastIntentTypes.dismissWaitDialog);
-				LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
-				
+//				//send broadcast to dismiss the wait dialog
+//				Intent intent1 = new Intent(BroadcastIntentTypes.dismissWaitDialog);
+//				LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
+
 				//Send a broadcast to start the next activity
 				Intent intent = new Intent(BroadcastIntentTypes.showNextActivity);
 				intent.putExtra("poll", (Serializable)newPoll);
 				intent.putExtra("sender", AndroidApplication.getInstance().getNetworkInterface().getMyUniqueId());
 				LocalBroadcastManager.getInstance(context).sendBroadcast(intent);	
+
+
 				return null;
 			}
 
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-		
+
 	}
 
 	@Override
-	public void beginVotingPeriod(Poll poll) {
-		
-		//send broadcast to show the wait dialog
+	public void beginVotingPeriod(final Poll poll) {
+
+		//Send a broadcast to start the vote activity
+		Intent intent = new Intent(BroadcastIntentTypes.showNextActivity);
+		intent.putExtra("poll", (Serializable)poll);
+		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+
+		//send broadcast to dismiss the wait dialog
 		Intent intent1 = new Intent(BroadcastIntentTypes.showWaitDialog);
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
-		
+
 		if(AndroidApplication.getInstance().isAdmin()){
 			//called when admin want to begin voting period
 
@@ -123,17 +125,18 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 			VoteMessage vm = new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_START_POLL, null);
 			AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);	
 
-			//Send a broadcast to start the review activity
-			Intent intent = new Intent(BroadcastIntentTypes.showNextActivity);
-			intent.putExtra("poll", (Serializable)poll);
-			LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+
 		} 
 
-		//Do some protocol specific stuff
-		stateMachineManager = new StateMachineManager(context, (ProtocolPoll)poll);
-		stateMachineManager.run();
-		
-		Log.e("HKRS12PI", "BeginVotePeriod called");
+		new AsyncTask<Object, Object, Object>(){
+			@Override
+			protected Object doInBackground(Object... arg0) {
+				//Do some protocol specific stuff
+				stateMachineManager = new StateMachineManager(context, (ProtocolPoll)poll);
+				stateMachineManager.run();
+				return null;
+			}
+		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
 
 	@Override
@@ -149,27 +152,59 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 	}
 
 	@Override
-	public void vote(Option selectedOption, Poll poll) {
-		
-		//do some protocol specific stuff
-		int index = -1;
-		int j = 0;
-		for(Option op : poll.getOptions()){
-			if(op.equals(selectedOption)){
-				index = j;
-				break;
-			}
-			j++;
-		}
-		Intent i = new Intent(BroadcastIntentTypes.vote);
-		i.putExtra("option", (Serializable)selectedOption);
-		i.putExtra("index", index);
-		LocalBroadcastManager.getInstance(context).sendBroadcast(i);
-		
-		//Send a broadcast to start the review activity
+	public void vote(final Option selectedOption, final Poll poll) {
+
+		//Send a broadcast to start the wait for vote activity
 		Intent intent = new Intent(BroadcastIntentTypes.showNextActivity);
 		intent.putExtra("poll", (Serializable)poll);
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+
+//		new AsyncTask<Object, Object, Object>(){
+//			@Override
+//			protected Object doInBackground(Object... arg0) {
+//				//do some protocol specific stuff
+//				int index = -1;
+//				int j = 0;
+//				for(Option op : poll.getOptions()){
+//					if(op.equals(selectedOption)){
+//						index = j;
+//						break;
+//					}
+//					j++;
+//				}
+//				Intent i = new Intent(BroadcastIntentTypes.vote);
+//				i.putExtra("option", (Serializable)selectedOption);
+//				i.putExtra("index", index);
+//				LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+//
+//
+//				return null;
+//			}
+//		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+		new Thread(){
+
+			@Override
+			public void run() {
+				//do some protocol specific stuff
+				int index = -1;
+				int j = 0;
+				for(Option op : poll.getOptions()){
+					if(op.equals(selectedOption)){
+						index = j;
+						break;
+					}
+					j++;
+				}
+				Intent i = new Intent(BroadcastIntentTypes.vote);
+				i.putExtra("option", (Serializable)selectedOption);
+				i.putExtra("index", index);
+				LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+
+				super.run();
+			}
+			
+		}.start();
 	}
 
 
@@ -194,5 +229,5 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 		return this.stateMachineManager;
 	}
 
-	
+
 }

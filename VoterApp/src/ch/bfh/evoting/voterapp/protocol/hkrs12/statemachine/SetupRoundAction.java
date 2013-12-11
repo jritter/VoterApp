@@ -5,12 +5,12 @@ import java.math.BigInteger;
 import android.content.Context;
 import android.util.Log;
 import ch.bfh.evoting.voterapp.AndroidApplication;
-import ch.bfh.evoting.voterapp.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.entities.VoteMessage.Type;
 import ch.bfh.evoting.voterapp.protocol.HKRS12ProtocolInterface;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolMessageContainer;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolParticipant;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolPoll;
+import ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine.StateMachineManager.Round;
 import ch.bfh.unicrypt.crypto.proofgenerator.challengegenerator.classes.StandardNonInteractiveSigmaChallengeGenerator;
 import ch.bfh.unicrypt.crypto.proofgenerator.challengegenerator.interfaces.SigmaChallengeGenerator;
 import ch.bfh.unicrypt.crypto.proofgenerator.classes.PreimageProofGenerator;
@@ -28,7 +28,6 @@ import ch.bfh.unicrypt.math.function.classes.SelfApplyFunction;
 import ch.bfh.unicrypt.math.function.interfaces.Function;
 import ch.bfh.unicrypt.math.helper.Alphabet;
 
-import com.continuent.tungsten.fsm.core.Action;
 import com.continuent.tungsten.fsm.core.Entity;
 import com.continuent.tungsten.fsm.core.Event;
 import com.continuent.tungsten.fsm.core.FiniteStateException;
@@ -44,9 +43,6 @@ import com.continuent.tungsten.fsm.core.TransitionRollbackException;
 public class SetupRoundAction extends AbstractAction {
 
 
-
-	private int numberOfRuns = 0;
-
 	public SetupRoundAction(Context context, String messageTypeToListenTo,
 			ProtocolPoll poll) {
 		super(context, messageTypeToListenTo, poll, 20000);
@@ -58,29 +54,26 @@ public class SetupRoundAction extends AbstractAction {
 			TransitionFailureException, InterruptedException {
 		super.doAction(message, entity, transition, actionType);
 		Log.d(TAG,"Setup round started");
-		Log.e(TAG, "Runs: "+numberOfRuns);
-		
+
 		me.setXi(poll.getZ_q().getRandomElement());
-		
+
 		me.setAi(poll.getGenerator().selfApply(me.getXi()));
 
-//		//Function g^r
-//		Function f = CompositeFunction.getInstance(MultiIdentityFunction.getInstance(poll.getZ_q(), 1), PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(poll.getG_q(), poll.getZ_q()), poll.getGenerator(), 0));
-//
-//		//Generator and index of the participant has also to be hashed in the proof
-//		Element index = N.getInstance().getElement(BigInteger.valueOf(me.getProtocolParticipantIndex()));
-//		StringElement proverId = StringMonoid.getInstance(Alphabet.ALPHANUMERIC).getElement(me.getUniqueId().replace(":", "").replace(".", ""));
-//		Tuple otherInput = Tuple.getInstance(poll.getGenerator(), index, proverId);
-//		
-//		SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator.getInstance(
-//				   f.getCoDomain(), (SemiGroup)f.getCoDomain(), ZMod.getInstance(f.getDomain().getMinimalOrder()), otherInput);
-//
-//		PreimageProofGenerator spg = PreimageProofGenerator.getInstance(scg, f);
-//
-//		me.setProofForXi(spg.generate(me.getXi(), me.getAi()));
+		//Function g^r
+		Function f = CompositeFunction.getInstance(MultiIdentityFunction.getInstance(poll.getZ_q(), 1), PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(poll.getG_q(), poll.getZ_q()), poll.getGenerator(), 0));
 
-		numberOfRuns++;
-		
+		//Generator and index of the participant has also to be hashed in the proof
+		Element index = N.getInstance().getElement(BigInteger.valueOf(me.getProtocolParticipantIndex()));
+		StringElement proverId = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII).getElement(me.getUniqueId());
+		Tuple otherInput = Tuple.getInstance(poll.getGenerator(), index, proverId);
+
+		SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator.getInstance(
+				f.getCoDomain(), (SemiGroup)f.getCoDomain(), ZMod.getInstance(f.getDomain().getMinimalOrder()), otherInput);
+
+		PreimageProofGenerator spg = PreimageProofGenerator.getInstance(scg, f);
+
+		me.setProofForXi(spg.generate(me.getXi(), me.getAi()));
+
 		ProtocolMessageContainer m = new ProtocolMessageContainer(me.getAi(), me.getProofForXi());
 		sendMessage(m, Type.VOTE_MESSAGE_SETUP);
 
@@ -89,20 +82,59 @@ public class SetupRoundAction extends AbstractAction {
 		}
 	}
 
+//	@Override
+//	protected void processMessage(ProtocolMessageContainer message,  ProtocolParticipant senderParticipant) {
+//
+//		Log.d(TAG,"Setup message received from "+senderParticipant.getIdentification());
+////		Intent intent = new Intent(context, ProcessingService.class);
+////		intent.putExtra("round", (Serializable) Round.setup);
+////		intent.putExtra("message", (Serializable) message);
+////		intent.putExtra("sender", (Serializable) senderParticipant);
+////		context.startService(intent);
+//		senderParticipant.setAi(message.getValue());
+//		senderParticipant.setProofForXi(message.getProof());
+//		
+//		//Verify proof of knowledge of xi
+//
+//		Function f = CompositeFunction.getInstance(MultiIdentityFunction.getInstance(poll.getZ_q(), 1), PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(poll.getG_q(), poll.getZ_q()), poll.getGenerator(), 0));
+//
+//		//Generator and index of the participant has also to be hashed in the proof
+//		Element index = N.getInstance().getElement(BigInteger.valueOf(senderParticipant.getProtocolParticipantIndex()));
+//		StringElement proverId = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII).getElement(senderParticipant.getUniqueId());
+//		Tuple otherInput = Tuple.getInstance(poll.getGenerator(), index, proverId);
+//
+//		SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator.getInstance(
+//				f.getCoDomain(), (SemiGroup)f.getCoDomain(), ZMod.getInstance(f.getDomain().getMinimalOrder()), otherInput);
+//
+//		PreimageProofGenerator spg = PreimageProofGenerator.getInstance(scg, f);
+//
+//		//if proof is false, exclude participant
+//		if(!spg.verify(message.getProof(), message.getValue()).getBoolean()){
+//			poll.getExcludedParticipants().put(senderParticipant.getUniqueId(), senderParticipant);
+//		}
+//
+//		if(this.readyToGoToNextState()){
+//			goToNextState();
+//		}
+//	}
+	
 	@Override
-	protected void processMessage(ProtocolMessageContainer message,  ProtocolParticipant senderParticipant) {
+	public void savedProcessedMessage(Round round, String sender, ProtocolMessageContainer message, boolean exclude){
+		if(round!=Round.setup){
+			Log.w(TAG, "Not saving value of processed message since they are value of a previous state.");
+		}
 		
-		Log.d(TAG,"Setup message received from "+senderParticipant.getIdentification());
-		
+		ProtocolParticipant senderParticipant = (ProtocolParticipant) poll.getParticipants().get(sender);
 		senderParticipant.setAi(message.getValue());
 		senderParticipant.setProofForXi(message.getProof());
-
-		//TODO verify proof ?
 		
-		if(this.readyToGoToNextState()){
-			goToNextState();
+		if(exclude){
+			poll.getExcludedParticipants().put(sender, senderParticipant);
 		}
+		
+		super.savedProcessedMessage(round, sender, message, exclude);
 	}
+
 
 	@Override
 	protected void goToNextState() {

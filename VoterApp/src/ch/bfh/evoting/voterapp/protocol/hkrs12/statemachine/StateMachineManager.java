@@ -7,9 +7,7 @@ import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import ch.bfh.evoting.voterapp.protocol.ProtocolInterface;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolPoll;
-import ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine.*;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 
 import com.continuent.tungsten.fsm.core.EntityAdapter;
@@ -30,7 +28,6 @@ import com.continuent.tungsten.fsm.core.StateType;
 public class StateMachineManager implements Runnable {
 
 	private static final String TAG = StateMachineManager.class.getSimpleName();
-	private StateMachine sm;
 	private SetupRoundAction setupRoundAction;
 	private CommitmentRoundAction commitmentRoundAction;
 	private VotingRoundAction votingRoundAction;
@@ -38,10 +35,16 @@ public class StateMachineManager implements Runnable {
 	private RecoveryRoundAction recoveryRoundAction;
 	private Context context;
 	private ProtocolPoll poll;
+	private StateMachine sm;
+	
+	enum Round{
+		setup, commit, voting, recovery;
+	}
 
 	/**
 	 * Create an object managing the state machine
-	 * @param 
+	 * @param context Android context
+	 * @param poll Poll to fill in the actions of the state machine
 	 */
 	public StateMachineManager(Context context, ProtocolPoll poll) {
 		this.context = context;
@@ -133,7 +136,7 @@ public class StateMachineManager implements Runnable {
 	
 	/**
 	 * Returns the state machine
-	 * @return
+	 * @return the state machine
 	 */
 	public StateMachine getStateMachine(){
 		return sm;

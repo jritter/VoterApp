@@ -14,13 +14,13 @@ import android.util.Log;
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Participant;
-import ch.bfh.evoting.voterapp.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.entities.VoteMessage.Type;
 import ch.bfh.evoting.voterapp.protocol.HKRS12ProtocolInterface;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolMessageContainer;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolOption;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolParticipant;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolPoll;
+import ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine.StateMachineManager.Round;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.unicrypt.crypto.proofgenerator.challengegenerator.interfaces.SigmaChallengeGenerator;
 import ch.bfh.unicrypt.crypto.proofgenerator.classes.ElGamalEncryptionValidityProofGenerator;
@@ -32,7 +32,6 @@ import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
 import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarMod;
 import ch.bfh.unicrypt.math.helper.Alphabet;
 
-import com.continuent.tungsten.fsm.core.Action;
 import com.continuent.tungsten.fsm.core.Entity;
 import com.continuent.tungsten.fsm.core.Event;
 import com.continuent.tungsten.fsm.core.FiniteStateException;
@@ -50,8 +49,10 @@ public class CommitmentRoundAction extends AbstractAction {
 
 
 	private BroadcastReceiver voteDone;
-	private AsyncTask<Object, Object, Object> sendVotesTask;
+	//	private AsyncTask<Object, Object, Object> sendVotesTask;
 	private BroadcastReceiver stopReceiver;
+	@SuppressWarnings("unused")
+	private AsyncTask<Object, Object, Object> sendVotesTask;
 
 	public CommitmentRoundAction(final Context context, String messageTypeToListenTo, final ProtocolPoll poll) {
 		super(context, messageTypeToListenTo, poll, 120000);
@@ -65,29 +66,13 @@ public class CommitmentRoundAction extends AbstractAction {
 		};
 		LocalBroadcastManager.getInstance(context).registerReceiver(voteDone, new IntentFilter(BroadcastIntentTypes.vote));
 
-		//inform GUI about new vote message received
-		sendVotesTask = new AsyncTask<Object, Object, Object>(){
-
-			@Override
-			protected Object doInBackground(Object... arg0) {
-				while(!actionTerminated){
-
-					Intent i = new Intent(BroadcastIntentTypes.newIncomingVote);
-					i.putExtra("votes", messagesReceived.size());
-					i.putExtra("options", (Serializable)poll.getOptions());
-					i.putExtra("participants", (Serializable)poll.getParticipants());
-					LocalBroadcastManager.getInstance(context).sendBroadcast(i);
-					SystemClock.sleep(1000);
-				}
-				return null;
-			}
-
-		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
 		//Register a BroadcastReceiver on stop poll order events
 		stopReceiver = new BroadcastReceiver(){
 			@Override
 			public void onReceive(Context arg0, Intent intent) {
+				//send broadcast to dismiss the wait dialog
+				Intent intent1 = new Intent(BroadcastIntentTypes.showWaitDialog);
+				LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
 
 				for(Participant p:poll.getParticipants().values()){
 					if(!messagesReceived.containsKey(p.getUniqueId())){
@@ -113,14 +98,11 @@ public class CommitmentRoundAction extends AbstractAction {
 		Intent intent1 = new Intent(BroadcastIntentTypes.showWaitDialog);
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
 
-		//TODO verify proofForXi ?
-
 		Element productNumerator = poll.getG_q().getElement(BigInteger.valueOf(1));
 		Element productDenominator = poll.getG_q().getElement(BigInteger.valueOf(1));
 
 		for(Participant p : poll.getParticipants().values()){
 			ProtocolParticipant p2 = (ProtocolParticipant) p;
-
 			if(p2.getProtocolParticipantIndex()>me.getProtocolParticipantIndex()){
 				productDenominator = productDenominator.apply(p2.getAi());
 			} else if(me.getProtocolParticipantIndex()>p2.getProtocolParticipantIndex()){
@@ -135,20 +117,29 @@ public class CommitmentRoundAction extends AbstractAction {
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent2);
 	}
 
-
 	@Override
-	protected void processMessage(ProtocolMessageContainer message,
-			ProtocolParticipant senderParticipant) {
+	public void savedProcessedMessage(Round round, String sender, ProtocolMessageContainer message, boolean exclude){
+		if(round!=Round.commit){
+			Log.w(TAG, "Not saving value of processed message since they are value of a previous state.");
+		}
 
-		Log.d(TAG,"Commitment message received from "+senderParticipant.getIdentification());
-
+		Log.e(TAG, "Saving proof of validity recvd "+sender);
+		ProtocolParticipant senderParticipant = (ProtocolParticipant) poll.getParticipants().get(sender);
 		senderParticipant.setProofValidVote(message.getProof());
 
-		//TODO verify proof ?
-
-		if(this.readyToGoToNextState()){
-			goToNextState();
+		if(exclude){
+			poll.getExcludedParticipants().put(sender, senderParticipant);
 		}
+		super.savedProcessedMessage(round, sender, message, exclude);
+		poll.getParticipants().get(sender).setHasVoted(true);
+
+//		Log.e(TAG, "Sending update vote broadcast");
+//		//notify UI about new incomed vote
+//		Intent i = new Intent(BroadcastIntentTypes.newIncomingVote);
+//		i.putExtra("votes", messagesReceived.size());
+//		i.putExtra("options", (Serializable)poll.getOptions());
+//		i.putExtra("participants", (Serializable)poll.getParticipants());
+//		LocalBroadcastManager.getInstance(context).sendBroadcast(i);
 	}
 
 	@Override
@@ -179,26 +170,56 @@ public class CommitmentRoundAction extends AbstractAction {
 		int i=0;
 		for(Option op:poll.getOptions()){
 			possibleVotes[i] = poll.getGenerator().selfApply(((ProtocolOption)op).getRepresentation());
+			i++;
 		}
 
-		//		ElGamalEncryptionScheme<GStarMod, Element> ees = ElGamalEncryptionScheme.getInstance(poll.getGenerator());
-		//		StringElement proverId = StringMonoid.getInstance(Alphabet.ALPHANUMERIC).getElement(me.getUniqueId().replace(":", "").replace(".", ""));
-		//		SigmaChallengeGenerator scg = ElGamalEncryptionValidityProofGenerator.createNonInteractiveChallengeGenerator(ees, possibleVotes.length, proverId);
-		//		ElGamalEncryptionValidityProofGenerator vpg = ElGamalEncryptionValidityProofGenerator.getInstance(
-		//				scg, ees, me.getHi(), possibleVotes);
-		//
-		//		//simulate the ElGamal cipher text (a,b) = (ai,bi);
-		//		Tuple publicInput = Tuple.getInstance(me.getAi(), me.getBi());
-		//		Log.e(TAG, "index is "+index);
-		//		Tuple privateInput = vpg.createPrivateInput(me.getXi(), index);
-		//		me.setProofValidVote(vpg.generate(privateInput, publicInput));
+		ElGamalEncryptionScheme<GStarMod, Element> ees = ElGamalEncryptionScheme.getInstance(poll.getGenerator());
+		StringElement proverId = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII).getElement(me.getUniqueId());
+		SigmaChallengeGenerator scg = ElGamalEncryptionValidityProofGenerator.createNonInteractiveChallengeGenerator(ees, possibleVotes.length, proverId);
+		ElGamalEncryptionValidityProofGenerator vpg = ElGamalEncryptionValidityProofGenerator.getInstance(
+				scg, ees, me.getHi(), possibleVotes);
 
-		ProtocolMessageContainer m = new ProtocolMessageContainer(null, me.getProofValidVote());
+		//simulate the ElGamal cipher text (a,b) = (ai,bi);
+		Tuple publicInput = Tuple.getInstance(me.getAi(), me.getBi());
+		Tuple privateInput = vpg.createPrivateInput(me.getXi(), index);
+		me.setProofValidVote(vpg.generate(privateInput, publicInput));
+
+		//notify UI about new incomed vote
+		Log.e(TAG, "Sending update vote broadcast");
+		me.setHasVoted(true);
+		Intent intent = new Intent(BroadcastIntentTypes.newIncomingVote);
+		intent.putExtra("votes", messagesReceived.size()+1);
+		intent.putExtra("options", (Serializable)poll.getOptions());
+		intent.putExtra("participants", (Serializable)poll.getParticipants());
+		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+
+		ProtocolMessageContainer m = new ProtocolMessageContainer(null, me.getProofValidVote(), null);
 		sendMessage(m, Type.VOTE_MESSAGE_COMMIT);
+		me.setHasVoted(true);
 
 		if(readyToGoToNextState()){
 			goToNextState();
 		}
+
+		//inform GUI about new vote message received
+		sendVotesTask = new AsyncTask<Object, Object, Object>(){
+
+			@Override
+			protected Object doInBackground(Object... arg0) {
+				while(!actionTerminated){
+
+					//notify UI about new incomed vote
+					Intent i = new Intent(BroadcastIntentTypes.newIncomingVote);
+					i.putExtra("votes", messagesReceived.size());
+					i.putExtra("options", (Serializable)poll.getOptions());
+					i.putExtra("participants", (Serializable)poll.getParticipants());
+					LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+					SystemClock.sleep(1000);
+				}
+				return null;
+			}
+
+		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
 
 
