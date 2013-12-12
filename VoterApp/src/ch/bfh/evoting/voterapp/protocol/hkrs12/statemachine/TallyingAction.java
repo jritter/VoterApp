@@ -10,13 +10,19 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import ch.bfh.evoting.voterapp.AndroidApplication;
+import ch.bfh.evoting.voterapp.DisplayResultActivity;
+import ch.bfh.evoting.voterapp.MainActivity;
+import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.protocol.HKRS12ProtocolInterface;
@@ -27,6 +33,7 @@ import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolPoll;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine.StateMachineManager.Round;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.ObservableTreeMap;
+import ch.bfh.evoting.voterapp.util.Utility;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
 
 import com.continuent.tungsten.fsm.core.Entity;
@@ -47,6 +54,8 @@ public class TallyingAction extends AbstractAction {
 	private Map<Element, int[]> resultMap = new ConcurrentHashMap<Element, int[]>();
 	private boolean allResultsComputed = false;
 	private AsyncTask<Object, Object, Object> precomputationTask;
+	private AlertDialog dialogResultComputed = null;
+	private AlertDialog dialogResultNotShown = null;
 
 	public TallyingAction(Context context, String messageTypeToListenTo,
 			final ProtocolPoll poll) {
@@ -72,10 +81,6 @@ public class TallyingAction extends AbstractAction {
 			TransitionFailureException {
 
 		Log.d(TAG,"Tally started");
-
-		//send broadcast to dismiss the wait dialog
-		Intent intent1 = new Intent(BroadcastIntentTypes.showWaitDialog);
-		LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
 
 		long time0 = System.currentTimeMillis();
 
@@ -103,16 +108,107 @@ public class TallyingAction extends AbstractAction {
 		if(result!=null){
 			Log.d(TAG, "Result is "+Arrays.toString(result));
 			float sum = arraySum(result);
-			int i=0;
-			for(Option op : poll.getOptions()){
-				op.setVotes(result[i]);
-				if(sum!=0){
-					op.setPercentage(result[i]/sum*100);
+			if(sum>2){
+				int i=0;
+				for(Option op : poll.getOptions()){
+					op.setVotes(result[i]);
+					if(sum!=0){
+						op.setPercentage(result[i]/sum*100);
+					}
+					i++;
 				}
-				i++;
+			} else {
+				Log.w(TAG, "Number of voters <= 2, so didn't display result to keep vote secrecy");
+
+				new AsyncTask<Void, Void, Void>() {
+
+					@Override
+					protected Void doInBackground(Void... params) {
+
+						while(!(AndroidApplication.getInstance().getCurrentActivity() instanceof DisplayResultActivity)){
+							SystemClock.sleep(300);
+						}
+
+						AndroidApplication.getInstance().getCurrentActivity().runOnUiThread(new Runnable(){
+
+							public void run(){
+								AlertDialog.Builder builder = new AlertDialog.Builder(AndroidApplication.getInstance().getCurrentActivity());
+								// Add the buttons
+								builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog, int id) {
+										dialogResultNotShown.dismiss();
+									}
+								});
+
+								builder.setTitle(R.string.dialog_title_result_not_shown);
+								builder.setMessage(R.string.dialog_result_not_shown);
+
+
+								dialogResultNotShown = builder.create();
+								dialogResultNotShown.setOnShowListener(new DialogInterface.OnShowListener() {
+									@Override
+									public void onShow(DialogInterface dialog) {
+										Utility.setTextColor(dialog, AndroidApplication.getInstance().getResources().getColor(R.color.theme_color));
+										dialogResultNotShown.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
+												R.drawable.selectable_background_votebartheme);
+									}
+								});
+
+								// Create the AlertDialog
+								dialogResultNotShown.show();
+							}
+						});
+						return null;
+					}
+				}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
 			}
 		} else {
 			Log.e(TAG, "Result not found");
+			new AsyncTask<Void, Void, Void>() {
+
+				@Override
+				protected Void doInBackground(Void... params) {
+
+					while(!(AndroidApplication.getInstance().getCurrentActivity() instanceof DisplayResultActivity)){
+						SystemClock.sleep(300);
+					}
+
+					AndroidApplication.getInstance().getCurrentActivity().runOnUiThread(new Runnable(){
+
+						public void run(){
+							AlertDialog.Builder builder = new AlertDialog.Builder(AndroidApplication.getInstance().getCurrentActivity());
+							// Add the buttons
+							builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) {
+									dialogResultComputed.dismiss();
+								}
+							});
+
+							builder.setTitle(R.string.dialog_title_result_not_computed);
+							builder.setMessage(R.string.dialog_result_not_computed);
+
+
+							dialogResultComputed = builder.create();
+							dialogResultComputed.setOnShowListener(new DialogInterface.OnShowListener() {
+								@Override
+								public void onShow(DialogInterface dialog) {
+									Utility.setTextColor(dialog, AndroidApplication.getInstance().getResources().getColor(R.color.theme_color));
+									dialogResultComputed.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
+											R.drawable.selectable_background_votebartheme);
+								}
+							});
+
+							// Create the AlertDialog
+							dialogResultComputed.show();
+						}
+					});
+
+
+					return null;
+				}
+			}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
 		}
 
 		long time1 = System.currentTimeMillis();
@@ -182,13 +278,13 @@ public class TallyingAction extends AbstractAction {
 	 */	
 	private void computePossibleResultsRecursion(int[] array, int resting, int max, int idx, boolean interrupt) {
 		if(interrupt) return;
-		
+
 		//stop condition for the recursion
 		//we have reached the last column
 		if (idx == array.length) {
 			//if the number of votes attributed < max => not interesting for us
 			if(arraySum(array)<max)return;
-			System.out.println("Possible combination "+Arrays.toString(array));
+			//System.out.println("Possible combination "+Arrays.toString(array));
 			//compare combination and result of tally
 			Element tempResult = poll.getZ_q().getElement(BigInteger.ZERO);
 			for(int j=0;j<array.length;j++){

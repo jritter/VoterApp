@@ -42,6 +42,12 @@ public class VotingRoundAction extends AbstractAction {
 		super.doAction(message, entity, transition, actionType);
 		Log.d(TAG,"Voting round started");
 
+		Log.e(TAG,"Voting action thread: "+Thread.currentThread().getId());
+		//send broadcast to show the wait dialog
+		Intent intent1 = new Intent(BroadcastIntentTypes.showWaitDialog);
+		LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
+
+		numberMessagesReceived++;
 		ProtocolMessageContainer m = new ProtocolMessageContainer(me.getBi(), null, me.getHi());
 		sendMessage(m, Type.VOTE_MESSAGE_VOTE);
 

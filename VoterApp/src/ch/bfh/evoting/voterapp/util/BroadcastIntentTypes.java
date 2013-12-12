@@ -8,9 +8,10 @@ package ch.bfh.evoting.voterapp.util;
  */
 public class BroadcastIntentTypes {
 	/**
-	 * Intent type sent when a participant has changed his state i.e. has joined the network
+	 * Intent type sent when a participant has changed his state i.e. has joined or left the network
 	 * Extras:
-	 * - nothing
+	 * - action: left when participant left, added when participant added
+	 * - id: id of participant
 	 */
 	public static final String participantStateUpdate = "participantStateUpdate";
 	/**

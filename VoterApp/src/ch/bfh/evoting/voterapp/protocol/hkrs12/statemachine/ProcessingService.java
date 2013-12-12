@@ -53,6 +53,8 @@ public class ProcessingService extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent intent) {
 
+		Log.e(TAG,"Service thread: "+Thread.currentThread().getId());
+
 		boolean exclude = false;
 		Round round = (Round) intent.getSerializableExtra("round");
 		String sender = intent.getStringExtra("sender");

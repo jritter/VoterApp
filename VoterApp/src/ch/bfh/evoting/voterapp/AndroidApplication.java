@@ -423,7 +423,12 @@ public class AndroidApplication extends Application {
 
 	private void dismissDialog(){
 		if(waitDialog!=null && waitDialog.isShowing()){
-			waitDialog.dismiss();
+			try{
+				waitDialog.dismiss();
+			} catch (IllegalArgumentException e){
+				//some time dismissing a dialog that is no more attached to the view
+				e.printStackTrace();
+			}
 			dialogShown = false;
 			Log.e(TAG, "Dismissing dialog");
 		}

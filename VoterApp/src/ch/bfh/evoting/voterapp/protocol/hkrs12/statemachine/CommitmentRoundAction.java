@@ -2,6 +2,8 @@ package ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -53,6 +55,7 @@ public class CommitmentRoundAction extends AbstractAction {
 	private BroadcastReceiver stopReceiver;
 	@SuppressWarnings("unused")
 	private AsyncTask<Object, Object, Object> sendVotesTask;
+	public boolean stopSendingUpdateVote = false;
 
 	public CommitmentRoundAction(final Context context, String messageTypeToListenTo, final ProtocolPoll poll) {
 		super(context, messageTypeToListenTo, poll, 120000);
@@ -60,8 +63,15 @@ public class CommitmentRoundAction extends AbstractAction {
 		voteDone = new BroadcastReceiver() {
 
 			@Override
-			public void onReceive(Context context, Intent intent) {
-				executeCallback(intent);
+			public void onReceive(Context context, final Intent intent) {
+				new AsyncTask<Void, Void, Void>() {
+
+					@Override
+					protected Void doInBackground(Void... params) {
+						executeCallback(intent);
+						return null;
+					}
+				}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 			}
 		};
 		LocalBroadcastManager.getInstance(context).registerReceiver(voteDone, new IntentFilter(BroadcastIntentTypes.vote));
@@ -70,16 +80,24 @@ public class CommitmentRoundAction extends AbstractAction {
 		stopReceiver = new BroadcastReceiver(){
 			@Override
 			public void onReceive(Context arg0, Intent intent) {
-				//send broadcast to dismiss the wait dialog
-				Intent intent1 = new Intent(BroadcastIntentTypes.showWaitDialog);
-				LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
+				new AsyncTask<Void, Void, Void>() {
 
-				for(Participant p:poll.getParticipants().values()){
-					if(!messagesReceived.containsKey(p.getUniqueId())){
-						poll.getExcludedParticipants().put(p.getUniqueId(), p);
+					@Override
+					protected Void doInBackground(Void... params) {
+						//send broadcast to dismiss the wait dialog
+						Intent intent1 = new Intent(BroadcastIntentTypes.showWaitDialog);
+						LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
+
+						for(Participant p:poll.getParticipants().values()){
+							if(!messagesReceived.containsKey(p.getUniqueId())){
+								poll.getExcludedParticipants().put(p.getUniqueId(), p);
+							}
+						}
+						goToNextState();
+						return null;
 					}
-				}
-				goToNextState();
+				}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
 			}
 		};
 		LocalBroadcastManager.getInstance(context).registerReceiver(stopReceiver, new IntentFilter(BroadcastIntentTypes.stopVote));
@@ -131,15 +149,7 @@ public class CommitmentRoundAction extends AbstractAction {
 			poll.getExcludedParticipants().put(sender, senderParticipant);
 		}
 		super.savedProcessedMessage(round, sender, message, exclude);
-		poll.getParticipants().get(sender).setHasVoted(true);
 
-//		Log.e(TAG, "Sending update vote broadcast");
-//		//notify UI about new incomed vote
-//		Intent i = new Intent(BroadcastIntentTypes.newIncomingVote);
-//		i.putExtra("votes", messagesReceived.size());
-//		i.putExtra("options", (Serializable)poll.getOptions());
-//		i.putExtra("participants", (Serializable)poll.getParticipants());
-//		LocalBroadcastManager.getInstance(context).sendBroadcast(i);
 	}
 
 	@Override
@@ -156,9 +166,50 @@ public class CommitmentRoundAction extends AbstractAction {
 			Log.e(TAG,e.getMessage());
 			e.printStackTrace();
 		}
+		Timer timer = new Timer();
+		TaskTimer timerTask = new TaskTimer();
+		timer.schedule(timerTask, 5000);
 	}
+	
+	/**
+	 * Task run on timer tick
+	 * 
+	 */
+	private class TaskTimer extends TimerTask {
+
+		@Override
+		public void run() {
+			stopSendingUpdateVote = true;
+		}
+	};
 
 	public void executeCallback(Intent data) {
+
+		Log.e(TAG,"executeCallback thread id: "+Thread.currentThread().getId());
+
+		//notify UI about new incomed vote
+		Log.e(TAG, "Sending update vote broadcast");
+		me.setHasVoted(true);
+		numberMessagesReceived++;
+		//inform GUI about new vote message received
+		sendVotesTask = new AsyncTask<Object, Object, Object>(){
+
+			@Override
+			protected Object doInBackground(Object... arg0) {
+				while(!stopSendingUpdateVote){
+
+					//notify UI about new incomed vote
+					Intent i = new Intent(BroadcastIntentTypes.newIncomingVote);
+					i.putExtra("votes", numberMessagesReceived);
+					i.putExtra("options", (Serializable)poll.getOptions());
+					i.putExtra("participants", (Serializable)poll.getParticipants());
+					LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+					SystemClock.sleep(1000);
+				}
+				return null;
+			}
+
+		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
 		ProtocolOption option = (ProtocolOption)data.getSerializableExtra("option");
 		int index = data.getIntExtra("index", -1);
@@ -184,42 +235,13 @@ public class CommitmentRoundAction extends AbstractAction {
 		Tuple privateInput = vpg.createPrivateInput(me.getXi(), index);
 		me.setProofValidVote(vpg.generate(privateInput, publicInput));
 
-		//notify UI about new incomed vote
-		Log.e(TAG, "Sending update vote broadcast");
-		me.setHasVoted(true);
-		Intent intent = new Intent(BroadcastIntentTypes.newIncomingVote);
-		intent.putExtra("votes", messagesReceived.size()+1);
-		intent.putExtra("options", (Serializable)poll.getOptions());
-		intent.putExtra("participants", (Serializable)poll.getParticipants());
-		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-
 		ProtocolMessageContainer m = new ProtocolMessageContainer(null, me.getProofValidVote(), null);
 		sendMessage(m, Type.VOTE_MESSAGE_COMMIT);
-		me.setHasVoted(true);
 
 		if(readyToGoToNextState()){
 			goToNextState();
 		}
 
-		//inform GUI about new vote message received
-		sendVotesTask = new AsyncTask<Object, Object, Object>(){
-
-			@Override
-			protected Object doInBackground(Object... arg0) {
-				while(!actionTerminated){
-
-					//notify UI about new incomed vote
-					Intent i = new Intent(BroadcastIntentTypes.newIncomingVote);
-					i.putExtra("votes", messagesReceived.size());
-					i.putExtra("options", (Serializable)poll.getOptions());
-					i.putExtra("participants", (Serializable)poll.getParticipants());
-					LocalBroadcastManager.getInstance(context).sendBroadcast(i);
-					SystemClock.sleep(1000);
-				}
-				return null;
-			}
-
-		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
 
 

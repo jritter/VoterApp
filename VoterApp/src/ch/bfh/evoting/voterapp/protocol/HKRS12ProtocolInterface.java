@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Participant;
@@ -133,7 +134,7 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 			protected Object doInBackground(Object... arg0) {
 				//Do some protocol specific stuff
 				stateMachineManager = new StateMachineManager(context, (ProtocolPoll)poll);
-				stateMachineManager.run();
+				new Thread(stateMachineManager).start();
 				return null;
 			}
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -154,10 +155,7 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 	@Override
 	public void vote(final Option selectedOption, final Poll poll) {
 
-		//Send a broadcast to start the wait for vote activity
-		Intent intent = new Intent(BroadcastIntentTypes.showNextActivity);
-		intent.putExtra("poll", (Serializable)poll);
-		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+		
 
 //		new AsyncTask<Object, Object, Object>(){
 //			@Override
@@ -182,10 +180,21 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 //			}
 //		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
+		//Send a broadcast to start the wait for vote activity
+		Intent intent = new Intent(BroadcastIntentTypes.showNextActivity);
+		intent.putExtra("poll", (Serializable)poll);
+		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+		
+		Log.e("HKRS12","UI thread: "+Thread.currentThread().getId());
+		
 		new Thread(){
 
 			@Override
 			public void run() {
+				Log.e("HKRS12","Vote processing thread: "+Thread.currentThread().getId());
+
+				
+				
 				//do some protocol specific stuff
 				int index = -1;
 				int j = 0;

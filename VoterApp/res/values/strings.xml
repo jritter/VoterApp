@@ -129,7 +129,12 @@
     <string name="dialog_nfc_unable_format_ndef">Unable to format NFC tag to NDEF.</string>
     <string name="dialog_nfc_no_ndef_support">This NFC tag does not appear to support NDEF format.</string>
     <string name="dialog_title_result_chart">Result chart</string>
-
+    <string name="dialog_title_result_not_shown">Result not shown</string>
+    <string name="dialog_result_not_shown">There were less than three voters. In order to keep the vote secrecy, the result is not shown.</string>
+    <string name="dialog_title_result_not_computed">Result not computed</string>
+    <string name="dialog_result_not_computed">The application was not able to compute the result. We apologize for the inconvenience this may cause.</string>
+        
+    
     <!-- Help overlays -->
     <string name="overlay_close">Touch the screen to close this help</string>
     <string name="overlay_identification">Put your identification here&#8230;</string>

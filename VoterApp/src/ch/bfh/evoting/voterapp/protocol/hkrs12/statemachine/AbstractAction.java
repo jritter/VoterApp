@@ -42,6 +42,8 @@ public abstract class AbstractAction implements Action {
 	protected String TAG;
 
 	protected Map<String,ProtocolMessageContainer> messagesReceived;
+	protected int numberMessagesReceived = 0;
+
 
 	private boolean timerIsRunning = false;
 	private Timer timer;
@@ -86,7 +88,8 @@ public abstract class AbstractAction implements Action {
 		// Subscribing to the messageArrived events to update immediately
 		LocalBroadcastManager.getInstance(context).registerReceiver(
 				this.voteMessageReceiver, new IntentFilter(messageTypeToListenTo));
-
+		LocalBroadcastManager.getInstance(context).registerReceiver(
+				this.participantsLeaved, new IntentFilter(BroadcastIntentTypes.participantStateUpdate));
 	}
 
 	/**
@@ -99,6 +102,7 @@ public abstract class AbstractAction implements Action {
 		if(timeOut>0){
 			this.startTimer(timeOut);
 		}
+		Log.e(TAG,"action thread: "+Thread.currentThread().getId());
 	}
 
 
@@ -130,7 +134,7 @@ public abstract class AbstractAction implements Action {
 				Log.w(TAG, "Ignoring message from previously excluded participant!");
 				return;
 			}
-			
+						
 			if(sender.equals(me.getUniqueId())){
 				Log.d(TAG, "Message received from myself, not needed to process it.");
 				if(!messagesReceived.containsKey(sender)){
@@ -142,12 +146,21 @@ public abstract class AbstractAction implements Action {
 				return;
 			}
 			
+			numberMessagesReceived++;
+
 			Round round = null;
 			
 			if(AbstractAction.this instanceof SetupRoundAction){
 				round = Round.setup;
 			} else if(AbstractAction.this instanceof CommitmentRoundAction){
 				round = Round.commit;
+				poll.getParticipants().get(sender).setHasVoted(true);
+				//notify UI about new incomed vote
+				Intent i = new Intent(BroadcastIntentTypes.newIncomingVote);
+				i.putExtra("votes", numberMessagesReceived);
+				i.putExtra("options", (Serializable)poll.getOptions());
+				i.putExtra("participants", (Serializable)poll.getParticipants());
+				LocalBroadcastManager.getInstance(context).sendBroadcast(i);
 			} else if(AbstractAction.this instanceof VotingRoundAction){
 				round = Round.voting;
 			} else if(AbstractAction.this instanceof RecoveryRoundAction){
@@ -170,9 +183,18 @@ public abstract class AbstractAction implements Action {
 	protected BroadcastReceiver participantsLeaved = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			//TODO
+
+			String action = intent.getStringExtra("action");
+			if(action==null || action.equals("")){
+				return;
+			} else if (action.equals("left")){
+				Participant p = poll.getParticipants().get(intent.getStringExtra("id"));
+				if(p!=null){
+					poll.getExcludedParticipants().put(p.getUniqueId(), p);
+					Log.w(TAG, "Participant "+p.getIdentification()+" ("+p.getUniqueId()+") was added to excluded list since he went out of the network.");
+				}
+			}
 			
-			//poll.getExcludedParticipants().put(key, value);
 			if(readyToGoToNextState()){
 				goToNextState();
 			}
@@ -210,6 +232,7 @@ public abstract class AbstractAction implements Action {
 				return false;
 			}
 		}
+		Log.e(TAG, "number of messages received "+messagesReceived.size());
 		return true;
 	}
 
@@ -293,7 +316,7 @@ public abstract class AbstractAction implements Action {
 	 */
 	public void reset(){
 		LocalBroadcastManager.getInstance(context).unregisterReceiver(voteMessageReceiver);
-		//		LocalBroadcastManager.getInstance(context).unregisterReceiver(participantsLeaved);
+		LocalBroadcastManager.getInstance(context).unregisterReceiver(participantsLeaved);
 	}
 
 	

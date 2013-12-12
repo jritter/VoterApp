@@ -73,7 +73,7 @@ public class SetupRoundAction extends AbstractAction {
 		PreimageProofGenerator spg = PreimageProofGenerator.getInstance(scg, f);
 
 		me.setProofForXi(spg.generate(me.getXi(), me.getAi()));
-
+		numberMessagesReceived++;
 		ProtocolMessageContainer m = new ProtocolMessageContainer(me.getAi(), me.getProofForXi());
 		sendMessage(m, Type.VOTE_MESSAGE_SETUP);
 

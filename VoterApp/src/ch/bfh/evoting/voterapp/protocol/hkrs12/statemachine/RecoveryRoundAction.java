@@ -54,6 +54,8 @@ public class RecoveryRoundAction extends AbstractAction {
 			TransitionFailureException, InterruptedException {
 		super.doAction(message, entity, transition, actionType);
 		Log.d(TAG,"Recovery round started");
+		Log.e(TAG,"Recovery action thread: "+Thread.currentThread().getId());
+
 
 		Element productNumerator = poll.getG_q().getElement(BigInteger.valueOf(1));
 		Element productDenominator = poll.getG_q().getElement(BigInteger.valueOf(1));
@@ -92,6 +94,7 @@ public class RecoveryRoundAction extends AbstractAction {
 		Tuple publicInput = Tuple.getInstance(me.getAi(), me.getHiHatPowXi());
 		me.setProofForHiHat(piepg.generate(me.getXi(), publicInput));
 		
+		numberMessagesReceived++;
 		ProtocolMessageContainer m = new ProtocolMessageContainer(me.getHiHatPowXi(), me.getProofForHiHat(), me.getHiHat());
 		sendMessage(m, Type.VOTE_MESSAGE_RECOVERY);
 

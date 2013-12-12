@@ -1,17 +1,12 @@
 package ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolPoll;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 
 import com.continuent.tungsten.fsm.core.EntityAdapter;
-import com.continuent.tungsten.fsm.core.Event;
 import com.continuent.tungsten.fsm.core.EventTypeGuard;
 import com.continuent.tungsten.fsm.core.FiniteStateException;
 import com.continuent.tungsten.fsm.core.Guard;
@@ -49,7 +44,6 @@ public class StateMachineManager implements Runnable {
 	public StateMachineManager(Context context, ProtocolPoll poll) {
 		this.context = context;
 		this.poll = poll;
-		LocalBroadcastManager.getInstance(context).registerReceiver(applyTransition, new IntentFilter("applyTransition"));
 	}
 
 	/**
@@ -57,6 +51,7 @@ public class StateMachineManager implements Runnable {
 	 */
 	@Override
 	public void run() {
+		Log.e("StateMachineManager","SMM thread: "+Thread.currentThread().getId());
 
 		/*Create the state machine*/
 		StateTransitionMap stmap = new StateTransitionMap();
@@ -141,24 +136,5 @@ public class StateMachineManager implements Runnable {
 	public StateMachine getStateMachine(){
 		return sm;
 	}
-	
-	
-	
-	/**
-	 * Listen for broadcasts asking to apply a transition
-	 */
-	private BroadcastReceiver applyTransition = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Event event = (Event)intent.getSerializableExtra("event");
-			try {
-				sm.applyEvent(event);
-			} catch (FiniteStateException e) {
-				Log.e(TAG, e.getMessage());
-			} catch (InterruptedException e) {
-				Log.e(TAG, e.getMessage());
-			}
-		}
-	};
 	
 }
