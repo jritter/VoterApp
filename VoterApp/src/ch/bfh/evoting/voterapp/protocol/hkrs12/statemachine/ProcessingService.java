@@ -17,12 +17,14 @@ import ch.bfh.unicrypt.crypto.proofgenerator.challengegenerator.interfaces.Sigma
 import ch.bfh.unicrypt.crypto.proofgenerator.classes.ElGamalEncryptionValidityProofGenerator;
 import ch.bfh.unicrypt.crypto.proofgenerator.classes.PreimageEqualityProofGenerator;
 import ch.bfh.unicrypt.crypto.proofgenerator.classes.PreimageProofGenerator;
+import ch.bfh.unicrypt.crypto.schemes.commitment.classes.StandardCommitmentScheme;
 import ch.bfh.unicrypt.crypto.schemes.encryption.classes.ElGamalEncryptionScheme;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringElement;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringMonoid;
 import ch.bfh.unicrypt.math.algebra.dualistic.classes.N;
 import ch.bfh.unicrypt.math.algebra.dualistic.classes.ZMod;
 import ch.bfh.unicrypt.math.algebra.general.classes.ProductSemiGroup;
+import ch.bfh.unicrypt.math.algebra.general.classes.Subset;
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.SemiGroup;
@@ -61,7 +63,7 @@ public class ProcessingService extends IntentService {
 		ProtocolMessageContainer message = (ProtocolMessageContainer) intent.getSerializableExtra("message");
 
 		AbstractAction action = ((AbstractAction)sm.getState().getEntryAction());
-		if(action==null) return; //state machine was already terminated
+		if(action==null || action instanceof ExitAction) return; //state machine was already terminated
 
 		//Get the poll for read only actions
 		ProtocolPoll poll = action.getPoll();
@@ -74,17 +76,18 @@ public class ProcessingService extends IntentService {
 
 			//Verify proof of knowledge of xi
 
-			Function f = CompositeFunction.getInstance(MultiIdentityFunction.getInstance(poll.getZ_q(), 1), PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(poll.getG_q(), poll.getZ_q()), poll.getGenerator(), 0));
+			StandardCommitmentScheme<GStarMod, Element> csSetup = StandardCommitmentScheme.getInstance(poll.getGenerator());
+//			Function f = CompositeFunction.getInstance(MultiIdentityFunction.getInstance(poll.getZ_q(), 1), PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(poll.getG_q(), poll.getZ_q()), poll.getGenerator(), 0));
 
 			//Generator and index of the participant has also to be hashed in the proof
 			Element index = N.getInstance().getElement(BigInteger.valueOf(senderParticipant.getProtocolParticipantIndex()));
 			StringElement proverId = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII).getElement(senderParticipant.getUniqueId());
 			Tuple otherInput = Tuple.getInstance(poll.getGenerator(), index, proverId);
 
-			SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator.getInstance(
-					f.getCoDomain(), (SemiGroup)f.getCoDomain(), ZMod.getInstance(f.getDomain().getMinimalOrder()), otherInput);
+			SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator.getInstance(csSetup.getCommitmentFunction(), otherInput);
+//					f.getCoDomain(), (SemiGroup)f.getCoDomain(), ZMod.getInstance(f.getDomain().getMinimalOrder()), otherInput);
 
-			PreimageProofGenerator spg = PreimageProofGenerator.getInstance(scg, f);
+			PreimageProofGenerator spg = PreimageProofGenerator.getInstance(scg, csSetup.getCommitmentFunction());
 
 			//if proof is false, exclude participant
 			if(!spg.verify(message.getProof(), message.getValue()).getBoolean()){
@@ -114,8 +117,9 @@ public class ProcessingService extends IntentService {
 			ElGamalEncryptionScheme<GStarMod, Element> ees = ElGamalEncryptionScheme.getInstance(poll.getGenerator());
 			StringElement proverId2 = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII).getElement(senderParticipant.getUniqueId());
 			SigmaChallengeGenerator scg2 = ElGamalEncryptionValidityProofGenerator.createNonInteractiveChallengeGenerator(ees, possibleVotes.length, proverId2);
+			Subset possibleVotesSet = Subset.getInstance(poll.getG_q(), possibleVotes);
 			ElGamalEncryptionValidityProofGenerator vpg = ElGamalEncryptionValidityProofGenerator.getInstance(
-					scg2, ees, message.getComplementaryValue(), possibleVotes);
+					scg2, ees, message.getComplementaryValue(), possibleVotesSet);
 
 			//simulate the ElGamal cipher text (a,b) = (ai,bi);
 			Tuple publicInput = Tuple.getInstance(senderParticipant.getAi(), message.getValue());

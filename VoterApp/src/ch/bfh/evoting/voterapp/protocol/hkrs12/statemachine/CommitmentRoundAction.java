@@ -2,6 +2,8 @@ package ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine;
 
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -29,6 +31,7 @@ import ch.bfh.unicrypt.crypto.proofgenerator.classes.ElGamalEncryptionValidityPr
 import ch.bfh.unicrypt.crypto.schemes.encryption.classes.ElGamalEncryptionScheme;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringElement;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringMonoid;
+import ch.bfh.unicrypt.math.algebra.general.classes.Subset;
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
 import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarMod;
@@ -87,9 +90,12 @@ public class CommitmentRoundAction extends AbstractAction {
 						//send broadcast to dismiss the wait dialog
 						Intent intent1 = new Intent(BroadcastIntentTypes.showWaitDialog);
 						LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
+						
+						//Wait for other voters to submit their votes
+						SystemClock.sleep(8000);
 
 						for(Participant p:poll.getParticipants().values()){
-							if(!messagesReceived.containsKey(p.getUniqueId())){
+							if(!messagesReceived.containsKey(p.getUniqueId()) && !poll.getCompletelyExcludedParticipants().containsKey(p.getUniqueId())){
 								poll.getExcludedParticipants().put(p.getUniqueId(), p);
 							}
 						}
@@ -119,7 +125,12 @@ public class CommitmentRoundAction extends AbstractAction {
 		Element productNumerator = poll.getG_q().getElement(BigInteger.valueOf(1));
 		Element productDenominator = poll.getG_q().getElement(BigInteger.valueOf(1));
 
+		Collection<Participant> activeParticipants = new ArrayList<Participant>();
 		for(Participant p : poll.getParticipants().values()){
+			activeParticipants.add(p);
+		}
+		activeParticipants.removeAll(poll.getCompletelyExcludedParticipants().values());
+		for(Participant p : activeParticipants){
 			ProtocolParticipant p2 = (ProtocolParticipant) p;
 			if(p2.getProtocolParticipantIndex()>me.getProtocolParticipantIndex()){
 				productDenominator = productDenominator.apply(p2.getAi());
@@ -128,7 +139,7 @@ public class CommitmentRoundAction extends AbstractAction {
 			}
 		}
 
-		me.setHi(productNumerator.apply(productDenominator.invert()));
+		me.setHi(productNumerator.applyInverse(productDenominator));
 
 		//send broadcast to dismiss the wait dialog
 		Intent intent2 = new Intent(BroadcastIntentTypes.dismissWaitDialog);
@@ -227,8 +238,9 @@ public class CommitmentRoundAction extends AbstractAction {
 		ElGamalEncryptionScheme<GStarMod, Element> ees = ElGamalEncryptionScheme.getInstance(poll.getGenerator());
 		StringElement proverId = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII).getElement(me.getUniqueId());
 		SigmaChallengeGenerator scg = ElGamalEncryptionValidityProofGenerator.createNonInteractiveChallengeGenerator(ees, possibleVotes.length, proverId);
+		Subset possibleVotesSet = Subset.getInstance(poll.getG_q(), possibleVotes);
 		ElGamalEncryptionValidityProofGenerator vpg = ElGamalEncryptionValidityProofGenerator.getInstance(
-				scg, ees, me.getHi(), possibleVotes);
+				scg, ees, me.getHi(), possibleVotesSet);
 
 		//simulate the ElGamal cipher text (a,b) = (ai,bi);
 		Tuple publicInput = Tuple.getInstance(me.getAi(), me.getBi());
@@ -243,6 +255,5 @@ public class CommitmentRoundAction extends AbstractAction {
 		}
 
 	}
-
 
 }

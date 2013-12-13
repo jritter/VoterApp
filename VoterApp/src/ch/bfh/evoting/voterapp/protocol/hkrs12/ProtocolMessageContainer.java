@@ -77,5 +77,13 @@ public class ProtocolMessageContainer implements Serializable {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return "ProtocolMessageContainer [value=" + value + ", proof=" + proof
+				+ ", complementaryValue=" + complementaryValue + "]";
+	}
+
+	
+
 	
 }

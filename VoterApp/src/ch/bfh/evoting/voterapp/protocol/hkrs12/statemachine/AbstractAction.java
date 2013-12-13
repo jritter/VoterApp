@@ -12,6 +12,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import ch.bfh.evoting.voterapp.AndroidApplication;
@@ -59,6 +60,8 @@ public abstract class AbstractAction implements Action {
 
 	private long timeOut;
 
+	public AbstractAction(){};
+	
 	/**
 	 * Create an  Action object
 	 * 
@@ -79,17 +82,17 @@ public abstract class AbstractAction implements Action {
 		this.context = context;
 		this.poll = poll;
 		this.timeOut = timeOut;
-		
+
 		for(Participant p:poll.getParticipants().values()){
 			if(p.getUniqueId().equals(AndroidApplication.getInstance().getNetworkInterface().getMyUniqueId())){
 				this.me = (ProtocolParticipant)p;
 			}
 		}
-		// Subscribing to the messageArrived events to update immediately
-		LocalBroadcastManager.getInstance(context).registerReceiver(
-				this.voteMessageReceiver, new IntentFilter(messageTypeToListenTo));
-		LocalBroadcastManager.getInstance(context).registerReceiver(
-				this.participantsLeaved, new IntentFilter(BroadcastIntentTypes.participantStateUpdate));
+		if(messageTypeToListenTo!=null){
+			// Subscribing to the messageArrived events to update immediately
+			LocalBroadcastManager.getInstance(context).registerReceiver(
+					this.voteMessageReceiver, new IntentFilter(messageTypeToListenTo));
+		}
 	}
 
 	/**
@@ -99,6 +102,8 @@ public abstract class AbstractAction implements Action {
 	public void doAction(Event arg0, Entity arg1, Transition arg2, int arg3)
 			throws TransitionRollbackException, TransitionFailureException,
 			InterruptedException {
+		LocalBroadcastManager.getInstance(context).registerReceiver(
+				this.participantsLeaved, new IntentFilter(BroadcastIntentTypes.participantStateUpdate));
 		if(timeOut>0){
 			this.startTimer(timeOut);
 		}
@@ -134,22 +139,22 @@ public abstract class AbstractAction implements Action {
 				Log.w(TAG, "Ignoring message from previously excluded participant!");
 				return;
 			}
-						
+
 			if(sender.equals(me.getUniqueId())){
 				Log.d(TAG, "Message received from myself, not needed to process it.");
 				if(!messagesReceived.containsKey(sender)){
 					messagesReceived.put(sender, message);
 					Log.d(TAG, "Message received from "+sender);
 				}
-				
+
 				if(readyToGoToNextState()) goToNextState();
 				return;
 			}
-			
+
 			numberMessagesReceived++;
 
 			Round round = null;
-			
+
 			if(AbstractAction.this instanceof SetupRoundAction){
 				round = Round.setup;
 			} else if(AbstractAction.this instanceof CommitmentRoundAction){
@@ -166,13 +171,13 @@ public abstract class AbstractAction implements Action {
 			} else if(AbstractAction.this instanceof RecoveryRoundAction){
 				round = Round.recovery;
 			}
-			
+
 			Intent intent2 = new Intent(context, ProcessingService.class);
 			intent2.putExtra("round", (Serializable) round);
 			intent2.putExtra("message", (Serializable) message);
 			intent2.putExtra("sender", sender);
 			context.startService(intent2);
-			
+
 		}
 	};
 
@@ -190,11 +195,16 @@ public abstract class AbstractAction implements Action {
 			} else if (action.equals("left")){
 				Participant p = poll.getParticipants().get(intent.getStringExtra("id"));
 				if(p!=null){
-					poll.getExcludedParticipants().put(p.getUniqueId(), p);
-					Log.w(TAG, "Participant "+p.getIdentification()+" ("+p.getUniqueId()+") was added to excluded list since he went out of the network.");
+					if(AbstractAction.this instanceof SetupRoundAction){
+						poll.getCompletelyExcludedParticipants().put(p.getUniqueId(), p);
+						Log.w(TAG, "Participant "+p.getIdentification()+" ("+p.getUniqueId()+") went out of the network before submitting the setup value, so he was completely excluded (also from recovery).");
+					} else {
+						poll.getExcludedParticipants().put(p.getUniqueId(), p);
+						Log.w(TAG, "Participant "+p.getIdentification()+" ("+p.getUniqueId()+") was added to excluded list since he went out of the network.");
+					}
 				}
 			}
-			
+
 			if(readyToGoToNextState()){
 				goToNextState();
 			}
@@ -209,10 +219,10 @@ public abstract class AbstractAction implements Action {
 	 * @param exclude if the processing of the message done imply the exclusion of the participant
 	 */
 	public void savedProcessedMessage(Round round, String sender, ProtocolMessageContainer message, boolean exclude){
-		
+
 		if(!messagesReceived.containsKey(sender)){
 			messagesReceived.put(sender, message);
-			Log.d(TAG, "Message received from "+sender);
+			Log.d(TAG, "Message received from "+sender+ message);
 		}
 	}
 
@@ -226,6 +236,7 @@ public abstract class AbstractAction implements Action {
 			activeParticipants.add(p);
 		}
 		activeParticipants.removeAll(poll.getExcludedParticipants().values());
+		activeParticipants.removeAll(poll.getCompletelyExcludedParticipants().values());
 		for(Participant p: activeParticipants){
 			if(!this.messagesReceived.containsKey(p.getUniqueId())){
 				Log.w(TAG, "Message from "+p.getUniqueId()+" ("+p.getIdentification()+") not received");
@@ -243,6 +254,7 @@ public abstract class AbstractAction implements Action {
 		this.stopTimer();
 		this.actionTerminated = true;
 		LocalBroadcastManager.getInstance(context).unregisterReceiver(voteMessageReceiver);
+		LocalBroadcastManager.getInstance(context).unregisterReceiver(participantsLeaved);
 	}
 
 
@@ -297,12 +309,19 @@ public abstract class AbstractAction implements Action {
 		public void run() {
 			Log.e(TAG, "Time out !");
 			stopTimer();
+			if(AbstractAction.this instanceof CommitmentRoundAction){
+				//Sleeping some time in order to let time voters processing a message to send this message
+				SystemClock.sleep(15000);
+			}
 			for(Participant p:poll.getParticipants().values()){
-				if(!messagesReceived.containsKey(p.getUniqueId())){
+				if(AbstractAction.this instanceof SetupRoundAction){
+					poll.getCompletelyExcludedParticipants().put(p.getUniqueId(), p);
+					Log.w(TAG, "Participant "+p.getIdentification()+" ("+p.getUniqueId()+") went out of the network before submitting the setup value, so he was completely excluded (also from recovery).");
+				} else if(!messagesReceived.containsKey(p.getUniqueId()) && !poll.getCompletelyExcludedParticipants().containsKey(p.getUniqueId())){
 					poll.getExcludedParticipants().put(p.getUniqueId(), p);
 				}
 			}
-			
+
 			goToNextState();
 		}
 	};
@@ -319,8 +338,8 @@ public abstract class AbstractAction implements Action {
 		LocalBroadcastManager.getInstance(context).unregisterReceiver(participantsLeaved);
 	}
 
-	
 
-	
+
+
 
 }

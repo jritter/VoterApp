@@ -70,7 +70,7 @@ public class StateMachineManager implements Runnable {
 		State vote = new State("vote", StateType.ACTIVE, votingRoundAction, null);
 		State tally = new State("tally", StateType.ACTIVE, tallyingAction, null);
 		State recovery = new State("recover", StateType.ACTIVE, recoveryRoundAction, null);
-		State exit = new State("exit", StateType.END, null, null);
+		State exit = new State("exit", StateType.END, new ExitAction(), null);
 
 		
 		/*Define Guards (=conditions) for transitions*/

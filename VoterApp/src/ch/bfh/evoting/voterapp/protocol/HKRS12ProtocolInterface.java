@@ -51,18 +51,14 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 
 				//compute Baudron et al
 				Element two = newPoll.getZ_q().getElement(BigInteger.valueOf(2));
-				int m = -1;
-				for(int i=0; i<Integer.MAX_VALUE;i++){
-					BigInteger pow2i = two.getValue().pow(i);
-					//if 2^i > n
-					if(pow2i.compareTo(BigInteger.valueOf(poll.getNumberOfParticipants()))==1){
-						m=i;
-						break;
-					}
-				}
+				BigInteger pow2i;
+				int m=-1;
+				do{
+					m++;
+					pow2i = two.getValue().pow(m);
+				}while(pow2i.compareTo(BigInteger.valueOf(poll.getNumberOfParticipants()))<1);
 
 				//transform options in protocol options and create a "generator" for each option
-				//TODO generator dependant of the text...
 				int j=0;
 				List<Option> options = new ArrayList<Option>();
 				for(Option op : poll.getOptions()){
@@ -238,5 +234,8 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 		return this.stateMachineManager;
 	}
 
+	public void reset(){
+		this.stateMachineManager = null;
+	}
 
 }

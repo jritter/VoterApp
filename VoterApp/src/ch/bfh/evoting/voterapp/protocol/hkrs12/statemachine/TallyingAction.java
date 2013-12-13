@@ -70,7 +70,17 @@ public class TallyingAction extends AbstractAction {
 			public void propertyChange(PropertyChangeEvent event) {
 				precomputationTask.cancel(true);
 				resultMap.clear();
-				precomputationTask = createPrecomputationTask(poll.getNumberOfParticipants()-poll.getExcludedParticipants().size());
+				precomputationTask = createPrecomputationTask(poll.getNumberOfParticipants()-poll.getExcludedParticipants().size()-poll.getCompletelyExcludedParticipants().size());
+			}
+		});
+		
+		((ObservableTreeMap<String, Participant>)poll.getCompletelyExcludedParticipants()).addPropertyChangeListener(new PropertyChangeListener() {
+
+			@Override
+			public void propertyChange(PropertyChangeEvent event) {
+				precomputationTask.cancel(true);
+				resultMap.clear();
+				precomputationTask = createPrecomputationTask(poll.getNumberOfParticipants()-poll.getExcludedParticipants().size()-poll.getCompletelyExcludedParticipants().size());
 			}
 		});
 	}
@@ -91,6 +101,7 @@ public class TallyingAction extends AbstractAction {
 			activeParticipants.add(p);
 		}
 		activeParticipants.removeAll(poll.getExcludedParticipants().values());
+		activeParticipants.removeAll(poll.getCompletelyExcludedParticipants().values());
 		for(Participant p : activeParticipants){
 
 			ProtocolParticipant p2 = (ProtocolParticipant)p;
@@ -108,7 +119,6 @@ public class TallyingAction extends AbstractAction {
 		if(result!=null){
 			Log.d(TAG, "Result is "+Arrays.toString(result));
 			float sum = arraySum(result);
-			if(sum>2){
 				int i=0;
 				for(Option op : poll.getOptions()){
 					op.setVotes(result[i]);
@@ -117,52 +127,52 @@ public class TallyingAction extends AbstractAction {
 					}
 					i++;
 				}
-			} else {
-				Log.w(TAG, "Number of voters <= 2, so didn't display result to keep vote secrecy");
-
-				new AsyncTask<Void, Void, Void>() {
-
-					@Override
-					protected Void doInBackground(Void... params) {
-
-						while(!(AndroidApplication.getInstance().getCurrentActivity() instanceof DisplayResultActivity)){
-							SystemClock.sleep(300);
-						}
-
-						AndroidApplication.getInstance().getCurrentActivity().runOnUiThread(new Runnable(){
-
-							public void run(){
-								AlertDialog.Builder builder = new AlertDialog.Builder(AndroidApplication.getInstance().getCurrentActivity());
-								// Add the buttons
-								builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog, int id) {
-										dialogResultNotShown.dismiss();
-									}
-								});
-
-								builder.setTitle(R.string.dialog_title_result_not_shown);
-								builder.setMessage(R.string.dialog_result_not_shown);
-
-
-								dialogResultNotShown = builder.create();
-								dialogResultNotShown.setOnShowListener(new DialogInterface.OnShowListener() {
-									@Override
-									public void onShow(DialogInterface dialog) {
-										Utility.setTextColor(dialog, AndroidApplication.getInstance().getResources().getColor(R.color.theme_color));
-										dialogResultNotShown.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
-												R.drawable.selectable_background_votebartheme);
-									}
-								});
-
-								// Create the AlertDialog
-								dialogResultNotShown.show();
-							}
-						});
-						return null;
-					}
-				}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
-			}
+//			} else {
+//				Log.w(TAG, "Number of voters <= 2, so didn't display result to keep vote secrecy");
+//
+//				new AsyncTask<Void, Void, Void>() {
+//
+//					@Override
+//					protected Void doInBackground(Void... params) {
+//
+//						while(!(AndroidApplication.getInstance().getCurrentActivity() instanceof DisplayResultActivity)){
+//							SystemClock.sleep(300);
+//						}
+//
+//						AndroidApplication.getInstance().getCurrentActivity().runOnUiThread(new Runnable(){
+//
+//							public void run(){
+//								AlertDialog.Builder builder = new AlertDialog.Builder(AndroidApplication.getInstance().getCurrentActivity());
+//								// Add the buttons
+//								builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+//									public void onClick(DialogInterface dialog, int id) {
+//										dialogResultNotShown.dismiss();
+//									}
+//								});
+//
+//								builder.setTitle(R.string.dialog_title_result_not_shown);
+//								builder.setMessage(R.string.dialog_result_not_shown);
+//
+//
+//								dialogResultNotShown = builder.create();
+//								dialogResultNotShown.setOnShowListener(new DialogInterface.OnShowListener() {
+//									@Override
+//									public void onShow(DialogInterface dialog) {
+//										Utility.setTextColor(dialog, AndroidApplication.getInstance().getResources().getColor(R.color.theme_color));
+//										dialogResultNotShown.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
+//												R.drawable.selectable_background_votebartheme);
+//									}
+//								});
+//
+//								// Create the AlertDialog
+//								dialogResultNotShown.show();
+//							}
+//						});
+//						return null;
+//					}
+//				}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+//
+//			}
 		} else {
 			Log.e(TAG, "Result not found");
 			new AsyncTask<Void, Void, Void>() {
@@ -322,7 +332,7 @@ public class TallyingAction extends AbstractAction {
 				long startTime = SystemClock.currentThreadTimeMillis();
 				computePossibleResults(numberOfParticipants, this.isCancelled());
 				allResultsComputed = true;
-				Log.e(TAG, "***** All possible results computed in "+(SystemClock.currentThreadTimeMillis()-startTime)+" ms *****");
+				Log.e(TAG, "***** All possible results computed in "+(SystemClock.currentThreadTimeMillis()-startTime)+" ms for "+numberOfParticipants+" participants *****");
 				return null;
 			}
 

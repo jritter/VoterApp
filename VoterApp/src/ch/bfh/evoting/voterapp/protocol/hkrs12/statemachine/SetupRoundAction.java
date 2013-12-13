@@ -14,18 +14,13 @@ import ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine.StateMachineManager.
 import ch.bfh.unicrypt.crypto.proofgenerator.challengegenerator.classes.StandardNonInteractiveSigmaChallengeGenerator;
 import ch.bfh.unicrypt.crypto.proofgenerator.challengegenerator.interfaces.SigmaChallengeGenerator;
 import ch.bfh.unicrypt.crypto.proofgenerator.classes.PreimageProofGenerator;
+import ch.bfh.unicrypt.crypto.schemes.commitment.classes.StandardCommitmentScheme;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringElement;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringMonoid;
 import ch.bfh.unicrypt.math.algebra.dualistic.classes.N;
-import ch.bfh.unicrypt.math.algebra.dualistic.classes.ZMod;
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
-import ch.bfh.unicrypt.math.algebra.general.interfaces.SemiGroup;
-import ch.bfh.unicrypt.math.function.classes.CompositeFunction;
-import ch.bfh.unicrypt.math.function.classes.MultiIdentityFunction;
-import ch.bfh.unicrypt.math.function.classes.PartiallyAppliedFunction;
-import ch.bfh.unicrypt.math.function.classes.SelfApplyFunction;
-import ch.bfh.unicrypt.math.function.interfaces.Function;
+import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarMod;
 import ch.bfh.unicrypt.math.helper.Alphabet;
 
 import com.continuent.tungsten.fsm.core.Entity;
@@ -57,20 +52,22 @@ public class SetupRoundAction extends AbstractAction {
 
 		me.setXi(poll.getZ_q().getRandomElement());
 
-		me.setAi(poll.getGenerator().selfApply(me.getXi()));
+		StandardCommitmentScheme<GStarMod, Element> cs = StandardCommitmentScheme.getInstance(poll.getGenerator());
+		me.setAi(cs.commit(me.getXi()));
+//		poll.getGenerator().selfApply(me.getXi()));
 
 		//Function g^r
-		Function f = CompositeFunction.getInstance(MultiIdentityFunction.getInstance(poll.getZ_q(), 1), PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(poll.getG_q(), poll.getZ_q()), poll.getGenerator(), 0));
+//		Function f = CompositeFunction.getInstance(MultiIdentityFunction.getInstance(poll.getZ_q(), 1), PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(poll.getG_q(), poll.getZ_q()), poll.getGenerator(), 0));
 
 		//Generator and index of the participant has also to be hashed in the proof
 		Element index = N.getInstance().getElement(BigInteger.valueOf(me.getProtocolParticipantIndex()));
 		StringElement proverId = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII).getElement(me.getUniqueId());
 		Tuple otherInput = Tuple.getInstance(poll.getGenerator(), index, proverId);
 
-		SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator.getInstance(
-				f.getCoDomain(), (SemiGroup)f.getCoDomain(), ZMod.getInstance(f.getDomain().getMinimalOrder()), otherInput);
+		SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator.getInstance(cs.getCommitmentFunction(), otherInput);
+//				f.getCoDomain(), (SemiGroup)f.getCoDomain(), ZMod.getInstance(f.getDomain().getMinimalOrder()), otherInput);
 
-		PreimageProofGenerator spg = PreimageProofGenerator.getInstance(scg, f);
+		PreimageProofGenerator spg = PreimageProofGenerator.getInstance(scg, cs.getCommitmentFunction());
 
 		me.setProofForXi(spg.generate(me.getXi(), me.getAi()));
 		numberMessagesReceived++;
@@ -81,42 +78,6 @@ public class SetupRoundAction extends AbstractAction {
 			goToNextState();
 		}
 	}
-
-//	@Override
-//	protected void processMessage(ProtocolMessageContainer message,  ProtocolParticipant senderParticipant) {
-//
-//		Log.d(TAG,"Setup message received from "+senderParticipant.getIdentification());
-////		Intent intent = new Intent(context, ProcessingService.class);
-////		intent.putExtra("round", (Serializable) Round.setup);
-////		intent.putExtra("message", (Serializable) message);
-////		intent.putExtra("sender", (Serializable) senderParticipant);
-////		context.startService(intent);
-//		senderParticipant.setAi(message.getValue());
-//		senderParticipant.setProofForXi(message.getProof());
-//		
-//		//Verify proof of knowledge of xi
-//
-//		Function f = CompositeFunction.getInstance(MultiIdentityFunction.getInstance(poll.getZ_q(), 1), PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(poll.getG_q(), poll.getZ_q()), poll.getGenerator(), 0));
-//
-//		//Generator and index of the participant has also to be hashed in the proof
-//		Element index = N.getInstance().getElement(BigInteger.valueOf(senderParticipant.getProtocolParticipantIndex()));
-//		StringElement proverId = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII).getElement(senderParticipant.getUniqueId());
-//		Tuple otherInput = Tuple.getInstance(poll.getGenerator(), index, proverId);
-//
-//		SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator.getInstance(
-//				f.getCoDomain(), (SemiGroup)f.getCoDomain(), ZMod.getInstance(f.getDomain().getMinimalOrder()), otherInput);
-//
-//		PreimageProofGenerator spg = PreimageProofGenerator.getInstance(scg, f);
-//
-//		//if proof is false, exclude participant
-//		if(!spg.verify(message.getProof(), message.getValue()).getBoolean()){
-//			poll.getExcludedParticipants().put(senderParticipant.getUniqueId(), senderParticipant);
-//		}
-//
-//		if(this.readyToGoToNextState()){
-//			goToNextState();
-//		}
-//	}
 	
 	@Override
 	public void savedProcessedMessage(Round round, String sender, ProtocolMessageContainer message, boolean exclude){

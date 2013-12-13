@@ -2,7 +2,6 @@ package ch.bfh.evoting.voterapp.protocol.hkrs12;
 
 import java.math.BigInteger;
 import java.util.Map;
-import java.util.TreeMap;
 
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
@@ -28,13 +27,14 @@ public class ProtocolPoll extends Poll {
 	private GStarModElement generator;
 	
 	private Map<String, Participant> excludedParticipants = new ObservableTreeMap<String,Participant>();
+	private Map<String, Participant> completelyExcludedParticipants = new ObservableTreeMap<String,Participant>();
 	
 	
 	public ProtocolPoll(Poll poll){
 		super(poll.getId(), poll.getQuestion(), poll.getStartTime(), poll.getOptions(), poll.getParticipants(), poll.isTerminated());
 		G_q = GStarModSafePrime.getInstance(p);
 		Z_q = G_q.getZModOrder();
-		generator = G_q.getRandomGenerator();
+		generator = G_q.getDefaultGenerator();
 	}
 	
 	/**
@@ -61,14 +61,25 @@ public class ProtocolPoll extends Poll {
 		return generator;
 	}
 
+	/**
+	 * Get the map containing all participant excluded during the protocol
+	 * The recovery round will allow to recover them
+	 * @return the map containing all participant excluded during the protocol
+	 */
 	public Map<String, Participant> getExcludedParticipants() {
 		return excludedParticipants;
 	}
 
-	public void setExcludedParticipants(
-			Map<String, Participant> excludedParticipants) {
-		this.excludedParticipants = excludedParticipants;
+	
+	/**
+	 * Get the map containing all participant excluded before the protocol
+	 * The recovery round will NOT allow to recover them
+	 * @return the map containing all participant excluded before the protocol
+	 */
+	public Map<String, Participant> getCompletelyExcludedParticipants() {
+		return completelyExcludedParticipants;
 	}
+
 	
 	
 	

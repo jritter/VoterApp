@@ -15,12 +15,14 @@ import ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine.StateMachineManager.
 import ch.bfh.unicrypt.crypto.proofgenerator.challengegenerator.classes.StandardNonInteractiveSigmaChallengeGenerator;
 import ch.bfh.unicrypt.crypto.proofgenerator.challengegenerator.interfaces.SigmaChallengeGenerator;
 import ch.bfh.unicrypt.crypto.proofgenerator.classes.PreimageEqualityProofGenerator;
+import ch.bfh.unicrypt.crypto.schemes.commitment.classes.StandardCommitmentScheme;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringElement;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringMonoid;
 import ch.bfh.unicrypt.math.algebra.dualistic.classes.ZMod;
 import ch.bfh.unicrypt.math.algebra.general.classes.ProductSemiGroup;
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
+import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarMod;
 import ch.bfh.unicrypt.math.function.classes.CompositeFunction;
 import ch.bfh.unicrypt.math.function.classes.MultiIdentityFunction;
 import ch.bfh.unicrypt.math.function.classes.PartiallyAppliedFunction;
@@ -69,25 +71,29 @@ public class RecoveryRoundAction extends AbstractAction {
 			}
 		}
 
-		me.setHiHat(productNumerator.apply(productDenominator.invert()));
-		me.setHiHatPowXi(me.getHiHat().selfApply(me.getXi()));
+		me.setHiHat(productNumerator.applyInverse(productDenominator));
+		StandardCommitmentScheme<GStarMod, Element> csRecovery = StandardCommitmentScheme.getInstance(me.getHiHat());	
+		me.setHiHatPowXi(csRecovery.commit(me.getXi()));
 
 		//compute proof of equality between discrete logs
 
 		//Function g^r
-		Function f1 = CompositeFunction.getInstance(MultiIdentityFunction.getInstance(poll.getZ_q(), 1),
-				PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(poll.getG_q(),poll.getZ_q()), poll.getGenerator(), 0));
+		StandardCommitmentScheme<GStarMod, Element> csSetup = StandardCommitmentScheme.getInstance(poll.getGenerator());	
+		Function f1 = csSetup.getCommitmentFunction();
+//				CompositeFunction.getInstance(MultiIdentityFunction.getInstance(poll.getZ_q(), 1),
+//				PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(poll.getG_q(),poll.getZ_q()), poll.getGenerator(), 0));
 
 		//Function h_hat^r
-		Function f2 = CompositeFunction.getInstance(MultiIdentityFunction.getInstance(poll.getZ_q(), 1),
-				PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(poll.getG_q(),poll.getZ_q()), me.getHiHat(), 0));
+		Function f2 = csRecovery.getCommitmentFunction();
+//				CompositeFunction.getInstance(MultiIdentityFunction.getInstance(poll.getZ_q(), 1),
+//				PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(poll.getG_q(),poll.getZ_q()), me.getHiHat(), 0));
 
 		ProductFunction f = ProductFunction.getInstance(f1, f2);
 		
 		StringElement proverId = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII).getElement(me.getUniqueId());
 
-		SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator.getInstance(
-				   f.getCoDomain(), (ProductSemiGroup) f.getCoDomain(), ZMod.getInstance(f.getDomain().getMinimalOrder()), proverId);
+		SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator.getInstance(f, proverId);
+//				   f.getCoDomain(), (ProductSemiGroup) f.getCoDomain(), ZMod.getInstance(f.getDomain().getMinimalOrder()), proverId);
 
 		PreimageEqualityProofGenerator piepg = PreimageEqualityProofGenerator.getInstance(scg, f1,f2);
 
@@ -102,48 +108,6 @@ public class RecoveryRoundAction extends AbstractAction {
 			goToNextState();
 		}
 	}
-
-//	@Override
-//	protected void processMessage(ProtocolMessageContainer message,
-//			ProtocolParticipant senderParticipant) {
-//		
-//		Log.d(TAG,"Recovery message received from "+senderParticipant.getIdentification());
-//
-//		senderParticipant.setHiHatPowXi(message.getValue());
-//		senderParticipant.setProofForHiHat(message.getProof());
-//		senderParticipant.setHiHat(message.getComplementaryValue());
-//
-//		//verify proof
-//		
-//		//Function g^r
-//		Function f1 = CompositeFunction.getInstance(MultiIdentityFunction.getInstance(poll.getZ_q(), 1),
-//				PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(poll.getG_q(),poll.getZ_q()), poll.getGenerator(), 0));
-//
-//		//Function h_hat^r
-//		Function f2 = CompositeFunction.getInstance(MultiIdentityFunction.getInstance(poll.getZ_q(), 1),
-//				PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(poll.getG_q(),poll.getZ_q()), senderParticipant.getHiHat(), 0));
-//
-//		ProductFunction f = ProductFunction.getInstance(f1, f2);
-//
-//		StringElement proverId = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII).getElement(senderParticipant.getUniqueId());
-//
-//		SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator.getInstance(
-//				f.getCoDomain(), (ProductSemiGroup) f.getCoDomain(), ZMod.getInstance(f.getDomain().getMinimalOrder()), proverId);
-//
-//		PreimageEqualityProofGenerator piepg = PreimageEqualityProofGenerator.getInstance(scg, f1,f2);
-//
-//		Tuple publicInput = Tuple.getInstance(senderParticipant.getAi(), senderParticipant.getHiHatPowXi());
-//
-//		if(!piepg.verify(senderParticipant.getProofForHiHat(), publicInput).getBoolean()){
-//			senderParticipant.setProofForHiHat(message.getProof());
-//			poll.getExcludedParticipants().put(senderParticipant.getUniqueId(), senderParticipant);
-//		}
-//		
-//		
-//		if(this.readyToGoToNextState()){
-//			goToNextState();
-//		}
-//	}
 	
 	@Override
 	public void savedProcessedMessage(Round round, String sender, ProtocolMessageContainer message, boolean exclude){
