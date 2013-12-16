@@ -71,6 +71,17 @@
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:text="@string/action_redo_poll" />
+        
+        <Button
+            android:id="@+id/button_export"
+            style="@style/BottomBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.18"
+            android:drawableLeft="@drawable/ic_action_play"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="@string/action_export" />
     </LinearLayout>
 
 </LinearLayout>

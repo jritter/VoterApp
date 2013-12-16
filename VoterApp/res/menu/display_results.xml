@@ -13,5 +13,12 @@
         android:showAsAction="always|withText"
         android:title="@string/action_redo_poll">
     </item>
+    
+    <item
+        android:id="@+id/action_export"
+        android:icon="@drawable/ic_action_play"
+        android:showAsAction="always|withText"
+        android:title="@string/action_export">
+    </item>
 
 </menu>
