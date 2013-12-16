@@ -1,5 +1,7 @@
 package ch.bfh.evoting.voterapp.protocol;
 
+import java.io.File;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -67,6 +69,14 @@ public abstract class ProtocolInterface {
 	 * @param poll the poll object
 	 */
 	public abstract void vote(Option selectedOption, Poll poll);
+
+	/**
+	 * Method called at the end of the vote, when displaying results. This methods
+	 * create a file in the app data containing the protocol values. This file can then
+	 * be used to verify the vote outside of this app. 
+	 * @param file filename
+	 */
+	public abstract void exportToXML(File file);
 
 	
 
