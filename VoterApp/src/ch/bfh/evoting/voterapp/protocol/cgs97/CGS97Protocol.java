@@ -1,5 +1,6 @@
 package ch.bfh.evoting.voterapp.protocol.cgs97;
 
+import java.io.File;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.List;
@@ -20,9 +21,7 @@ import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringElement;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringMonoid;
 import ch.bfh.unicrypt.math.algebra.dualistic.classes.PolynomialElement;
-import ch.bfh.unicrypt.math.algebra.dualistic.classes.PolynomialField;
 import ch.bfh.unicrypt.math.algebra.dualistic.classes.PolynomialRing;
-import ch.bfh.unicrypt.math.algebra.dualistic.classes.ZMod;
 import ch.bfh.unicrypt.math.algebra.dualistic.classes.ZModElement;
 import ch.bfh.unicrypt.math.algebra.dualistic.classes.ZModPrime;
 import ch.bfh.unicrypt.math.algebra.general.classes.FiniteByteArrayElement;
@@ -188,8 +187,10 @@ public class CGS97Protocol extends ProtocolInterface {
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 	}
 
-
-
-
+	@Override
+	public void exportToXML(File file) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
