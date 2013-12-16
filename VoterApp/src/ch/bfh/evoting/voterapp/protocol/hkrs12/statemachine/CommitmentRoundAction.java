@@ -31,6 +31,7 @@ import ch.bfh.unicrypt.crypto.proofgenerator.classes.ElGamalEncryptionValidityPr
 import ch.bfh.unicrypt.crypto.schemes.encryption.classes.ElGamalEncryptionScheme;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringElement;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringMonoid;
+import ch.bfh.unicrypt.math.algebra.dualistic.classes.N;
 import ch.bfh.unicrypt.math.algebra.general.classes.Subset;
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
@@ -61,7 +62,7 @@ public class CommitmentRoundAction extends AbstractAction {
 	public boolean stopSendingUpdateVote = false;
 
 	public CommitmentRoundAction(final Context context, String messageTypeToListenTo, final ProtocolPoll poll) {
-		super(context, messageTypeToListenTo, poll, 120000);
+		super(context, messageTypeToListenTo, poll, 0);
 
 		voteDone = new BroadcastReceiver() {
 
@@ -92,11 +93,13 @@ public class CommitmentRoundAction extends AbstractAction {
 						LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
 						
 						//Wait for other voters to submit their votes
-						SystemClock.sleep(8000);
+						SystemClock.sleep(20000);
+						Log.d(TAG, "Ending voting phase.");
 
 						for(Participant p:poll.getParticipants().values()){
 							if(!messagesReceived.containsKey(p.getUniqueId()) && !poll.getCompletelyExcludedParticipants().containsKey(p.getUniqueId())){
 								poll.getExcludedParticipants().put(p.getUniqueId(), p);
+								Log.w(TAG, "Excluding "+p.getIdentification()+"("+p.getUniqueId()+")");
 							}
 						}
 						goToNextState();
@@ -236,8 +239,10 @@ public class CommitmentRoundAction extends AbstractAction {
 		}
 
 		ElGamalEncryptionScheme<GStarMod, Element> ees = ElGamalEncryptionScheme.getInstance(poll.getGenerator());
-		StringElement proverId = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII).getElement(me.getUniqueId());
-		SigmaChallengeGenerator scg = ElGamalEncryptionValidityProofGenerator.createNonInteractiveChallengeGenerator(ees, possibleVotes.length, proverId);
+		Tuple otherInput = Tuple.getInstance(me.getDataToHash(), poll.getDataToHash());
+
+		
+		SigmaChallengeGenerator scg = ElGamalEncryptionValidityProofGenerator.createNonInteractiveChallengeGenerator(ees, possibleVotes.length, otherInput);
 		Subset possibleVotesSet = Subset.getInstance(poll.getG_q(), possibleVotes);
 		ElGamalEncryptionValidityProofGenerator vpg = ElGamalEncryptionValidityProofGenerator.getInstance(
 				scg, ees, me.getHi(), possibleVotesSet);

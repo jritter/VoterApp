@@ -1,7 +1,14 @@
 package ch.bfh.evoting.voterapp.protocol.hkrs12;
 
+import java.math.BigInteger;
+
 import ch.bfh.evoting.voterapp.entities.Participant;
+import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringElement;
+import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringMonoid;
+import ch.bfh.unicrypt.math.algebra.dualistic.classes.N;
+import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
+import ch.bfh.unicrypt.math.helper.Alphabet;
 
 public class ProtocolParticipant extends Participant {
 
@@ -190,6 +197,13 @@ public class ProtocolParticipant extends Participant {
 	 */
 	public void setProofForHiHat(Element proofForHiHat) {
 		this.proofForHiHat = proofForHiHat;
+	}
+	
+	public Tuple getDataToHash(){
+		Element index = N.getInstance().getElement(BigInteger.valueOf(this.getProtocolParticipantIndex()));
+		StringElement proverId = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII).getElement(this.getUniqueId());
+		
+		return Tuple.getInstance(index, proverId);
 	}
 
 //	@Override

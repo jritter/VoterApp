@@ -77,15 +77,11 @@ public class ProcessingService extends IntentService {
 			//Verify proof of knowledge of xi
 
 			StandardCommitmentScheme<GStarMod, Element> csSetup = StandardCommitmentScheme.getInstance(poll.getGenerator());
-//			Function f = CompositeFunction.getInstance(MultiIdentityFunction.getInstance(poll.getZ_q(), 1), PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(poll.getG_q(), poll.getZ_q()), poll.getGenerator(), 0));
 
 			//Generator and index of the participant has also to be hashed in the proof
-			Element index = N.getInstance().getElement(BigInteger.valueOf(senderParticipant.getProtocolParticipantIndex()));
-			StringElement proverId = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII).getElement(senderParticipant.getUniqueId());
-			Tuple otherInput = Tuple.getInstance(poll.getGenerator(), index, proverId);
+			Tuple otherInput = Tuple.getInstance(senderParticipant.getDataToHash(), poll.getDataToHash());
 
 			SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator.getInstance(csSetup.getCommitmentFunction(), otherInput);
-//					f.getCoDomain(), (SemiGroup)f.getCoDomain(), ZMod.getInstance(f.getDomain().getMinimalOrder()), otherInput);
 
 			PreimageProofGenerator spg = PreimageProofGenerator.getInstance(scg, csSetup.getCommitmentFunction());
 
@@ -115,8 +111,10 @@ public class ProcessingService extends IntentService {
 			}
 
 			ElGamalEncryptionScheme<GStarMod, Element> ees = ElGamalEncryptionScheme.getInstance(poll.getGenerator());
-			StringElement proverId2 = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII).getElement(senderParticipant.getUniqueId());
-			SigmaChallengeGenerator scg2 = ElGamalEncryptionValidityProofGenerator.createNonInteractiveChallengeGenerator(ees, possibleVotes.length, proverId2);
+
+			Tuple otherInput2 = Tuple.getInstance(senderParticipant.getDataToHash(), poll.getDataToHash());
+
+			SigmaChallengeGenerator scg2 = ElGamalEncryptionValidityProofGenerator.createNonInteractiveChallengeGenerator(ees, possibleVotes.length, otherInput2);
 			Subset possibleVotesSet = Subset.getInstance(poll.getG_q(), possibleVotes);
 			ElGamalEncryptionValidityProofGenerator vpg = ElGamalEncryptionValidityProofGenerator.getInstance(
 					scg2, ees, message.getComplementaryValue(), possibleVotesSet);
@@ -136,19 +134,18 @@ public class ProcessingService extends IntentService {
 			//verify proof
 
 			//Function g^r
-			Function f1 = CompositeFunction.getInstance(MultiIdentityFunction.getInstance(poll.getZ_q(), 1),
-					PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(poll.getG_q(),poll.getZ_q()), poll.getGenerator(), 0));
+			StandardCommitmentScheme<GStarMod, Element> cs3 = StandardCommitmentScheme.getInstance(poll.getGenerator());
+			Function f1 = cs3.getCommitmentFunction();
 
 			//Function h_hat^r
-			Function f2 = CompositeFunction.getInstance(MultiIdentityFunction.getInstance(poll.getZ_q(), 1),
-					PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(poll.getG_q(),poll.getZ_q()), message.getComplementaryValue(), 0));
-
+			StandardCommitmentScheme<GStarMod, Element> cs4 = StandardCommitmentScheme.getInstance(message.getComplementaryValue());
+			Function f2 = cs4.getCommitmentFunction();
+			
 			ProductFunction f3 = ProductFunction.getInstance(f1, f2);
 
-			StringElement proverId3 = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII).getElement(senderParticipant.getUniqueId());
+			Tuple otherInput3 = Tuple.getInstance(senderParticipant.getDataToHash(), poll.getDataToHash());
 
-			SigmaChallengeGenerator scg3 = StandardNonInteractiveSigmaChallengeGenerator.getInstance(
-					f3.getCoDomain(), (ProductSemiGroup) f3.getCoDomain(), ZMod.getInstance(f3.getDomain().getMinimalOrder()), proverId3);
+			SigmaChallengeGenerator scg3 = StandardNonInteractiveSigmaChallengeGenerator.getInstance(f3, otherInput3);
 
 			PreimageEqualityProofGenerator piepg = PreimageEqualityProofGenerator.getInstance(scg3, f1,f2);
 

@@ -22,7 +22,15 @@ import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolParticipant;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolPoll;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine.StateMachineManager;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
+import ch.bfh.unicrypt.crypto.schemes.commitment.classes.StandardCommitmentScheme;
+import ch.bfh.unicrypt.crypto.schemes.hash.classes.StandardHashScheme;
+import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringElement;
+import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringMonoid;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
+import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarMod;
+import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarModElement;
+import ch.bfh.unicrypt.math.helper.Alphabet;
+import ch.bfh.unicrypt.math.helper.HashMethod;
 
 public class HKRS12ProtocolInterface extends ProtocolInterface {
 
@@ -85,9 +93,9 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 				AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);
 
 
-//				//send broadcast to dismiss the wait dialog
-//				Intent intent1 = new Intent(BroadcastIntentTypes.dismissWaitDialog);
-//				LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
+				//				//send broadcast to dismiss the wait dialog
+				//				Intent intent1 = new Intent(BroadcastIntentTypes.dismissWaitDialog);
+				//				LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
 
 				//Send a broadcast to start the next activity
 				Intent intent = new Intent(BroadcastIntentTypes.showNextActivity);
@@ -151,46 +159,46 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 	@Override
 	public void vote(final Option selectedOption, final Poll poll) {
 
-		
 
-//		new AsyncTask<Object, Object, Object>(){
-//			@Override
-//			protected Object doInBackground(Object... arg0) {
-//				//do some protocol specific stuff
-//				int index = -1;
-//				int j = 0;
-//				for(Option op : poll.getOptions()){
-//					if(op.equals(selectedOption)){
-//						index = j;
-//						break;
-//					}
-//					j++;
-//				}
-//				Intent i = new Intent(BroadcastIntentTypes.vote);
-//				i.putExtra("option", (Serializable)selectedOption);
-//				i.putExtra("index", index);
-//				LocalBroadcastManager.getInstance(context).sendBroadcast(i);
-//
-//
-//				return null;
-//			}
-//		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+		//		new AsyncTask<Object, Object, Object>(){
+		//			@Override
+		//			protected Object doInBackground(Object... arg0) {
+		//				//do some protocol specific stuff
+		//				int index = -1;
+		//				int j = 0;
+		//				for(Option op : poll.getOptions()){
+		//					if(op.equals(selectedOption)){
+		//						index = j;
+		//						break;
+		//					}
+		//					j++;
+		//				}
+		//				Intent i = new Intent(BroadcastIntentTypes.vote);
+		//				i.putExtra("option", (Serializable)selectedOption);
+		//				i.putExtra("index", index);
+		//				LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+		//
+		//
+		//				return null;
+		//			}
+		//		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
 		//Send a broadcast to start the wait for vote activity
 		Intent intent = new Intent(BroadcastIntentTypes.showNextActivity);
 		intent.putExtra("poll", (Serializable)poll);
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-		
+
 		Log.e("HKRS12","UI thread: "+Thread.currentThread().getId());
-		
+
 		new Thread(){
 
 			@Override
 			public void run() {
 				Log.e("HKRS12","Vote processing thread: "+Thread.currentThread().getId());
 
-				
-				
+
+
 				//do some protocol specific stuff
 				int index = -1;
 				int j = 0;
@@ -208,25 +216,52 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 
 				super.run();
 			}
-			
+
 		}.start();
 	}
 
 
 	@Override
-	protected void handleReceivedPoll(Poll poll, String sender) {
-		//do some protocol specific stuff
-		//check if speaking the same language
-		if(!(poll instanceof ProtocolPoll)){
-			//TODO broadcast
-			throw new RuntimeException("Not using the same protocol!");
-		}
+	protected void handleReceivedPoll(final Poll poll, final String sender) {
+		new AsyncTask<Object, Object, Object>(){
+			@Override
+			protected Object doInBackground(Object... arg0) {
+				//do some protocol specific stuff
+				//check if speaking the same language
+				if(!(poll instanceof ProtocolPoll)){
+					//TODO broadcast
+					throw new RuntimeException("Not using the same protocol!");
+				}
 
-		//Send a broadcast to start the review activity
-		Intent intent = new Intent(BroadcastIntentTypes.showNextActivity);
-		intent.putExtra("poll", (Serializable) poll);
-		intent.putExtra("sender", sender);
-		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+				//compute the text commitment
+				//TODO
+//				ProtocolPoll pp = (ProtocolPoll)poll;
+//
+//				String hashInputString = poll.getQuestion();
+//				for(Option op:poll.getOptions()){
+//					hashInputString += op.getText();
+//				}
+//
+//				StandardHashScheme shs = StandardHashScheme.getInstance(HashMethod.DEFAULT);
+//				StringElement hashInput = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII).getElement(hashInputString);
+//
+//				Element hash = shs.hash(hashInput);
+//				StandardCommitmentScheme<GStarMod, GStarModElement> scs = StandardCommitmentScheme.getInstance(pp.getTempGenerator());
+//				if(!scs.commit(hash).isEqual(pp.getGenerator())){
+//					//TODO broadcast
+//					throw new RuntimeException("text commitment wrong!");
+//				}
+				
+
+				//Send a broadcast to start the review activity
+				Intent intent = new Intent(BroadcastIntentTypes.showNextActivity);
+				intent.putExtra("poll", (Serializable) poll);
+				intent.putExtra("sender", sender);
+				LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+				return null;
+			}
+		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+		
 	}
 
 
