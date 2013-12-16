@@ -15,6 +15,7 @@ import android.util.Log;
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Poll;
+import ch.bfh.evoting.voterapp.protocol.cgs97.CGS97Protocol;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 
 public class VoteService extends Service{
@@ -80,7 +81,7 @@ public class VoteService extends Service{
 				}
 								
 				if(votesReceived>=poll.getNumberOfParticipants()){
-					((DummyProtocolInterface)AndroidApplication.getInstance().getProtocolInterface()).computeResult(poll);
+					((CGS97Protocol)AndroidApplication.getInstance().getProtocolInterface()).computeResult(poll);
 				}
 
 				sendVotesTask = new AsyncTask<Object, Object, Object>(){

@@ -26,6 +26,7 @@ import ch.bfh.evoting.voterapp.network.NetworkInterface;
 import ch.bfh.evoting.voterapp.network.NetworkMonitor;
 import ch.bfh.evoting.voterapp.protocol.DummyProtocolInterface;
 import ch.bfh.evoting.voterapp.protocol.ProtocolInterface;
+import ch.bfh.evoting.voterapp.protocol.cgs97.CGS97Protocol;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.JavaSerialization;
 import ch.bfh.evoting.voterapp.util.SerializationUtil;
@@ -129,7 +130,7 @@ public class AndroidApplication extends Application {
 
 				su = new SerializationUtil(new JavaSerialization());
 				ni = new AllJoynNetworkInterface(AndroidApplication.this.getApplicationContext());///* new InstaCircleNetworkInterface(this.getApplicationContext());*/new SimulatedNetworkInterface(AndroidApplication.this.getApplicationContext());
-				pi = new DummyProtocolInterface(AndroidApplication.this.getApplicationContext());
+				pi = new CGS97Protocol(AndroidApplication.this.getApplicationContext());
 				
 				return null;
 			}

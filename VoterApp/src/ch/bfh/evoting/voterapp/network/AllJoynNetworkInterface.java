@@ -102,7 +102,18 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 
 	@Override
 	public void sendMessage(VoteMessage votemessage, String destinationUniqueId) {
-		throw new UnsupportedOperationException("Unicast is not supported with AllJoyn Network interface");
+		votemessage.setSenderUniqueId(getMyUniqueId());
+		SerializationUtil su = AndroidApplication.getInstance().getSerializationUtil();
+		String string = su.serialize(votemessage);
+			
+		Message msg = mBusHandler.obtainMessage(BusHandler.UNICAST);
+		Bundle data = new Bundle();
+		data.putString("groupName", this.groupName);
+		data.putString("pingString", string);
+		data.putBoolean("encrypted", true);
+		data.putString("destinationUniqueId", destinationUniqueId);
+		msg.setData(data);
+		mBusHandler.sendMessage(msg);
 	}
 
 	@Override
@@ -202,7 +213,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 	private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			SerializationUtil su = AndroidApplication.getInstance().getSerializationUtil();
+			SerializationUtil su = AndroidApplication.getInstance().getSerializationUtil();			
 			transmitReceivedMessage((VoteMessage) su.deserialize(intent.getStringExtra("message")));
 		}
 	};
