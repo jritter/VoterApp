@@ -137,7 +137,7 @@ public class DummyProtocolInterface extends ProtocolInterface {
 	}
 
 	@Override
-	public void exportToXML(File file){
+	public void exportToXML(File file, Poll poll){
 		FileOutputStream outputStream;
 		try {
 			outputStream = new FileOutputStream(file);
@@ -148,6 +148,12 @@ public class DummyProtocolInterface extends ProtocolInterface {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void cancelVotingPeriod() {
+		Intent i = new Intent(context, VoteService.class);
+		context.stopService(i);
 	}
 
 

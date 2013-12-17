@@ -8,9 +8,18 @@
     </item>
 
     <item
-        android:id="@+id/action_finish_vote"
+        android:id="@+id/action_cancel_vote"
         android:icon="@drawable/ic_action_cancel"
+        android:showAsAction="always|withText"
+        android:title="@string/action_cancel_poll">
+    </item>
+    
+    <item
+        android:id="@+id/action_finish_vote"
+        android:icon="@drawable/ic_action_play"
         android:showAsAction="always|withText"
         android:title="@string/action_stop_poll">
     </item>
+    
+    
 </menu>

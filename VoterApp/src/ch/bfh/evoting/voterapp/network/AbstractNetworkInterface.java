@@ -28,7 +28,7 @@ public abstract class AbstractNetworkInterface implements NetworkInterface {
 		this.context = context;
 		su = AndroidApplication.getInstance().getSerializationUtil();		
 	}
-	
+
 	/**
 	 * This method checks the message type and inform the application of the new incoming message.
 	 * 
@@ -36,7 +36,7 @@ public abstract class AbstractNetworkInterface implements NetworkInterface {
 	 */
 	protected final void transmitReceivedMessage(VoteMessage voteMessage) {
 		if(voteMessage==null) return;
-		
+
 		Intent messageArrivedIntent;
 		switch(voteMessage.getMessageType()){
 		case VOTE_MESSAGE_ELECTORATE:
@@ -75,9 +75,16 @@ public abstract class AbstractNetworkInterface implements NetworkInterface {
 			messageArrivedIntent.putExtra("voter", voteMessage.getSenderUniqueId());
 			LocalBroadcastManager.getInstance(context).sendBroadcast(messageArrivedIntent);
 			break;
+		case VOTE_MESSAGE_CANCEL_POLL:
+			// notify the UI that new message has arrived
+			messageArrivedIntent = new Intent(BroadcastIntentTypes.cancelVote);
+			LocalBroadcastManager.getInstance(context).sendBroadcast(messageArrivedIntent);
+			break;
+		default:
+			break;
 		}
 	}
 
-	
+
 
 }

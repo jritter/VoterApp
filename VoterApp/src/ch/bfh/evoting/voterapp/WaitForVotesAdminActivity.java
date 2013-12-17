@@ -1,6 +1,7 @@
 package ch.bfh.evoting.voterapp;
 
 import ch.bfh.evoting.voterapp.entities.Poll;
+import ch.bfh.evoting.voterapp.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.WaitForVotesFragment;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
@@ -37,6 +38,8 @@ public class WaitForVotesAdminActivity extends Activity implements OnClickListen
 	private AlertDialog dialogBack;
 	private AlertDialog stopPollDialog;
 	private Poll poll;
+	private Button btnCancelPoll;
+	private AlertDialog cancelPollDialog;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +59,9 @@ public class WaitForVotesAdminActivity extends Activity implements OnClickListen
 
 		btnStopPoll = (Button) findViewById(R.id.button_stop_poll);
 		btnStopPoll.setOnClickListener(this);
+		
+		btnCancelPoll = (Button) findViewById(R.id.button_cancel_poll);
+		btnCancelPoll.setOnClickListener(this);
 
 		if(savedInstanceState!=null){
 			poll = (Poll) savedInstanceState.getSerializable("poll");
@@ -169,6 +175,7 @@ public class WaitForVotesAdminActivity extends Activity implements OnClickListen
 		
 		if(getResources().getBoolean(R.bool.display_bottom_bar)){
 			menu.findItem(R.id.action_finish_vote).setVisible(false);
+			menu.findItem(R.id.action_cancel_vote).setVisible(false);
 	    }
 		
 		return true;
@@ -185,6 +192,9 @@ public class WaitForVotesAdminActivity extends Activity implements OnClickListen
 		case R.id.action_finish_vote:
 			finishVote();
 			return true;
+		case R.id.action_cancel_vote:
+			cancelVote();
+			return true;
 		}
 		return super.onOptionsItemSelected(item); 
 	}
@@ -193,6 +203,8 @@ public class WaitForVotesAdminActivity extends Activity implements OnClickListen
 	public void onClick(View view) {
 		if (view == btnStopPoll){
 			finishVote();
+		}else if (view == btnCancelPoll){
+			cancelVote();
 		}
 
 	}
@@ -246,6 +258,49 @@ public class WaitForVotesAdminActivity extends Activity implements OnClickListen
 		});
 
 		stopPollDialog.show();
+	}
+	
+	private void cancelVote(){
+		
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		// Add the buttons
+		builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				//Send cancel signal over the network
+				VoteMessage vm = new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_CANCEL_POLL, null);
+				AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);
+				
+				AndroidApplication.getInstance().getProtocolInterface().cancelVotingPeriod();
+				
+				Intent i = new Intent(WaitForVotesAdminActivity.this, MainActivity.class);
+				startActivity(i);
+			}
+		});
+		builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				return;
+			}
+		});
+
+		builder.setTitle(R.string.dialog_title_cancel_poll);
+		builder.setMessage(R.string.dialog_cancel_poll);
+
+		// Create the AlertDialog
+		cancelPollDialog = builder.create();
+
+		cancelPollDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+			@Override
+			public void onShow(DialogInterface dialog) {
+				Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+				cancelPollDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setBackgroundResource(
+						R.drawable.selectable_background_votebartheme);
+				cancelPollDialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundResource(
+						R.drawable.selectable_background_votebartheme);
+			}
+		});
+
+		cancelPollDialog.show();
+		
 	}
 
 }

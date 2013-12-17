@@ -312,6 +312,8 @@ public class AndroidApplication extends Application {
 	 * this broadcast receiver listens for information about an attack
 	 */
 	private BroadcastReceiver mAttackDetecter = new BroadcastReceiver() {
+		private AlertDialog dialogAttack;
+
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			if(currentActivity!=null && voteRunning){
@@ -334,7 +336,17 @@ public class AndroidApplication extends Application {
 				}
 
 				// Create the AlertDialog
-				builder.create().show();
+				dialogAttack = builder.create();
+				
+				dialogAttack.setOnShowListener(new DialogInterface.OnShowListener() {
+						@Override
+						public void onShow(DialogInterface dialog) {
+							Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+							dialogAttack.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
+									R.drawable.selectable_background_votebartheme);
+						}
+					});
+				dialogAttack.show();
 			}
 		}
 	};

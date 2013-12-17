@@ -34,12 +34,23 @@
         android:showDividers="middle" >
 
         <Button
-            android:id="@+id/button_stop_poll"
+            android:id="@+id/button_cancel_poll"
             style="@style/BottomBar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="0.18"
             android:drawableLeft="@drawable/ic_action_cancel"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="@string/action_cancel_poll" />
+        
+        <Button
+            android:id="@+id/button_stop_poll"
+            style="@style/BottomBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.18"
+            android:drawableLeft="@drawable/ic_action_play"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:text="@string/action_stop_poll" />

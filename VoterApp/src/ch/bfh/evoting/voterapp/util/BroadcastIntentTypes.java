@@ -1,5 +1,7 @@
 package ch.bfh.evoting.voterapp.util;
 
+import android.content.Intent;
+
 /**
  * Class listing local broadcast intent types that are sent in the application
  * @author Philémon von Bergen
@@ -32,17 +34,25 @@ public class BroadcastIntentTypes {
 	 */
 	public static final String pollToReview = "pollToReview";
 	/**
-	 * Intent type sent when the admin sends the start signal for the voting phase
+	 * Intent type sent when the admin sends the start signal for the voting period
 	 * Extras:
 	 * - nothing
 	 */
 	public static final String startVote = "startVote";
 	/**
-	 * Intent type sent when the admin sends the stop signal for the voting phase
+	 * Intent type sent when the admin sends the stop signal for the voting period
 	 * Extras:
 	 * - nothing
 	 */
 	public static final String stopVote = "stopVote";
+	
+	/**
+	 * Intent type sent when the admin sends the cancel signal for the voting period
+	 * Extras:
+	 * - nothing
+	 */
+	public static String cancelVote = "cancelVote";
+
 	/**
 	 * Intent type sent when a new vote is received
 	 * Extras:
