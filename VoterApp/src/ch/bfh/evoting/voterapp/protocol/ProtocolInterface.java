@@ -76,7 +76,7 @@ public abstract class ProtocolInterface {
 	 * be used to verify the vote outside of this app. 
 	 * @param file filename
 	 */
-	public abstract void exportToXML(File file);
+	public abstract void exportToXML(File file, Poll poll);
 
 	/**
 	 * Method called when the administrator wants to cancel the voting period
