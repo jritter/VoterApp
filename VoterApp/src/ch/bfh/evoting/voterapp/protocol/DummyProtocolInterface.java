@@ -150,6 +150,12 @@ public class DummyProtocolInterface extends ProtocolInterface {
 		}
 	}
 
+	@Override
+	public void cancelVotingPeriod() {
+		Intent i = new Intent(context, VoteService.class);
+		context.stopService(i);
+	}
+
 
 
 

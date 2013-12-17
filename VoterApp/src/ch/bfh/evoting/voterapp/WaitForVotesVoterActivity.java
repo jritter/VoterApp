@@ -9,8 +9,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.nfc.NfcAdapter;
@@ -32,6 +35,7 @@ public class WaitForVotesVoterActivity extends Activity {
 
 	private AlertDialog dialogBack;
 	private Poll poll;
+	private BroadcastReceiver cancelVotingPeriodListener;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +84,7 @@ public class WaitForVotesVoterActivity extends Activity {
 				nfcAvailable = false;
 			}
 		}
+		
 	}
 	
 	@Override
@@ -88,6 +93,7 @@ public class WaitForVotesVoterActivity extends Activity {
 		if (nfcAvailable) {
 			nfcAdapter.disableForegroundDispatch(this);
 		}
+		LocalBroadcastManager.getInstance(WaitForVotesVoterActivity.this).unregisterReceiver(cancelVotingPeriodListener);
 	}
 	
 	@Override
@@ -105,6 +111,46 @@ public class WaitForVotesVoterActivity extends Activity {
 			nfcAdapter.enableForegroundDispatch(this, pendingIntent,
 					Utility.getNFCIntentFilters(), null);
 		}
+		
+		// Subscribing to the cancel vote event
+		cancelVotingPeriodListener = new BroadcastReceiver() {
+			private AlertDialog dialogCancel;
+
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				LocalBroadcastManager.getInstance(WaitForVotesVoterActivity.this).unregisterReceiver(this);
+
+				AlertDialog.Builder builder = new AlertDialog.Builder(WaitForVotesVoterActivity.this);
+				// Add the buttons
+				builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						AndroidApplication.getInstance().getProtocolInterface().cancelVotingPeriod();
+						
+						Intent i = new Intent(WaitForVotesVoterActivity.this, MainActivity.class);
+						startActivity(i);
+					}
+				});
+
+				builder.setTitle(R.string.dialog_title_poll_canceled);
+				builder.setMessage(R.string.dialog_poll_canceled);
+				
+				// Create the AlertDialog
+				dialogCancel = builder.create();
+				
+				dialogCancel.setOnShowListener(new DialogInterface.OnShowListener() {
+						@Override
+						public void onShow(DialogInterface dialog) {
+							Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+							dialogCancel.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
+									R.drawable.selectable_background_votebartheme);
+						}
+					});
+				dialogCancel.show();
+				
+			}
+		};
+		LocalBroadcastManager.getInstance(this).registerReceiver(cancelVotingPeriodListener, new IntentFilter(BroadcastIntentTypes.cancelVote));
+
 	}
 	
 	@Override

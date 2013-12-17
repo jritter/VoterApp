@@ -78,7 +78,9 @@ public abstract class ProtocolInterface {
 	 */
 	public abstract void exportToXML(File file);
 
-	
-
+	/**
+	 * Method called when the administrator wants to cancel the voting period
+	 */
+	public abstract void cancelVotingPeriod();
 
 }
