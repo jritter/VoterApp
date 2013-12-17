@@ -1,11 +1,6 @@
 package ch.bfh.evoting.voterapp;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -145,7 +140,7 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 			File directory = new File(Environment.getExternalStorageDirectory() + "/MobiVote/");
 			directory.mkdirs();
 		    File file = new File(Environment.getExternalStorageDirectory() + "/MobiVote/" + poll.getStartTime()+".mobix");
-		    AndroidApplication.getInstance().getProtocolInterface().exportToXML(file);
+		    AndroidApplication.getInstance().getProtocolInterface().exportToXML(file, poll);
 			
 		}
 		
