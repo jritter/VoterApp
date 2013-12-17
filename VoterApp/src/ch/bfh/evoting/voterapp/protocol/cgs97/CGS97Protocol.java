@@ -188,7 +188,13 @@ public class CGS97Protocol extends ProtocolInterface {
 	}
 
 	@Override
-	public void exportToXML(File file) {
+	public void exportToXML(File file, Poll poll) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void cancelVotingPeriod() {
 		// TODO Auto-generated method stub
 		
 	}
