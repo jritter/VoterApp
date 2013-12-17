@@ -1,5 +1,9 @@
 package ch.bfh.evoting.voterapp.protocol;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
@@ -130,6 +134,26 @@ public class DummyProtocolInterface extends ProtocolInterface {
 		intent.putExtra("poll", (Serializable) poll);
 		intent.putExtra("sender", sender);
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+	}
+
+	@Override
+	public void exportToXML(File file){
+		FileOutputStream outputStream;
+		try {
+			outputStream = new FileOutputStream(file);
+			outputStream.write("toto\ntoto2".getBytes());
+			outputStream.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void cancelVotingPeriod() {
+		Intent i = new Intent(context, VoteService.class);
+		context.stopService(i);
 	}
 
 

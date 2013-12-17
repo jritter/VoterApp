@@ -52,6 +52,7 @@ public class VoteActivity extends Activity {
 	private AlertDialog dialogBack;
 	private BroadcastReceiver showNextActivityListener;
 	private BroadcastReceiver showNextActivityListener2;
+	private BroadcastReceiver cancelVotingPeriodListener;
 
 
 	@Override
@@ -199,6 +200,8 @@ public class VoteActivity extends Activity {
 		if (nfcAvailable) {
 			nfcAdapter.disableForegroundDispatch(this);
 		}
+		LocalBroadcastManager.getInstance(VoteActivity.this).unregisterReceiver(cancelVotingPeriodListener);
+
 	}
 
 	@Override
@@ -216,6 +219,46 @@ public class VoteActivity extends Activity {
 			nfcAdapter.enableForegroundDispatch(this, pendingIntent,
 					Utility.getNFCIntentFilters(), null);
 		}
+
+		// Subscribing to the cancel vote event
+		cancelVotingPeriodListener = new BroadcastReceiver() {
+			private AlertDialog dialogCancel;
+
+			@Override
+			public void onReceive(Context context, Intent intent) {
+				LocalBroadcastManager.getInstance(VoteActivity.this).unregisterReceiver(this);
+
+				AlertDialog.Builder builder = new AlertDialog.Builder(VoteActivity.this);
+				// Add the buttons
+				builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						AndroidApplication.getInstance().getProtocolInterface().cancelVotingPeriod();
+						
+						Intent i = new Intent(VoteActivity.this, MainActivity.class);
+						startActivity(i);
+					}
+				});
+
+				builder.setTitle(R.string.dialog_title_poll_canceled);
+				builder.setMessage(R.string.dialog_poll_canceled);
+
+				// Create the AlertDialog
+				dialogCancel = builder.create();
+
+				dialogCancel.setOnShowListener(new DialogInterface.OnShowListener() {
+					@Override
+					public void onShow(DialogInterface dialog) {
+						Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+						dialogCancel.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
+								R.drawable.selectable_background_votebartheme);
+					}
+				});
+				dialogCancel.show();
+
+			}
+		};
+		LocalBroadcastManager.getInstance(this).registerReceiver(cancelVotingPeriodListener, new IntentFilter(BroadcastIntentTypes.cancelVote));
+
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package ch.bfh.evoting.voterapp.protocol;
 
+import java.io.File;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -271,6 +272,17 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 
 	public void reset(){
 		this.stateMachineManager = null;
+	}
+
+	@Override
+	public void exportToXML(File file) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void cancelVotingPeriod() {
+		this.reset();		
 	}
 
 }

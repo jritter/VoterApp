@@ -38,6 +38,7 @@ public abstract class AbstractNetworkInterface implements NetworkInterface {
 	protected final void transmitReceivedMessage(VoteMessage voteMessage) {
 		if(voteMessage==null) return;
 		Log.d("AbstractNetworkInterface", "VoteMessage of type "+voteMessage.getMessageType()+" arrived.");
+
 		Intent messageArrivedIntent;
 		switch(voteMessage.getMessageType()){
 		case VOTE_MESSAGE_ELECTORATE:
@@ -95,6 +96,11 @@ public abstract class AbstractNetworkInterface implements NetworkInterface {
 			messageArrivedIntent = new Intent(BroadcastIntentTypes.setupMessage);
 			messageArrivedIntent.putExtra("message", voteMessage.getMessageContent());
 			messageArrivedIntent.putExtra("sender", voteMessage.getSenderUniqueId());
+			LocalBroadcastManager.getInstance(context).sendBroadcast(messageArrivedIntent);
+			break;
+		case VOTE_MESSAGE_CANCEL_POLL:
+			// notify the UI that new message has arrived
+			messageArrivedIntent = new Intent(BroadcastIntentTypes.cancelVote);
 			LocalBroadcastManager.getInstance(context).sendBroadcast(messageArrivedIntent);
 			break;
 		default:

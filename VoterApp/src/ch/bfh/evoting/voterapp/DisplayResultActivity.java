@@ -1,5 +1,11 @@
 package ch.bfh.evoting.voterapp;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,8 +15,10 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Menu;
@@ -49,6 +57,7 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 	private Poll poll;
 
 	private Button btnRedo;
+	private Button btnExport;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +119,10 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 				btnRedo.setText(R.string.action_clone_poll);
 			}
 		}
+		
+		// Set a listener on the redo button
+		btnExport = (Button) findViewById(R.id.button_export);
+		btnExport.setOnClickListener(this);
 
 		lv.setAdapter(new ResultAdapter(this, poll));
 
@@ -129,8 +142,14 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 						"DB error: " + e.getMessage());
 				e.printStackTrace();
 			}
+			File directory = new File(Environment.getExternalStorageDirectory() + "/MobiVote/");
+			directory.mkdirs();
+		    File file = new File(Environment.getExternalStorageDirectory() + "/MobiVote/" + poll.getStartTime()+".mobix");
+		    AndroidApplication.getInstance().getProtocolInterface().exportToXML(file);
+			
 		}
-
+		
+		
 		// Is NFC available on this device?
 		nfcAvailable = this.getPackageManager().hasSystemFeature(
 				PackageManager.FEATURE_NFC);
@@ -232,6 +251,9 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 		case R.id.action_redo_vote:
 			redoVote();
 			return true;
+		case R.id.action_export:
+			export();
+			return true;
 		}
 		return true;
 	}
@@ -251,6 +273,7 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 
 		if (getResources().getBoolean(R.bool.display_bottom_bar)) {
 			menu.findItem(R.id.action_redo_vote).setVisible(false);
+			menu.findItem(R.id.action_export).setVisible(false);
 		}
 
 		return true;
@@ -260,6 +283,8 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 	public void onClick(View view) {
 		if (view == btnRedo) {
 			redoVote();
+		} else if (view == btnExport){
+			export();
 		}
 	}
 
@@ -317,5 +342,22 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 			e.printStackTrace();
 		}
 	}
-
+	
+	private void export(){
+		
+	    File file = new File(Environment.getExternalStorageDirectory() + "/MobiVote/" + poll.getStartTime()+".mobix");
+	    if (!file.exists()) {
+	    	for(int i=0; i<2;i++)
+	    		Toast.makeText(this, getString(R.string.toast_export_failed), Toast.LENGTH_SHORT).show();
+	        return;
+	    }
+	    for(int i=0; i<2;i++)
+			Toast.makeText(this, getString(R.string.toast_file_exported, Environment.getExternalStorageDirectory() + "/MobiVote/"+poll.getStartTime()+".mobix"), Toast.LENGTH_SHORT).show();
+		
+		Intent sendIntent = new Intent();
+		sendIntent.setAction(Intent.ACTION_SEND);
+		sendIntent.setType("text/xml");
+		sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+		startActivity(Intent.createChooser(sendIntent, getString(R.string.action_export)));
+	}
 }
