@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.core.Persister;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -23,6 +26,7 @@ import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolParticipant;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolPoll;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine.StateMachineManager;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
+import ch.bfh.evoting.voterapp.util.xml.XMLPoll;
 import ch.bfh.unicrypt.crypto.schemes.commitment.classes.StandardCommitmentScheme;
 import ch.bfh.unicrypt.crypto.schemes.hash.classes.StandardHashScheme;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringElement;
@@ -276,7 +280,14 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 
 	@Override
 	public void exportToXML(File file) {
-		// TODO Auto-generated method stub
+		Serializer serializer = new Persister();
+		XMLPoll xmlPoll = new XMLPoll();
+
+		try {
+			serializer.write(xmlPoll, file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 	}
 
