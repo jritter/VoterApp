@@ -32,6 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.18"
             android:drawableLeft="@drawable/ic_action_edit"
+            android:singleLine="true"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:text="@string/recreate_network" />
@@ -43,6 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.18"
             android:drawableRight="@drawable/ic_action_next_item"
+            android:singleLine="true"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:text="@string/action_next" />
