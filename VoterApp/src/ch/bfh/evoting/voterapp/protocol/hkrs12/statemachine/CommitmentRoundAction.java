@@ -147,6 +147,7 @@ public class CommitmentRoundAction extends AbstractAction {
 		//send broadcast to dismiss the wait dialog
 		Intent intent2 = new Intent(BroadcastIntentTypes.dismissWaitDialog);
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent2);
+		
 	}
 
 	@Override
@@ -155,7 +156,6 @@ public class CommitmentRoundAction extends AbstractAction {
 			Log.w(TAG, "Not saving value of processed message since they are value of a previous state.");
 		}
 
-		Log.e(TAG, "Saving proof of validity recvd "+sender);
 		ProtocolParticipant senderParticipant = (ProtocolParticipant) poll.getParticipants().get(sender);
 		senderParticipant.setProofValidVote(message.getProof());
 
@@ -170,7 +170,6 @@ public class CommitmentRoundAction extends AbstractAction {
 	protected void goToNextState() {
 		LocalBroadcastManager.getInstance(context).unregisterReceiver(voteDone);
 		super.goToNextState();
-		Log.e(TAG, "Going to next state");
 		try {
 			((HKRS12ProtocolInterface)AndroidApplication.getInstance().getProtocolInterface()).getStateMachineManager().getStateMachine().applyEvent(new AllCommitMessagesReceivedEvent(null));
 		} catch (FiniteStateException e) {
@@ -199,10 +198,6 @@ public class CommitmentRoundAction extends AbstractAction {
 
 	public void executeCallback(Intent data) {
 
-		Log.e(TAG,"executeCallback thread id: "+Thread.currentThread().getId());
-
-		//notify UI about new incomed vote
-		Log.e(TAG, "Sending update vote broadcast");
 		me.setHasVoted(true);
 		numberMessagesReceived++;
 		//inform GUI about new vote message received
@@ -227,7 +222,7 @@ public class CommitmentRoundAction extends AbstractAction {
 
 		ProtocolOption option = (ProtocolOption)data.getSerializableExtra("option");
 		int index = data.getIntExtra("index", -1);
-
+		
 		me.setBi(me.getHi().selfApply(me.getXi()).apply(poll.getGenerator().selfApply(option.getRepresentation())));
 
 		//compute validity proof

@@ -1,11 +1,14 @@
 package ch.bfh.evoting.voterapp.adapters;
 
+import java.io.File;
 import java.util.List;
 
+import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.db.PollDbHelper;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import android.content.Context;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,7 +23,7 @@ import android.widget.TextView;
  * @author von Bergen Philémon
  */
 public class PollArchiveAdapter extends ArrayAdapter<Poll> {
-
+	
 	private Context context;
 	private List<Poll> values;
 
@@ -66,6 +69,8 @@ public class PollArchiveAdapter extends ArrayAdapter<Poll> {
 			@Override
 			public void onClick(View v) {
 				PollDbHelper.getInstance(context).deletePoll(values.get(position).getId());
+			    File file = new File(Environment.getExternalStorageDirectory() + AndroidApplication.FOLDER + values.get(position).getStartTime()+ AndroidApplication.EXTENSION);
+			    file.delete();
 				values.remove(position);
 				notifyDataSetChanged();
 			}

@@ -3,6 +3,8 @@ package ch.bfh.evoting.voterapp.protocol.hkrs12;
 import java.math.BigInteger;
 
 import ch.bfh.evoting.voterapp.entities.Participant;
+import ch.bfh.unicrypt.math.algebra.concatenative.classes.ByteArrayElement;
+import ch.bfh.unicrypt.math.algebra.concatenative.classes.ByteArrayMonoid;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringElement;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringMonoid;
 import ch.bfh.unicrypt.math.algebra.dualistic.classes.N;
@@ -20,8 +22,7 @@ public class ProtocolParticipant extends Participant {
 	private int protocolParticipantIndex;
 	
 	//transient fields are not serialized
-	//TODO exclude secret when sending poll over network
-	private Element xi = null;
+	private transient Element xi = null;
 	private Element ai = null;
 	private Element proofForXi = null;
 	private Element hi = null;
@@ -200,77 +201,11 @@ public class ProtocolParticipant extends Participant {
 	}
 	
 	public Tuple getDataToHash(){
+
 		Element index = N.getInstance().getElement(BigInteger.valueOf(this.getProtocolParticipantIndex()));
-		StringElement proverId = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII).getElement(this.getUniqueId());
-		
+		ByteArrayElement proverId = ByteArrayMonoid.getInstance().getElement(this.getUniqueId().getBytes());
+
 		return Tuple.getInstance(index, proverId);
-	}
-
-//	@Override
-//	public String toString() {
-//		String s = "Participant object\n";
-//		s+="\tIdentification: "+s+"\n";
-//		s+="\tIP Address: "+this.ipAddress+"\n";
-//		s+="\tState at this moment: "+this.state+"\n";
-//		s+="\tProtocol participant index: "+this.protocolParticipantIndex+"\n";
-//		if(this.xi!=null){
-//			s+="\txi: "+((AtomicElement)this.xi).getBigInteger()+"\n";
-//		} else {
-//			s+="\txi: "+this.xi+"\n";
-//		}
-//		if(this.ai!=null){
-//			s+="\tai: "+((AtomicElement)this.ai).getBigInteger()+"\n";
-//		} else {
-//			s+="\tai: "+this.ai+"\n";
-//		}
-//		if(this.bi!=null){
-//			s+="\tbi: "+((AtomicElement)this.bi).getBigInteger()+"\n";
-//		} else {
-//			s+="\tbi: "+this.bi+"\n";
-//		}
-//		if(this.hi!=null){
-//			s+="\thi: "+((AtomicElement)this.hi).getBigInteger()+"\n";
-//		} else {
-//			s+="\thi: "+this.hi+"\n";
-//		}
-//		if(this.hiHat!=null){
-//			s+="\thi hat: "+((AtomicElement)this.hiHat).getBigInteger()+"\n";
-//		} else {
-//			s+="\thi hat: "+this.hiHat+"\n";
-//		}
-//		if(this.hiHatPowXi!=null){
-//			s+="\thi hat pow xi: "+((AtomicElement)this.hiHatPowXi).getBigInteger()+"\n";
-//		} else {
-//			s+="\thi hat pow xi: "+this.hiHatPowXi+"\n";
-//		}
-//		if(this.proofForXi!=null){
-//			s+="\tProof for xi: "+this.proofForXi+"\n";
-//		} else {
-//			s+="\tProof for xi: "+this.proofForXi+"\n";
-//		}
-//		if(this.proofValidVote!=null){
-//			s+="\tProof of valid vote: "+this.proofValidVote+"\n";
-//		} else {
-//			s+="\tProof of valid vote: "+this.proofValidVote+"\n";
-//		}
-//		if(this.proofValidVote!=null){
-//			s+="\tProof for hi hat pow xi : "+this.proofForHiHat+"\n";
-//		} else {
-//			s+="\tProof for hi hat pow xi : "+this.proofForHiHat+"\n";
-//		}
-//		return s;
-//	}
-	
-	@Override
-	public int hashCode() {
-		//TODO
-		return super.hashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		//TODO
-		return super.equals(obj);
 	}
 
 }

@@ -52,14 +52,12 @@ public class WaitForVotesFragment extends ListFragment {
 			@SuppressWarnings("unchecked")
 			@Override
 			public void onReceive(Context arg0, Intent intent) {
-				Log.e("WaitForVotesFragment","BC received, will update view "+intent.getIntExtra("votes", 0));
 				poll.setOptions((List<Option>)intent.getSerializableExtra("options"));
 				poll.setParticipants((Map<String,Participant>)intent.getSerializableExtra("participants"));
 				updateStatus(intent.getIntExtra("votes", 0));
 			}
 		};
 		LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(updateVoteReceiver, new IntentFilter(BroadcastIntentTypes.newIncomingVote));
-		Log.e("WaitForVotesFragment","Vote updater registered");
 
 		// Subscribing to the showNextActivity request to show ResultActivity
 		showNextActivityListener = new BroadcastReceiver() {
@@ -131,7 +129,6 @@ public class WaitForVotesFragment extends ListFragment {
 	 * @param progress
 	 */
 	private void updateStatus(int numberOfReceivedVotes){
-		Log.e("WaitForVotesFragment","update to "+numberOfReceivedVotes);
 		//update progress bar and participants list
 		int progress = 0;
 		if(poll.getParticipants().size()!=0){

@@ -6,6 +6,7 @@ import org.apache.log4j.Level;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
+import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -41,6 +42,8 @@ public class AndroidApplication extends Application {
 	public static final String PREFS_NAME = "network_preferences";
 	public static final Level LEVEL = Level.DEBUG;
 	private static final String TAG = null;
+	public static final String FOLDER = "/MobiVote/";
+	public static final String EXTENSION = ".mobix";
 
 	private static AndroidApplication instance;
 	private SerializationUtil su;
@@ -101,6 +104,10 @@ public class AndroidApplication extends Application {
 		LocalBroadcastManager.getInstance(this).registerReceiver(wrongDecryptionKeyReceiver, new IntentFilter(BroadcastIntentTypes.probablyWrongDecryptionKeyUsed));
 		LocalBroadcastManager.getInstance(this).registerReceiver(waitDialogDismiss, new IntentFilter(BroadcastIntentTypes.dismissWaitDialog));
 		LocalBroadcastManager.getInstance(this).registerReceiver(waitDialogShow, new IntentFilter(BroadcastIntentTypes.showWaitDialog));
+		LocalBroadcastManager.getInstance(this).registerReceiver(differentProtocolsReceiver, new IntentFilter(BroadcastIntentTypes.differentProtocols));
+		LocalBroadcastManager.getInstance(this).registerReceiver(differentPollsReceiver, new IntentFilter(BroadcastIntentTypes.differentPolls));
+		LocalBroadcastManager.getInstance(this).registerReceiver(resultComputationFailedReceiver, new IntentFilter(BroadcastIntentTypes.resultNotFound));
+
 	}
 
 	@Override
@@ -126,7 +133,7 @@ public class AndroidApplication extends Application {
 
 		//initialize ICE for AllJoyn
 		//This must be done on the main thread
-		org.alljoyn.bus.alljoyn.DaemonInit.PrepareDaemon(this); 
+//		org.alljoyn.bus.alljoyn.DaemonInit.PrepareDaemon(this); 
 
 		new AsyncTask<Object, Object, Object>() {
 
@@ -341,15 +348,15 @@ public class AndroidApplication extends Application {
 
 				// Create the AlertDialog
 				dialogAttack = builder.create();
-				
+
 				dialogAttack.setOnShowListener(new DialogInterface.OnShowListener() {
-						@Override
-						public void onShow(DialogInterface dialog) {
-							Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
-							dialogAttack.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
-									R.drawable.selectable_background_votebartheme);
-						}
-					});
+					@Override
+					public void onShow(DialogInterface dialog) {
+						Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+						dialogAttack.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
+								R.drawable.selectable_background_votebartheme);
+					}
+				});
 				dialogAttack.show();
 			}
 		}
@@ -407,6 +414,124 @@ public class AndroidApplication extends Application {
 		}
 	};
 
+	/**
+	 * this broadcast receiver listens for messages indicating that different protocols are used by different participants
+	 */
+	private BroadcastReceiver differentProtocolsReceiver = new BroadcastReceiver() {
+		private AlertDialog dialogDiffProtocols;
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if(currentActivity!=null){
+				AlertDialog.Builder builder = new AlertDialog.Builder(currentActivity);
+
+				// Add the buttons
+				builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+						Intent i = new Intent(AndroidApplication.this, MainActivity.class);
+						currentActivity.startActivity(i);
+					}
+				});
+
+				builder.setTitle(R.string.dialog_title_different_protocols);
+				builder.setMessage(R.string.dialog_different_protocols);
+
+				// Create the AlertDialog
+				dialogDiffProtocols = builder.create(); 
+
+				dialogDiffProtocols.setOnShowListener(new DialogInterface.OnShowListener() {
+					@Override
+					public void onShow(DialogInterface dialog) {
+						Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+						dialogDiffProtocols.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
+								R.drawable.selectable_background_votebartheme);
+					}
+				});
+				dialogDiffProtocols.show();
+			}
+		}
+	};
+
+	/**
+	 * this broadcast receiver listens for messages indicating that different polls are used by different participants
+	 */
+	private BroadcastReceiver differentPollsReceiver = new BroadcastReceiver() {
+		private AlertDialog dialogDiffPolls;
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if(currentActivity!=null){
+				AlertDialog.Builder builder = new AlertDialog.Builder(currentActivity);
+
+				// Add the buttons
+				builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.dismiss();
+						Intent i = new Intent(AndroidApplication.this, MainActivity.class);
+						currentActivity.startActivity(i);
+					}
+				});
+
+				builder.setTitle(R.string.dialog_title_different_polls);
+				builder.setMessage(R.string.dialog_different_polls);
+
+				// Create the AlertDialog
+				dialogDiffPolls = builder.create(); 
+
+				dialogDiffPolls.setOnShowListener(new DialogInterface.OnShowListener() {
+					@Override
+					public void onShow(DialogInterface dialog) {
+						Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+						dialogDiffPolls.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
+								R.drawable.selectable_background_votebartheme);
+					}
+				});
+				dialogDiffPolls.show();
+			}
+		}
+	};
+
+	/**
+	 * this broadcast receiver listens for messages indicating that the result could not be computed
+	 */
+	private BroadcastReceiver resultComputationFailedReceiver = new BroadcastReceiver() {
+		private AlertDialog dialogResultComputed;
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(AndroidApplication.getInstance().getCurrentActivity());
+			// Add the buttons
+			builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+
+				public void onClick(DialogInterface dialog, int id) {
+					dialogResultComputed.dismiss();
+					Intent i = new Intent(AndroidApplication.this, MainActivity.class);
+					currentActivity.startActivity(i);
+				}
+			});
+
+			builder.setTitle(R.string.dialog_title_result_not_computed);
+			builder.setMessage(R.string.dialog_result_not_computed);
+
+
+			dialogResultComputed = builder.create();
+			dialogResultComputed.setOnShowListener(new DialogInterface.OnShowListener() {
+				@Override
+				public void onShow(DialogInterface dialog) {
+					Utility.setTextColor(dialog, AndroidApplication.getInstance().getResources().getColor(R.color.theme_color));
+					dialogResultComputed.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
+							R.drawable.selectable_background_votebartheme);
+				}
+			});
+
+			// Create the AlertDialog
+			dialogResultComputed.show();
+		}
+	};
+
+
 	private BroadcastReceiver waitDialogDismiss = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -420,6 +545,7 @@ public class AndroidApplication extends Application {
 			showDialog(currentActivity);
 		}
 	};
+	public boolean backupDialogShown;
 
 	private void showDialog(Activity activity){
 		if(waitDialog!=null && waitDialog.isShowing()) return;
@@ -466,6 +592,10 @@ public class AndroidApplication extends Application {
 
 		public void onActivityPaused(Activity activity) {
 			this.connectedSSID = networkMonitor.getConnectedSSID();
+			if(dialogShown){
+				backupDialogShown = true;
+				dismissDialog();
+			}
 		}
 
 		public void onActivityResumed(Activity activity) {
@@ -474,8 +604,9 @@ public class AndroidApplication extends Application {
 				Intent intent = new Intent(BroadcastIntentTypes.networkGroupDestroyedEvent);
 				LocalBroadcastManager.getInstance(AndroidApplication.this).sendBroadcast(intent);
 			}
-			if(dialogShown){
+			if(backupDialogShown){
 				showDialog(activity);
+				backupDialogShown=false;
 			}
 		}
 

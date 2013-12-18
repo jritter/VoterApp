@@ -158,8 +158,6 @@ public class VoteActivity extends Activity {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				
-				Log.e("VoteActivity","BC receiver thread to show wait activity: "+Thread.currentThread().getId());
-
 				LocalBroadcastManager.getInstance(VoteActivity.this).unregisterReceiver(this);
 
 				//Start activity waiting for other participants to vote

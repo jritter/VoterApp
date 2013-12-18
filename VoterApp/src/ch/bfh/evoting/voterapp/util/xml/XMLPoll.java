@@ -15,11 +15,20 @@ public class XMLPoll {
 	private List<XMLParticipant> participants;
 
 	@Element
-	private String p = "139700725455163817218350367330248482081469054544178136562919376411664993761516359902466877562980091029644919043107300384411502932147505225644121231955823457305399024737939358832740762188317942235632506234568870323910594575297744132090375969205586671220221046438363046016679285179955869484584028329654326524819";
+	private String p;
 	@Element
 	private String generator;
 	@Element
-	private String tempGenerator;
+	
+	public XMLPoll(String question, List<XMLOption> options,
+			List<XMLParticipant> participants, String p, String generator) {
+		super();
+		this.question = question;
+		this.options = options;
+		this.participants = participants;
+		this.p = p;
+		this.generator = generator;
+	}
 	
 	public String getQuestion() {
 		return question;
@@ -50,15 +59,6 @@ public class XMLPoll {
 	}
 	public void setGenerator(String generator) {
 		this.generator = generator;
-	}
-	public String getTempGenerator() {
-		return tempGenerator;
-	}
-	public void setTempGenerator(String tempGenerator) {
-		this.tempGenerator = tempGenerator;
-	}
-	
-
-	
+	}	
 	
 }

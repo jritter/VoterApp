@@ -42,7 +42,6 @@ public class VotingRoundAction extends AbstractAction {
 		super.doAction(message, entity, transition, actionType);
 		Log.d(TAG,"Voting round started");
 
-		Log.e(TAG,"Voting action thread: "+Thread.currentThread().getId());
 		//send broadcast to show the wait dialog
 		Intent intent1 = new Intent(BroadcastIntentTypes.showWaitDialog);
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
@@ -76,9 +75,9 @@ public class VotingRoundAction extends AbstractAction {
 	@Override
 	protected void goToNextState() {
 		super.goToNextState();
-		//send broadcast to dismiss the wait dialog
-		Intent intent1 = new Intent(BroadcastIntentTypes.showWaitDialog);
-		LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
+//		//send broadcast to dismiss the wait dialog
+//				Intent intent1 = new Intent(BroadcastIntentTypes.showWaitDialog);
+//				LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
 		try {
 			if(poll.getExcludedParticipants().isEmpty()){
 				((HKRS12ProtocolInterface)AndroidApplication.getInstance().getProtocolInterface()).getStateMachineManager().getStateMachine().applyEvent(new AllVotingMessagesReceivedEvent(null));

@@ -51,7 +51,6 @@ public class StateMachineManager implements Runnable {
 	 */
 	@Override
 	public void run() {
-		Log.e("StateMachineManager","SMM thread: "+Thread.currentThread().getId());
 
 		/*Create the state machine*/
 		StateTransitionMap stmap = new StateTransitionMap();

@@ -161,7 +161,7 @@ public class BroadcastIntentTypes {
 	 * - "sender": unique id of the sender
 	 */
 	public static String setupMessage = "setupMessage";
-	
+		
 	/**
 	 * Intent type sent when user has chosen his vote
 	 * Extras:
@@ -183,5 +183,26 @@ public class BroadcastIntentTypes {
 	 * - nothing
 	 */
 	public static final String dismissWaitDialog = "dismissWaitDialog";
+	
+	/**
+	 * Intent type sent when detecting that different protocols are used on the network
+	 * Extras:
+	 * - nothing
+	 */
+	public static final String differentProtocols = "differentProtocols";
+	
+	/**
+	 * Intent type sent when detecting that the poll used by the administrator is not the same as the one used here
+	 * Extras:
+	 * - nothing
+	 */
+	public static final String differentPolls = "differentPolls";
+
+	/**
+	 * Intent type sent when computation of the final result failed
+	 * Extras:
+	 * - nothing
+	 */
+	public static final String resultNotFound = "resultNotFound";
 
 }

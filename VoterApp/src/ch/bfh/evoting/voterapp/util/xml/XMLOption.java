@@ -12,6 +12,13 @@ public class XMLOption {
 	@Element
 	private String representation;
 	
+	public XMLOption(String text, int votes, String representation) {
+		super();
+		this.text = text;
+		this.votes = votes;
+		this.representation = representation;
+	}
+	
 	public String getText() {
 		return text;
 	}

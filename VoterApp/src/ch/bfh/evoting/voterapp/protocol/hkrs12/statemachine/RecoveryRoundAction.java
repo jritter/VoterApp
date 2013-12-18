@@ -56,7 +56,6 @@ public class RecoveryRoundAction extends AbstractAction {
 			TransitionFailureException, InterruptedException {
 		super.doAction(message, entity, transition, actionType);
 		Log.d(TAG,"Recovery round started");
-		Log.e(TAG,"Recovery action thread: "+Thread.currentThread().getId());
 
 
 		Element productNumerator = poll.getG_q().getElement(BigInteger.valueOf(1));
@@ -80,20 +79,15 @@ public class RecoveryRoundAction extends AbstractAction {
 		//Function g^r
 		StandardCommitmentScheme<GStarMod, Element> csSetup = StandardCommitmentScheme.getInstance(poll.getGenerator());	
 		Function f1 = csSetup.getCommitmentFunction();
-//				CompositeFunction.getInstance(MultiIdentityFunction.getInstance(poll.getZ_q(), 1),
-//				PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(poll.getG_q(),poll.getZ_q()), poll.getGenerator(), 0));
 
 		//Function h_hat^r
 		Function f2 = csRecovery.getCommitmentFunction();
-//				CompositeFunction.getInstance(MultiIdentityFunction.getInstance(poll.getZ_q(), 1),
-//				PartiallyAppliedFunction.getInstance(SelfApplyFunction.getInstance(poll.getG_q(),poll.getZ_q()), me.getHiHat(), 0));
 
 		ProductFunction f = ProductFunction.getInstance(f1, f2);
 		
 		StringElement proverId = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII).getElement(me.getUniqueId());
 
 		SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator.getInstance(f, proverId);
-//				   f.getCoDomain(), (ProductSemiGroup) f.getCoDomain(), ZMod.getInstance(f.getDomain().getMinimalOrder()), proverId);
 
 		PreimageEqualityProofGenerator piepg = PreimageEqualityProofGenerator.getInstance(scg, f1,f2);
 

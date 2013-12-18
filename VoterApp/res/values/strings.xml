@@ -69,7 +69,6 @@
     <string name="action_cancel_poll">Cancel vote</string>
     <string name="action_start_poll_period">Start voting period</string>
     <string name="action_export">Export</string>
-    
 
     <!-- Question Dialogs -->
     <string name="dialog_title_confirm_vote">Cast ballot?</string>
@@ -90,11 +89,11 @@
     <string name="dialog_back">By going back, you will not be able to participate to the vote. Do you really want that?</string>
     <string name="dialog_back_admin">By going back, you will not be able to administrate the vote. You will have to restart the procedure from the beginning. Do you really want that?</string>
     <string name="dialog_back_result">By going back, you will not be able to see the result of the vote. Do you really want that?</string>
-	<string name="dialog_title_access_point">Android Wi-Fi hotspot</string>
+    <string name="dialog_title_access_point">Android Wi-Fi hotspot</string>
     <string name="dialog_content_access_point">The Android Wi-Fi hotspot is already enabled. Do you want to use this connection?</string>
     <string name="nfc_enable_nfc">Enable NFC?</string>
     <string name="nfc_enable_nfc_question">In order to use this feature, NFC must be enabled. Do you want to enable it now?</string>
-    
+
     <!-- Error or Info Dialogs / Toast -->
     <string name="toast_scroll">Please have a look at all options first.</string>
     <string name="toast_choose_one_option">Please choose one of the possible options.</string>
@@ -142,7 +141,11 @@
     <string name="dialog_result_not_computed">The application was not able to compute the result. We apologize for the inconvenience this may cause.</string>
     <string name="dialog_title_poll_canceled">Vote cancelled</string>
     <string name="dialog_poll_canceled">The administrator has canceled the vote. You will be redirected to the main screen.</string>
-    
+    <string name="dialog_title_different_polls">Different vote content</string>
+    <string name="dialog_different_polls">The content of the vote seem not to be the same for you and for the administrator. The vote will be cancelled.</string>
+    <string name="dialog_title_different_protocols">Different protocols</string>
+    <string name="dialog_different_protocols">Your app is not using the same cryptographic protocol as the app of the administrator. The vote will be cancelled.</string>
+
     <!-- Help overlays -->
     <string name="overlay_close">Touch the screen to close this help</string>
     <string name="overlay_identification">Put your identification here&#8230;</string>
@@ -166,7 +169,7 @@
     <string name="title_activity_electorate">Electorate selection</string>
     <string name="title_activity_review_poll">Vote review</string>
     <string name="title_activity_wait_for_votes_admin">Vote progress</string>
-    
+
     <!-- Activity subtitles -->
     <string name="subtitle_welcome">Welcome to MobiVote</string>
     <string name="subtitle_check_electorate">Please wait&#8230;</string>
@@ -192,7 +195,7 @@
     <string name="description_add_option">Add option</string>
     <string name="description_qrcode">QR-code</string>
     <string name="description_cast">Cast ballot</string>
-       
+
     <!-- Help dialog titles -->
     <string name="help_title_main">Welcome to MobiVote</string>
     <string name="help_title_electorate">Electorate selection</string>
@@ -351,4 +354,5 @@
 			When you select a vote in the list, you will be redirected to the screen displaying the result of this vote.
 		]]>
     </string>
+
 </resources>

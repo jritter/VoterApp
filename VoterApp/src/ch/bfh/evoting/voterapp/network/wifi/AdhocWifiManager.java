@@ -272,7 +272,6 @@ public class AdhocWifiManager {
 				// Configuration already exists, no need to create a new one...
 				success = wifi.enableNetwork(networkId, true);
 				//Sleep in order to let time to disconnect from current wifi and connect to new
-				Log.e(TAG, "Sleeping a while to let disconnection happen");
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {

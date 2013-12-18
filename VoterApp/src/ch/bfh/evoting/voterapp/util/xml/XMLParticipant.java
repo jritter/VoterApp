@@ -15,6 +15,26 @@ public class XMLParticipant {
 	private String hiHatPowXi = null;
 	private String proofForHiHat = null;
 	
+	public XMLParticipant(){
+		
+	}
+	
+	public XMLParticipant(String identification, String uniqueId, String ai,
+			String proofForXi, String hi, String bi, String proofValidVote,
+			String hiHat, String hiHatPowXi, String proofForHiHat) {
+		super();
+		this.identification = identification;
+		this.uniqueId = uniqueId;
+		this.ai = ai;
+		this.proofForXi = proofForXi;
+		this.hi = hi;
+		this.bi = bi;
+		this.proofValidVote = proofValidVote;
+		this.hiHat = hiHat;
+		this.hiHatPowXi = hiHatPowXi;
+		this.proofForHiHat = proofForHiHat;
+	}
+	
 	public String getIdentification() {
 		return identification;
 	}

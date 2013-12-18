@@ -107,7 +107,6 @@ public abstract class AbstractAction implements Action {
 		if(timeOut>0){
 			this.startTimer(timeOut);
 		}
-		Log.e(TAG,"action thread: "+Thread.currentThread().getId());
 	}
 
 
@@ -136,8 +135,7 @@ public abstract class AbstractAction implements Action {
 			}			
 
 			//Ignore messages from excluded participant
-			//TODO check remove instanceof
-			if(poll.getExcludedParticipants().containsKey(sender) /*|| !(AbstractAction.this instanceof RecoveryRoundAction)*/){
+			if(poll.getExcludedParticipants().containsKey(sender)){
 				Log.w(TAG, "Ignoring message from previously excluded participant!");
 				return;
 			}
@@ -244,7 +242,6 @@ public abstract class AbstractAction implements Action {
 				return false;
 			}
 		}
-		Log.e(TAG, "number of messages received "+messagesReceived.size());
 		return true;
 	}
 
@@ -308,12 +305,7 @@ public abstract class AbstractAction implements Action {
 
 		@Override
 		public void run() {
-			Log.e(TAG, "Time out !");
 			stopTimer();
-//			if(AbstractAction.this instanceof CommitmentRoundAction){
-//				//Sleeping some time in order to let time voters processing a message to send this message
-//				SystemClock.sleep(15000);
-//			}
 			for(Participant p:poll.getParticipants().values()){
 				if(AbstractAction.this instanceof SetupRoundAction){
 					poll.getCompletelyExcludedParticipants().put(p.getUniqueId(), p);
