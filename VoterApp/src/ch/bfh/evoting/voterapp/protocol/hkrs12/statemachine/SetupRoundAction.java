@@ -1,18 +1,11 @@
 package ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.util.Log;
 import ch.bfh.evoting.voterapp.AndroidApplication;
-import ch.bfh.evoting.voterapp.entities.Option;
-import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.VoteMessage.Type;
 import ch.bfh.evoting.voterapp.protocol.HKRS12ProtocolInterface;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolMessageContainer;
-import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolOption;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolParticipant;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolPoll;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine.StateMachineManager.Round;
@@ -20,15 +13,9 @@ import ch.bfh.unicrypt.crypto.proofgenerator.challengegenerator.classes.Standard
 import ch.bfh.unicrypt.crypto.proofgenerator.challengegenerator.interfaces.SigmaChallengeGenerator;
 import ch.bfh.unicrypt.crypto.proofgenerator.classes.PreimageProofGenerator;
 import ch.bfh.unicrypt.crypto.schemes.commitment.classes.StandardCommitmentScheme;
-import ch.bfh.unicrypt.crypto.schemes.hash.classes.StandardHashScheme;
-import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringElement;
-import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringMonoid;
-import ch.bfh.unicrypt.math.algebra.dualistic.classes.N;
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
 import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarMod;
-import ch.bfh.unicrypt.math.helper.Alphabet;
-import ch.bfh.unicrypt.math.helper.HashMethod;
 
 import com.continuent.tungsten.fsm.core.Entity;
 import com.continuent.tungsten.fsm.core.Event;

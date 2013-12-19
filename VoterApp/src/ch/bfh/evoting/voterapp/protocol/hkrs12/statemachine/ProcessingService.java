@@ -78,7 +78,7 @@ public class ProcessingService extends IntentService {
 
 			//Generator and index of the participant has also to be hashed in the proof
 			Tuple otherInput = Tuple.getInstance(senderParticipant.getDataToHash(), poll.getDataToHash());
-
+			
 			SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator.getInstance(csSetup.getCommitmentFunction(), otherInput);
 
 			PreimageProofGenerator spg = PreimageProofGenerator.getInstance(scg, csSetup.getCommitmentFunction());

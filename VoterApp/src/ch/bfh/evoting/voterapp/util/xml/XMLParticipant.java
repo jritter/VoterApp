@@ -14,14 +14,15 @@ public class XMLParticipant {
 	private String hiHat = null;
 	private String hiHatPowXi = null;
 	private String proofForHiHat = null;
-	
+	private int protocolParticipantIndex;
+
 	public XMLParticipant(){
 		
 	}
 	
 	public XMLParticipant(String identification, String uniqueId, String ai,
 			String proofForXi, String hi, String bi, String proofValidVote,
-			String hiHat, String hiHatPowXi, String proofForHiHat) {
+			String hiHat, String hiHatPowXi, String proofForHiHat, int protocolParticipantIndex) {
 		super();
 		this.identification = identification;
 		this.uniqueId = uniqueId;
@@ -33,6 +34,7 @@ public class XMLParticipant {
 		this.hiHat = hiHat;
 		this.hiHatPowXi = hiHatPowXi;
 		this.proofForHiHat = proofForHiHat;
+		this.protocolParticipantIndex = protocolParticipantIndex;
 	}
 	
 	public String getIdentification() {
@@ -94,6 +96,14 @@ public class XMLParticipant {
 	}
 	public void setProofForHiHat(String proofForHiHat) {
 		this.proofForHiHat = proofForHiHat;
+	}
+
+	public int getProtocolParticipantIndex() {
+		return protocolParticipantIndex;
+	}
+
+	public void setProtocolParticipantIndex(int protocolParticipantIndex) {
+		this.protocolParticipantIndex = protocolParticipantIndex;
 	}
 	
 	

@@ -57,6 +57,11 @@ public class RecoveryRoundAction extends AbstractAction {
 		super.doAction(message, entity, transition, actionType);
 		Log.d(TAG,"Recovery round started");
 
+		if(poll.getExcludedParticipants().size()==1 && poll.getExcludedParticipants().containsKey(me.getUniqueId())){
+			//this means that I was excluded
+			//so I have nothing to do here
+			return;
+		}
 
 		Element productNumerator = poll.getG_q().getElement(BigInteger.valueOf(1));
 		Element productDenominator = poll.getG_q().getElement(BigInteger.valueOf(1));
@@ -71,11 +76,12 @@ public class RecoveryRoundAction extends AbstractAction {
 		}
 
 		me.setHiHat(productNumerator.applyInverse(productDenominator));
+		
 		StandardCommitmentScheme<GStarMod, Element> csRecovery = StandardCommitmentScheme.getInstance(me.getHiHat());	
 		me.setHiHatPowXi(csRecovery.commit(me.getXi()));
 
 		//compute proof of equality between discrete logs
-
+		
 		//Function g^r
 		StandardCommitmentScheme<GStarMod, Element> csSetup = StandardCommitmentScheme.getInstance(poll.getGenerator());	
 		Function f1 = csSetup.getCommitmentFunction();
@@ -85,9 +91,9 @@ public class RecoveryRoundAction extends AbstractAction {
 
 		ProductFunction f = ProductFunction.getInstance(f1, f2);
 		
-		StringElement proverId = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII).getElement(me.getUniqueId());
-
-		SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator.getInstance(f, proverId);
+		Tuple otherInput3 = Tuple.getInstance(me.getDataToHash(), poll.getDataToHash());
+		
+		SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator.getInstance(f, otherInput3);
 
 		PreimageEqualityProofGenerator piepg = PreimageEqualityProofGenerator.getInstance(scg, f1,f2);
 

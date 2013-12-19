@@ -16,7 +16,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Base64;
 import android.util.Log;
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.entities.Option;
@@ -31,15 +30,14 @@ import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.xml.XMLOption;
 import ch.bfh.evoting.voterapp.util.xml.XMLParticipant;
 import ch.bfh.evoting.voterapp.util.xml.XMLPoll;
-import ch.bfh.unicrypt.crypto.schemes.hash.classes.StandardHashScheme;
+import ch.bfh.unicrypt.crypto.random.classes.PseudoRandomOracle;
+import ch.bfh.unicrypt.crypto.random.interfaces.RandomReferenceString;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.ByteArrayElement;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.ByteArrayMonoid;
-import ch.bfh.unicrypt.math.algebra.dualistic.classes.ZMod;
 import ch.bfh.unicrypt.math.algebra.general.classes.FiniteByteArrayElement;
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
 import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarModElement;
-import ch.bfh.unicrypt.math.helper.HashMethod;
 
 public class HKRS12ProtocolInterface extends ProtocolInterface {
 
@@ -218,39 +216,51 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 					return null;
 				}
 
-				//computes a generator depending on the text of the poll
-				String texts = poll.getQuestion();
-				Element[] representations = new Element[poll.getOptions().size()];
-				int i=0;
-				for(Option op:poll.getOptions()){
-					texts += op.getText();
-					representations[i]=((ProtocolOption)op).getRepresentation();
-					i++;
-				}
+				/*
+				 * Because of a modification of the SecureRandom in version 4.2 and higher of Android,
+				 * the RandomOracle of UniCrypt (at the current development stage) does not always return
+				 * the same generator as it is needed for the following check. So, if the version of Android is
+				 * 4.2 or higher, this check is disabled.
+				 * 
+				 * see: http://android-developers.blogspot.co.at/2013/02/security-enhancements-in-jelly-bean.html
+				 * New implementation of SecureRandom
+				 * Android 4.2 includes a new default implementation of SecureRandom based on OpenSSL.
+				 * In the older Bouncy Castle-based implementation, given a known seed, SecureRandom 
+				 * could technically (albeit incorrectly) be treated as a source of deterministic data. 
+				 * With the new OpenSSL-based implementation, this is no longer possible.
+				 *
+				 */
+				if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN_MR1){
 
-				Tuple tuple = Tuple.getInstance(representations);
-				FiniteByteArrayElement representationsElement = tuple.getHashValue();
-				ByteArrayElement textElement = ByteArrayMonoid.getInstance().getElement(texts.getBytes());
+					//computes a generator depending on the text of the poll
+					String texts = poll.getQuestion();
+					Element[] representations = new Element[poll.getOptions().size()];
+					int i=0;
+					for(Option op:poll.getOptions()){
+						texts += op.getText();
+						representations[i]=((ProtocolOption)op).getRepresentation();
+						i++;
+					}
 
-				ByteBuffer buffer = ByteBuffer.allocate(textElement.getByteArray().length+representationsElement.getByteArray().length);
-				buffer.put(textElement.getByteArray());
-				buffer.put(representationsElement.getByteArray());
-				buffer.flip(); 
+					Tuple tuple = Tuple.getInstance(representations);
+					FiniteByteArrayElement representationsElement = tuple.getHashValue();
+					ByteArrayElement textElement = ByteArrayMonoid.getInstance().getElement(texts.getBytes());
 
-				ProtocolPoll pp = (ProtocolPoll)poll;
-				Log.e(TAG, "Elements "+Base64.encodeToString(representationsElement.getByteArray(), Base64.DEFAULT));
-				Log.e(TAG, "Texts "+Base64.encodeToString(textElement.getByteArray(), Base64.DEFAULT));
-				Log.e(TAG, "Long value "+buffer.getLong());
-				Log.e(TAG, "Gq "+pp.getG_q());
-				//TODO replace when long no more needed
-				GStarModElement verificationGenerator = pp.getG_q().getIndependentGenerator(buffer.getLong());
-				Log.e(TAG, "Verif Generator "+verificationGenerator);
-				Log.e(TAG, "RCVD Generator "+pp.getGenerator());
+					ByteBuffer buffer = ByteBuffer.allocate(textElement.getByteArray().length+representationsElement.getByteArray().length);
+					buffer.put(textElement.getByteArray());
+					buffer.put(representationsElement.getByteArray());
+					buffer.flip(); 
 
-				if(!pp.getG_q().areEqual(pp.getGenerator(), verificationGenerator)){
-					LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(BroadcastIntentTypes.differentPolls));
-					Log.e(TAG, "There are some difference between the poll used by the admin and the one received");
-					return null;
+					ProtocolPoll pp = (ProtocolPoll)poll;
+					
+					RandomReferenceString rrs = PseudoRandomOracle.getInstance().getRandomReferenceString(buffer.array());
+					GStarModElement verificationGenerator = pp.getG_q().getIndependentGenerator(1, rrs);
+					
+					if(!pp.getG_q().areEqual(pp.getGenerator(), verificationGenerator)){
+						LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(BroadcastIntentTypes.differentPolls));
+						Log.e(TAG, "There are some difference between the poll used by the admin and the one received");
+						return null;
+					}
 				}
 
 				//Send a broadcast to start the review activity
@@ -292,6 +302,7 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 			XMLParticipant xpp = new XMLParticipant();
 			xpp.setIdentification(pPart.getIdentification());
 			xpp.setUniqueId(pPart.getUniqueId());
+			xpp.setProtocolParticipantIndex(pPart.getProtocolParticipantIndex());
 			if(pPart.getAi()!=null)
 				xpp.setAi(pPart.getAi().getValue().toString(10));
 			if(pPart.getProofForXi()!=null)

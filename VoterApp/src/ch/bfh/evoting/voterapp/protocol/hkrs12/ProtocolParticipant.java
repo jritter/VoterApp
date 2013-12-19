@@ -2,6 +2,8 @@ package ch.bfh.evoting.voterapp.protocol.hkrs12;
 
 import java.math.BigInteger;
 
+import android.util.Log;
+
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.ByteArrayElement;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.ByteArrayMonoid;

@@ -1,5 +1,9 @@
 package ch.bfh.evoting.voterapp;
 
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 import android.app.Activity;
@@ -67,9 +71,9 @@ public class MainActivity extends Activity implements OnClickListener, Identific
 	private String ssid;
 	private boolean identificationMissing = false;
 	private boolean wlanKeyMissing = false;
-	
+
 	private int networkId;
-	
+
 	private IdentificationWlanKeyDialogFragment identificationWlanKeyDialogFragment;
 	public static final int DIALOG_FRAGMENT = 1;
 
@@ -112,7 +116,7 @@ public class MainActivity extends Activity implements OnClickListener, Identific
 				// is tapped on the back
 				pendingIntent = PendingIntent.getActivity(this, 0, new Intent(
 						this, getClass())
-						.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+				.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 			} else {
 				nfcAvailable = false;
 			}
@@ -126,7 +130,7 @@ public class MainActivity extends Activity implements OnClickListener, Identific
 				NdefMessage msg = (NdefMessage) rawMsgs[0];
 
 				config = new String(msg.getRecords()[0].getPayload())
-						.split("\\|\\|");
+				.split("\\|\\|");
 
 				// saving the values that we got
 				SharedPreferences.Editor editor = preferences.edit();
@@ -147,7 +151,7 @@ public class MainActivity extends Activity implements OnClickListener, Identific
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				LocalBroadcastManager.getInstance(MainActivity.this)
-						.unregisterReceiver(this);
+				.unregisterReceiver(this);
 				startActivity(new Intent(MainActivity.this,
 						CheckElectorateActivity.class));
 			}
@@ -156,7 +160,6 @@ public class MainActivity extends Activity implements OnClickListener, Identific
 				serviceStartedListener,
 				new IntentFilter(
 						BroadcastIntentTypes.networkConnectionSuccessful));
-
 	}
 
 	@Override
@@ -269,7 +272,7 @@ public class MainActivity extends Activity implements OnClickListener, Identific
 				NdefMessage msg;
 				msg = ndef.getCachedNdefMessage();
 				config = new String(msg.getRecords()[0].getPayload())
-						.split("\\|\\|");
+				.split("\\|\\|");
 
 				// saving the values that we got
 				SharedPreferences.Editor editor = preferences.edit();
@@ -348,9 +351,9 @@ public class MainActivity extends Activity implements OnClickListener, Identific
 	private Void joinNetwork() {
 		// then start next activity
 		AndroidApplication.getInstance().getNetworkInterface()
-				.setGroupName(config[1]);
+		.setGroupName(config[1]);
 		AndroidApplication.getInstance().getNetworkInterface()
-				.setGroupPassword(config[2]);
+		.setGroupPassword(config[2]);
 
 		Log.d("Join Network", AndroidApplication.getInstance()
 				.getNetworkInterface().getGroupName());
@@ -378,16 +381,16 @@ public class MainActivity extends Activity implements OnClickListener, Identific
 	 *            android context
 	 */
 	public void connect(String[] config, Context context) {
-		
+
 		identificationMissing = false;
 		wlanKeyMissing = false;
 
 		wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 		adhoc = new AdhocWifiManager(wifi);
 		ssid = config[0];
-		
+
 		identification = preferences.getString("identification", "");
-		
+
 		if (identification.equals("")){
 			identificationMissing  = true;
 		}
@@ -403,12 +406,12 @@ public class MainActivity extends Activity implements OnClickListener, Identific
 				break;
 			}
 		}
-		
+
 		if (!connectedSuccessful) {
 			for (ScanResult result : wifi.getScanResults()) {
 				if (result.SSID.equals(ssid)) {
 					connectedSuccessful = true;
-					
+
 					if (result.capabilities.contains("WPA")
 							|| result.capabilities.contains("WEP")) {
 						wlanKeyMissing = true;
@@ -417,9 +420,9 @@ public class MainActivity extends Activity implements OnClickListener, Identific
 				}
 			}
 		}
-		
+
 		if (connectedSuccessful){
-		
+
 			if (identificationMissing || wlanKeyMissing){
 				identificationWlanKeyDialogFragment = new IdentificationWlanKeyDialogFragment(identificationMissing, wlanKeyMissing);
 				identificationWlanKeyDialogFragment.setStyle(DialogFragment.STYLE_NORMAL, R.style.Dialog);
@@ -438,20 +441,20 @@ public class MainActivity extends Activity implements OnClickListener, Identific
 	@Override
 	public void onDialogPositiveClick(DialogFragment dialog) {
 		if (identificationMissing){
-    		SharedPreferences.Editor editor = preferences.edit();
+			SharedPreferences.Editor editor = preferences.edit();
 			editor.putString("identification", ((IdentificationWlanKeyDialogFragment)dialog).getIdentification());
 			editor.commit();
-    	}
-    	
-    	if (wlanKeyMissing){
-    		adhoc.connectToNetwork(ssid, ((IdentificationWlanKeyDialogFragment)dialog).getWlanKey(), this);
-    	}
-    	else {
-    		adhoc.connectToNetwork(networkId, this);
-    	}
+		}
 
-    	dialog.dismiss();
-		
+		if (wlanKeyMissing){
+			adhoc.connectToNetwork(ssid, ((IdentificationWlanKeyDialogFragment)dialog).getWlanKey(), this);
+		}
+		else {
+			adhoc.connectToNetwork(networkId, this);
+		}
+
+		dialog.dismiss();
+
 	}
 
 	@Override
