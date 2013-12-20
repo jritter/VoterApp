@@ -213,7 +213,7 @@ public class AdhocWifiManager {
 			}
 			this.ssid = config.SSID;
 
-			
+
 		}
 
 		/*
@@ -248,7 +248,7 @@ public class AdhocWifiManager {
 
 			// make sure that wifi on the device is enabled
 			wifi.setWifiEnabled(true);
-			
+
 			// extract the current networkId and store it in the preferences
 			// file
 			preferences = context.getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
@@ -257,11 +257,12 @@ public class AdhocWifiManager {
 					.getNetworkId());
 			editor.commit();
 			SSID = config.SSID.replace("\"", "");
-			if(wifi.getConnectionInfo().getSSID()!=null)
+			if(wifi.getConnectionInfo().getSSID()!=null){
 				Log.d(TAG, "SSID to connect to: " +SSID+ " . Currently connected SSID: "+ wifi.getConnectionInfo().getSSID().replace("\"", ""));
-			if(SSID.equals(wifi.getConnectionInfo().getSSID().replace("\"", ""))){
-				success = true;
-				return null;
+				if(SSID.equals(wifi.getConnectionInfo().getSSID().replace("\"", ""))){
+					success = true;
+					return null;
+				}
 			}
 
 			Log.d(TAG, "Connect to: " + SSID);
@@ -435,13 +436,13 @@ public class AdhocWifiManager {
 					editor.putString("SSID", SSID);
 					editor.commit();
 
-					
+
 					//Register listener on group connexion event to dismiss the dialog
 					LocalBroadcastManager.getInstance(context).registerReceiver(new BroadcastReceiver() {
 
 						@Override
 						public void onReceive(Context arg0, Intent intent) {
-							
+
 							try{
 								d.dismiss();
 							} catch(Throwable t){
@@ -463,14 +464,14 @@ public class AdhocWifiManager {
 
 					String groupName = AndroidApplication.getInstance().getNetworkInterface().getGroupName();
 					AndroidApplication.getInstance().getNetworkInterface().joinGroup(groupName);
-					
+
 				} else {
 					try{
 						d.dismiss();
 					} catch(Throwable t){
 						//do nothing;
 					}
-					
+
 					for(int i=0; i<2; i++)
 						Toast.makeText(AndroidApplication.getInstance(), R.string.toast_content_connect_failed, Toast.LENGTH_SHORT).show();
 				}
