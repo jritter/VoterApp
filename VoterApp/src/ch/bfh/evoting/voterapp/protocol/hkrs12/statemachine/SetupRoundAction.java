@@ -48,15 +48,27 @@ public class SetupRoundAction extends AbstractAction {
 
 		StandardCommitmentScheme<GStarMod, Element> cs = StandardCommitmentScheme.getInstance(poll.getGenerator());
 		me.setAi(cs.commit(me.getXi()));
+		Log.e(TAG, "cs "+cs);
 
 		//Generator and index of the participant has also to be hashed in the proof
+		Log.e(TAG, "me data2hash "+me.getDataToHash());
+		Log.e(TAG, "poll data2hash "+poll.getDataToHash());
+		Log.e(TAG, "me ai "+me.getAi());
+		Log.e(TAG, "me xi "+me.getXi());
+
 		Tuple otherInput = Tuple.getInstance(me.getDataToHash(), poll.getDataToHash());
+		Log.e(TAG, "other input "+otherInput);
 
 		SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator.getInstance(cs.getCommitmentFunction(), otherInput);
+		Log.e(TAG, "scg "+scg);
+		Log.e(TAG, "f "+cs.getCommitmentFunction());
 
 		PreimageProofGenerator spg = PreimageProofGenerator.getInstance(scg, cs.getCommitmentFunction());
+		Log.e(TAG, "spg "+spg);
 
 		me.setProofForXi(spg.generate(me.getXi(), me.getAi()));
+		Log.e(TAG, "me proog "+me.getProofForXi());
+		
 		numberMessagesReceived++;
 		ProtocolMessageContainer m = new ProtocolMessageContainer(me.getAi(), me.getProofForXi());
 		sendMessage(m, Type.VOTE_MESSAGE_SETUP);
