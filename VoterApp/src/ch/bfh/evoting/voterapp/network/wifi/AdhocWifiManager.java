@@ -257,8 +257,8 @@ public class AdhocWifiManager {
 					.getNetworkId());
 			editor.commit();
 			SSID = config.SSID.replace("\"", "");
-			
-			Log.d(TAG, "SSID to connect to: " +SSID+ " . Currently connected SSID: "+ wifi.getConnectionInfo().getSSID().replace("\"", ""));
+			if(wifi.getConnectionInfo().getSSID()!=null)
+				Log.d(TAG, "SSID to connect to: " +SSID+ " . Currently connected SSID: "+ wifi.getConnectionInfo().getSSID().replace("\"", ""));
 			if(SSID.equals(wifi.getConnectionInfo().getSSID().replace("\"", ""))){
 				success = true;
 				return null;
