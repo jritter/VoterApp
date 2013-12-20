@@ -30,6 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.18"
             android:drawableLeft="@drawable/ic_action_play"
+            android:singleLine="true"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
             android:text="@string/action_start_poll_period" />
