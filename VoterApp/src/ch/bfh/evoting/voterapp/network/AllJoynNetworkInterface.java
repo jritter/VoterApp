@@ -136,8 +136,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 		connectionTimeOut(10000);
 
 		//Close previous connections
-		String oldNetworkName = this.groupName;
-		if(oldNetworkName!=null && oldNetworkName!=""){
+		if(this.groupName!=null && this.groupName!=""){
 			disconnect();
 		}
 
@@ -174,7 +173,6 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 			msg3.setData(data);
 			mBusHandler.sendMessage(msg3);
 		}		
-
 	}
 
 	@Override
@@ -225,7 +223,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			String groupName = intent.getStringExtra("groupName");
-			
+
 			if(AllJoynNetworkInterface.this.groupName!=null && groupName !=null && AllJoynNetworkInterface.this.groupName.equals(groupName)){
 				groupName = null;
 				Intent i  = new Intent(BroadcastIntentTypes.networkGroupDestroyedEvent);
@@ -253,6 +251,10 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 			} else if (status == 3){
 				for(int i=0; i < 2; i++)
 					Toast.makeText(context, context.getString(R.string.toast_join_error_voter), Toast.LENGTH_SHORT).show();
+					//TODO
+				HandlerThread busThread = new HandlerThread("BusHandler");
+				busThread.start();
+				BusHandler mBusHandler2 = new BusHandler(busThread.getLooper(), context);
 			} else if (status == 4){
 				for(int i=0; i < 2; i++)
 					Toast.makeText(context, context.getString(R.string.toast_join_error_voter_network), Toast.LENGTH_SHORT).show();
@@ -287,6 +289,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 
 			public void run() {  
 				if(!mBusHandler.getConnected() && !feedbackReceived){
+					//TODO is that allowed
 					disconnect();
 					LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent("networkConnectionFailed"));
 				}
