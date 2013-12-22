@@ -1,6 +1,5 @@
 package ch.bfh.evoting.voterapp.util;
 
-import android.content.Intent;
 
 /**
  * Class listing local broadcast intent types that are sent in the application
@@ -138,6 +137,20 @@ public class BroadcastIntentTypes {
 	 * - "poll" poll to use in GUI part (not always set)
 	 */
 	public static final String showResultActivity = "showResultActivity";
-
+	
+	/**
+	 * Intent type sent when asking to show the Result activity
+	 * Extras:
+	 * - "poll" poll to use in GUI part (not always set)
+	 */
+	public static final String coefficientCommitment = "coefficientCommitment";
+	
+	/**
+	 * Intent type sent when asking to show the Result activity
+	 * Extras:
+	 * - "poll" poll to use in GUI part (not always set)
+	 */
+	public static final String keyShare = "keyShare";
+	
 	
 }
