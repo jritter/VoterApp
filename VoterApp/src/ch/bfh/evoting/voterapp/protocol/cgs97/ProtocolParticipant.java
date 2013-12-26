@@ -7,6 +7,7 @@ import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarModElement;
 public class ProtocolParticipant extends Participant {
 
 	private GStarModElement[] coefficientCommitments;
+	private GStarModElement partDecryption;
 	private ZModElement keyShareFrom;
 
 	/**
@@ -38,5 +39,11 @@ public class ProtocolParticipant extends Participant {
 		this.keyShareFrom = keyShareFrom;
 	}
 
-
+	public void setPartDecryption(GStarModElement partDecryption) {
+		this.partDecryption = partDecryption;
+	}
+	
+	public GStarModElement getPartDecryption() {
+		return partDecryption;
+	}
 }

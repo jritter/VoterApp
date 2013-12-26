@@ -76,19 +76,19 @@ public class VoteService extends Service {
 						&& !poll.getParticipants().get(voter).hasVoted()) {
 					Log.e("VoteService", "vote++");
 					votesReceived++;
-					Option vote = (Option) intent.getSerializableExtra("vote");
-					for (Option op : poll.getOptions()) {
-						if (op.equals(vote)) {
-							op.setVotes(op.getVotes() + 1);
-						}
-					}
+//					Option vote = (Option) intent.getSerializableExtra("vote");
+//					for (Option op : poll.getOptions()) {
+//						if (op.equals(vote)) {
+//							op.setVotes(op.getVotes() + 1);
+//						}
+//					}
 					poll.getParticipants().get(voter).setHasVoted(true);
 				}
 
-				if (votesReceived >= poll.getNumberOfParticipants()) {
-					((CGS97Protocol) AndroidApplication.getInstance()
-							.getProtocolInterface()).computeResult(poll);
-				}
+//				if (votesReceived >= poll.getNumberOfParticipants()) {
+//					((CGS97Protocol) AndroidApplication.getInstance()
+//							.getProtocolInterface()).computeResult(poll);
+//				}
 
 				sendVotesTask = new AsyncTask<Object, Object, Object>() {
 

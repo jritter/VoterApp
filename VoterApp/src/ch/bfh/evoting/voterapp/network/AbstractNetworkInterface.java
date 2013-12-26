@@ -94,6 +94,13 @@ public abstract class AbstractNetworkInterface implements NetworkInterface {
 			messageArrivedIntent.putExtra("sender", voteMessage.getSenderUniqueId());
 			LocalBroadcastManager.getInstance(context).sendBroadcast(messageArrivedIntent);
 			break;
+			
+		case VOTE_MESSAGE_PART_DECRYPTION:
+			messageArrivedIntent = new Intent(BroadcastIntentTypes.partDecryption);
+			messageArrivedIntent.putExtra("partDecryption", voteMessage.getMessageContent());
+			messageArrivedIntent.putExtra("sender", voteMessage.getSenderUniqueId());
+			LocalBroadcastManager.getInstance(context).sendBroadcast(messageArrivedIntent);
+			break;
 		default:
 			break;
 		}

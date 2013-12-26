@@ -139,18 +139,28 @@ public class BroadcastIntentTypes {
 	public static final String showResultActivity = "showResultActivity";
 	
 	/**
-	 * Intent type sent when asking to show the Result activity
+	 * Intent type sent when a coefficient commitment has arrived
 	 * Extras:
-	 * - "poll" poll to use in GUI part (not always set)
+	 * - "coefficientCommitments" an array of all the coefficients which are used in the key generation protocol
+	 * - "sender" sender of the coefficient commitments
 	 */
 	public static final String coefficientCommitment = "coefficientCommitment";
 	
 	/**
-	 * Intent type sent when asking to show the Result activity
+	 * Intent type sent when a key share has arrived
 	 * Extras:
-	 * - "poll" poll to use in GUI part (not always set)
+	 * - "keyShare" key share for the participant
+	 * - "sender" sender of the key share
 	 */
 	public static final String keyShare = "keyShare";
+	
+	/**
+	 * Intent type sent when a part decryption has
+	 * Extras:
+	 * - "partDecryption" the part decryption
+	 * - "sender" sender of the part decryption
+	 */
+	public static final String partDecryption = "partDecryption";
 	
 	
 }
