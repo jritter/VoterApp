@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import ch.bfh.evoting.voterapp.AndroidApplication;
+import ch.bfh.evoting.voterapp.ElectorateActivity;
 import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -79,10 +79,17 @@ public class AdminNetworkParticipantListAdapter extends ArrayAdapter<Participant
 				}
 
 				//Send the updated list of participants in the network over the network
+				int numberOfSelectedParticipants = 0;
 				Map<String,Participant> map = new TreeMap<String,Participant>();
 				for(Participant p : values){
 					map.put(p.getUniqueId(), p);
+					if (p.isSelected()){
+						numberOfSelectedParticipants++;
+					}
 				}
+				
+				((ElectorateActivity) context).updateSeekBar(numberOfSelectedParticipants, numberOfSelectedParticipants - 1);
+				
 				VoteMessage vm = new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_ELECTORATE, (Serializable)map);
 				AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);
 			}
@@ -95,7 +102,7 @@ public class AdminNetworkParticipantListAdapter extends ArrayAdapter<Participant
 		} else {
 			cbInElectorate.setChecked(false);
 		}
-
+		
 		return view;
 	}
 

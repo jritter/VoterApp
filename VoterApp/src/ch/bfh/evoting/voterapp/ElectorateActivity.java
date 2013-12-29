@@ -12,6 +12,7 @@ import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.NetworkDialogFragment;
+import ch.bfh.evoting.voterapp.protocol.cgs97.ProtocolPoll;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.UniqueIdComparator;
 import ch.bfh.evoting.voterapp.util.Utility;
@@ -38,6 +39,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -58,6 +62,8 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 
 	private Button btnNext;
 	private ListView lvElectorate;
+	private SeekBar seekThreshold;
+	private TextView tvThreshold;
 
 	private AsyncTask<Object, Object, Object> resendElectorate;
 	private BroadcastReceiver participantsDiscoverer;
@@ -87,7 +93,36 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		btnNext.setOnClickListener(this);
 
 		lvElectorate = (ListView) findViewById(R.id.listview_electorate);
-
+		
+		tvThreshold = (TextView) findViewById(R.id.textview_thresholdvalue);
+		
+		seekThreshold = (SeekBar) findViewById(R.id.seek_threshold);
+		seekThreshold.setEnabled(false);
+		
+		seekThreshold.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+				
+			}
+			
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+				
+			}
+			
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress,
+					boolean fromUser) {
+				
+				if (progress < 2){
+					progress = 2;
+					seekBar.setProgress(progress);
+				}
+				tvThreshold.setText(progress + "");
+			}
+		});
+		
 		//if extra is present, it has priority
 		Intent intent = getIntent();
 		Poll serializedPoll = (Poll)intent.getSerializableExtra("poll");
@@ -405,6 +440,8 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 			return;
 		}
 		poll.setParticipants(finalParticipants);
+		
+		
 
 		//if this is a modification of the poll, reset all the acceptations received
 		for(Participant p: poll.getParticipants().values()){
@@ -413,11 +450,29 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 
 		active = false;
 		resendElectorate.cancel(true);
+		
+		ProtocolPoll protocolPoll = new ProtocolPoll(poll);
+		protocolPoll.setThreshold(seekThreshold.getProgress());
 
-		AndroidApplication.getInstance().getProtocolInterface().showReview(poll);
+		AndroidApplication.getInstance().getProtocolInterface().showReview(protocolPoll);
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(participantsDiscoverer);
 	}
-
+	
+	public void updateSeekBar(int max, int threshold) {
+		
+		if (max > 2){
+			seekThreshold.setMax(max);
+			seekThreshold.setProgress(threshold);
+			tvThreshold.setText(threshold + "");
+			seekThreshold.setEnabled(true);
+		}
+		else {
+			seekThreshold.setMax(2);
+			seekThreshold.setProgress(2);
+			tvThreshold.setText(2 + "");
+			seekThreshold.setEnabled(false);
+		}
+	}
 }
 

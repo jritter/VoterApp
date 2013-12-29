@@ -18,6 +18,7 @@ import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
+import ch.bfh.evoting.voterapp.protocol.cgs97.ProtocolPoll;
 import ch.bfh.evoting.voterapp.util.Separator;
 
 /**
@@ -38,6 +39,8 @@ public class ReviewPollAdapter extends BaseAdapter {
 		data.addAll(poll.getOptions());
 		data.add(new Separator("Participants"));
 		data.addAll(poll.getParticipants().values());
+		data.add(new Separator("Threshold"));
+		data.add(((ProtocolPoll)poll).getThreshold() + "");
 	}
 
 	@Override

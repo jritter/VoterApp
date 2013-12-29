@@ -16,6 +16,7 @@
     <string name="question">Question</string>
     <string name="options">Options</string>
     <string name="participants">Participants</string>
+    <string name="threshold">Threshold</string>
     <string name="vote_singular">ballot</string>
     <string name="vote_plural">ballots</string>
     <string name="empty_vote">Blank vote</string>

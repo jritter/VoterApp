@@ -85,10 +85,10 @@ public class VoteService extends Service {
 					poll.getParticipants().get(voter).setHasVoted(true);
 				}
 
-//				if (votesReceived >= poll.getNumberOfParticipants()) {
-//					((CGS97Protocol) AndroidApplication.getInstance()
-//							.getProtocolInterface()).computeResult(poll);
-//				}
+				if (votesReceived >= poll.getNumberOfParticipants()) {
+					((CGS97Protocol) AndroidApplication.getInstance()
+							.getProtocolInterface()).computeResult(poll);
+				}
 
 				sendVotesTask = new AsyncTask<Object, Object, Object>() {
 
