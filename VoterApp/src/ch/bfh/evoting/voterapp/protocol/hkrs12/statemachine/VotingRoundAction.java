@@ -75,9 +75,7 @@ public class VotingRoundAction extends AbstractAction {
 	@Override
 	protected void goToNextState() {
 		super.goToNextState();
-//		//send broadcast to dismiss the wait dialog
-//				Intent intent1 = new Intent(BroadcastIntentTypes.showWaitDialog);
-//				LocalBroadcastManager.getInstance(context).sendBroadcast(intent1);
+
 		try {
 			if(poll.getExcludedParticipants().isEmpty()){
 				((HKRS12ProtocolInterface)AndroidApplication.getInstance().getProtocolInterface()).getStateMachineManager().getStateMachine().applyEvent(new AllVotingMessagesReceivedEvent(null));

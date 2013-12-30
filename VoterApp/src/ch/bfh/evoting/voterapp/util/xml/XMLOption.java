@@ -10,11 +10,11 @@ public class XMLOption {
 	@Element
 	private int votes;
 	@Element
-	private String representation;
+	private XMLZqElement representation;
 	
 	public XMLOption(){}
 	
-	public XMLOption(String text, int votes, String representation) {
+	public XMLOption(String text, int votes, XMLZqElement representation) {
 		super();
 		this.text = text;
 		this.votes = votes;
@@ -33,10 +33,10 @@ public class XMLOption {
 	public void setVotes(int votes) {
 		this.votes = votes;
 	}
-	public String getRepresentation() {
+	public XMLZqElement getRepresentation() {
 		return representation;
 	}
-	public void setRepresentation(String representation) {
+	public void setRepresentation(XMLZqElement representation) {
 		this.representation = representation;
 	}
 	

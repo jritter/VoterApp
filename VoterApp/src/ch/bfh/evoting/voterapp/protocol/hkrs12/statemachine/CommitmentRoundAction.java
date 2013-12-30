@@ -29,14 +29,10 @@ import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.unicrypt.crypto.proofgenerator.challengegenerator.interfaces.SigmaChallengeGenerator;
 import ch.bfh.unicrypt.crypto.proofgenerator.classes.ElGamalEncryptionValidityProofGenerator;
 import ch.bfh.unicrypt.crypto.schemes.encryption.classes.ElGamalEncryptionScheme;
-import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringElement;
-import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringMonoid;
-import ch.bfh.unicrypt.math.algebra.dualistic.classes.N;
 import ch.bfh.unicrypt.math.algebra.general.classes.Subset;
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
 import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarMod;
-import ch.bfh.unicrypt.math.helper.Alphabet;
 
 import com.continuent.tungsten.fsm.core.Entity;
 import com.continuent.tungsten.fsm.core.Event;
@@ -158,7 +154,7 @@ public class CommitmentRoundAction extends AbstractAction {
 
 		ProtocolParticipant senderParticipant = (ProtocolParticipant) poll.getParticipants().get(sender);
 		senderParticipant.setProofValidVote(message.getProof());
-
+				
 		if(exclude){
 			poll.getExcludedParticipants().put(sender, senderParticipant);
 		}
@@ -246,7 +242,7 @@ public class CommitmentRoundAction extends AbstractAction {
 		Tuple publicInput = Tuple.getInstance(me.getAi(), me.getBi());
 		Tuple privateInput = vpg.createPrivateInput(me.getXi(), index);
 		me.setProofValidVote(vpg.generate(privateInput, publicInput));
-
+		
 		ProtocolMessageContainer m = new ProtocolMessageContainer(null, me.getProofValidVote(), null);
 		sendMessage(m, Type.VOTE_MESSAGE_COMMIT);
 

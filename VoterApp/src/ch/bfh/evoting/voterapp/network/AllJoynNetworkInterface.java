@@ -241,9 +241,9 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 				for(int i=0; i < 2; i++)
 					Toast.makeText(context, context.getString(R.string.toast_join_error_voter), Toast.LENGTH_SHORT).show();
 					//TODO
-				HandlerThread busThread = new HandlerThread("BusHandler");
-				busThread.start();
-				BusHandler mBusHandler2 = new BusHandler(busThread.getLooper(), context);
+//				HandlerThread busThread = new HandlerThread("BusHandler");
+//				busThread.start();
+//				BusHandler mBusHandler2 = new BusHandler(busThread.getLooper(), context);
 			} else if (status == 4){
 				for(int i=0; i < 2; i++)
 					Toast.makeText(context, context.getString(R.string.toast_join_error_voter_network), Toast.LENGTH_SHORT).show();
@@ -278,8 +278,10 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 
 			public void run() {  
 				if(!mBusHandler.getConnected() && !feedbackReceived){
-					//TODO is that allowed
-					disconnect();
+					mBusHandler.sendEmptyMessage(BusHandler.DISCONNECT);
+					HandlerThread busThread = new HandlerThread("BusHandler");
+					busThread.start();
+					mBusHandler = new BusHandler(busThread.getLooper(), context);
 					LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent("networkConnectionFailed"));
 				}
 				feedbackReceived = false;

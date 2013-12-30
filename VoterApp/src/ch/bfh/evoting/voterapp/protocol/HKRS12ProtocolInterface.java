@@ -27,9 +27,15 @@ import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolParticipant;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolPoll;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine.StateMachineManager;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
+import ch.bfh.evoting.voterapp.util.xml.XMLEqualityProof;
+import ch.bfh.evoting.voterapp.util.xml.XMLGqElement;
+import ch.bfh.evoting.voterapp.util.xml.XMLGqPair;
+import ch.bfh.evoting.voterapp.util.xml.XMLKnowledgeProof;
 import ch.bfh.evoting.voterapp.util.xml.XMLOption;
 import ch.bfh.evoting.voterapp.util.xml.XMLParticipant;
 import ch.bfh.evoting.voterapp.util.xml.XMLPoll;
+import ch.bfh.evoting.voterapp.util.xml.XMLValidityProof;
+import ch.bfh.evoting.voterapp.util.xml.XMLZqElement;
 import ch.bfh.unicrypt.crypto.random.classes.PseudoRandomOracle;
 import ch.bfh.unicrypt.crypto.random.interfaces.RandomReferenceString;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.ByteArrayElement;
@@ -230,7 +236,7 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 				 * With the new OpenSSL-based implementation, this is no longer possible.
 				 *
 				 */
-				if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN_MR1){
+				//if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN_MR1){
 
 					//computes a generator depending on the text of the poll
 					String texts = poll.getQuestion();
@@ -261,7 +267,7 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 						Log.e(TAG, "There are some difference between the poll used by the admin and the one received");
 						return null;
 					}
-				}
+				//}
 
 				//Send a broadcast to start the review activity
 				Intent intent = new Intent(BroadcastIntentTypes.showNextActivity);
@@ -285,13 +291,12 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 
 	@Override
 	public void exportToXML(File file, Poll poll) {
-
 		ProtocolPoll pp = (ProtocolPoll)poll;
 
 		List<XMLOption> newOptions = new ArrayList<XMLOption>();
 		for(Option op : pp.getOptions()){
 			ProtocolOption pop = (ProtocolOption)op;
-			XMLOption xop = new XMLOption(pop.getText(), pop.getVotes(), pop.getRepresentation().getValue().toString(10));
+			XMLOption xop = new XMLOption(pop.getText(), pop.getVotes(), new XMLZqElement(pop.getRepresentation().getValue().toString(10)));
 			newOptions.add(xop);
 		}
 		Log.e(TAG,"XML options prepared");
@@ -304,31 +309,67 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 			xpp.setUniqueId(pPart.getUniqueId());
 			xpp.setProtocolParticipantIndex(pPart.getProtocolParticipantIndex());
 			if(pPart.getAi()!=null)
-				xpp.setAi(pPart.getAi().getValue().toString(10));
-			if(pPart.getProofForXi()!=null)
-				xpp.setProofForXi(pPart.getProofForXi().getValue().toString(10));
-			if(pPart.getHi()!=null)
-				xpp.setHi(pPart.getHi().getValue().toString(10));
+				xpp.setAi(new XMLGqElement(pPart.getAi().getValue().toString(10)));
+			if(pPart.getProofForXi()!=null){
+				Tuple proof = (Tuple)pPart.getProofForXi();
+				XMLGqElement value11 = new XMLGqElement(proof.getAt(0).getValue().toString(10));
+				XMLZqElement value12 = new XMLZqElement(proof.getAt(1).getValue().toString(10));
+				XMLZqElement value13 = new XMLZqElement(proof.getAt(2).getValue().toString(10));	
+				xpp.setProofForXi(new XMLKnowledgeProof(value11, value12, value13));
+			}
+			if(pPart.getBi()!=null){
+				//Does only include Hi if Bi is not null, because when Bi is null, all other participant
+				//never received Hi, so the do not include it in their XML
+				//if pPart is me, and I didn't vote, without this check, I would include my Hi, but
+				//other participant don't. So I don't have to do it, in order to get the same XML file
+				//as the others
+				xpp.setHi(new XMLGqElement(pPart.getHi().getValue().toString(10)));
+			}
 			if(pPart.getBi()!=null)
-				xpp.setBi(pPart.getBi().getValue().toString(10));
-			if(pPart.getProofValidVote()!=null)
-				xpp.setProofValidVote(pPart.getProofValidVote().getValue().toString(10));
+				xpp.setBi(new XMLGqElement(pPart.getBi().getValue().toString(10)));
+			if(pPart.getProofValidVote()!=null){
+				Tuple proof = (Tuple)pPart.getProofValidVote();
+				Tuple subPart11 = (Tuple)proof.getAt(0);//list of Gq pairs
+				Tuple subPart12 = (Tuple)proof.getAt(1);//list ZModElements
+				Tuple subPart13 = (Tuple)proof.getAt(2);//list ZModElements
+				List<XMLGqPair> value11 = new ArrayList<XMLGqPair>();
+				for(Element e : subPart11.getAll()){
+					Tuple tuple = (Tuple)e;
+					XMLGqPair pair = new XMLGqPair(new XMLGqElement(tuple.getAt(0).getValue().toString(10)),
+											new XMLGqElement(tuple.getAt(1).getValue().toString(10)));
+					value11.add(pair);
+				}
+				List<XMLZqElement> value12 = new ArrayList<XMLZqElement>();
+				for(Element e : subPart12.getAll()){
+					value12.add(new XMLZqElement(e.getValue().toString(10)));
+				}
+				List<XMLZqElement> value13 = new ArrayList<XMLZqElement>();
+				for(Element e : subPart13.getAll()){
+					value13.add(new XMLZqElement(e.getValue().toString(10)));
+				}
+
+				XMLValidityProof xvp = new XMLValidityProof(value11, value12, value13);
+				xpp.setProofValidVote(xvp);
+			}
 			if(pPart.getHiHat()!=null)
-				xpp.setHiHat(pPart.getHiHat().getValue().toString(10));
+				xpp.setHiHat(new XMLGqElement(pPart.getHiHat().getValue().toString(10)));
 			if(pPart.getHiHatPowXi()!=null)
-				xpp.setHiHatPowXi(pPart.getHiHatPowXi().getValue().toString(10));
-			if(pPart.getProofForHiHat()!=null)
-				xpp.setProofForHiHat(pPart.getProofForHiHat().getValue().toString(10));
+				xpp.setHiHatPowXi(new XMLGqElement(pPart.getHiHatPowXi().getValue().toString(10)));
+			if(pPart.getProofForHiHat()!=null){
+				Tuple proof = (Tuple)pPart.getProofForHiHat();
+				XMLGqElement value111 = new XMLGqElement(((Tuple)proof.getAt(0)).getAt(0).getValue().toString(10));
+				XMLGqElement value112 = new XMLGqElement(((Tuple)proof.getAt(0)).getAt(1).getValue().toString(10));
+				XMLZqElement value12 = new XMLZqElement(proof.getAt(1).getValue().toString(10));	
+				XMLZqElement value13 = new XMLZqElement(proof.getAt(2).getValue().toString(10));	
+				xpp.setProofForHiHat(new XMLEqualityProof(value111, value112, value12, value13));
+			}
 			newParticipant.add(xpp);
 		}
-		Log.e(TAG,"XML Participants prepared");
 
-		XMLPoll xmlPoll = new XMLPoll(pp.getQuestion(), newOptions, newParticipant, pp.getP().toString(10), pp.getGenerator().getValue().toString(10));
-		Log.e(TAG,"XML poll prepared");
+		XMLPoll xmlPoll = new XMLPoll(pp.getQuestion(), newOptions, newParticipant, pp.getP().toString(10), new XMLGqElement(pp.getGenerator().getValue().toString(10)));
 		Serializer serializer = new Persister();
 		try {
 			serializer.write(xmlPoll, file);
-			Log.e(TAG,"XML poll write finished");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

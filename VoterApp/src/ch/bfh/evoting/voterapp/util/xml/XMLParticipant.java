@@ -6,23 +6,23 @@ public class XMLParticipant {
 	private String identification;
 	private String uniqueId;
 
-	private String ai = null;
-	private String proofForXi = null;
-	private String hi = null;
-	private String bi = null;
-	private String proofValidVote = null;
-	private String hiHat = null;
-	private String hiHatPowXi = null;
-	private String proofForHiHat = null;
+	private XMLGqElement ai = null;
+	private XMLKnowledgeProof proofForXi = null;
+	private XMLGqElement hi = null;
+	private XMLGqElement bi = null;
+	private XMLValidityProof proofValidVote = null;
+	private XMLGqElement hiHat = null;
+	private XMLGqElement hiHatPowXi = null;
+	private XMLEqualityProof proofForHiHat = null;
 	private int protocolParticipantIndex;
 
 	public XMLParticipant(){
 		
 	}
 	
-	public XMLParticipant(String identification, String uniqueId, String ai,
-			String proofForXi, String hi, String bi, String proofValidVote,
-			String hiHat, String hiHatPowXi, String proofForHiHat, int protocolParticipantIndex) {
+	public XMLParticipant(String identification, String uniqueId, XMLGqElement ai,
+			XMLKnowledgeProof proofForXi, XMLGqElement hi, XMLGqElement bi, XMLValidityProof proofValidVote,
+			XMLGqElement hiHat, XMLGqElement hiHatPowXi, XMLEqualityProof proofForHiHat, int protocolParticipantIndex) {
 		super();
 		this.identification = identification;
 		this.uniqueId = uniqueId;
@@ -49,52 +49,52 @@ public class XMLParticipant {
 	public void setUniqueId(String uniqueId) {
 		this.uniqueId = uniqueId;
 	}
-	public String getAi() {
+	public XMLGqElement getAi() {
 		return ai;
 	}
-	public void setAi(String ai) {
+	public void setAi(XMLGqElement ai) {
 		this.ai = ai;
 	}
-	public String getProofForXi() {
+	public XMLKnowledgeProof getProofForXi() {
 		return proofForXi;
 	}
-	public void setProofForXi(String proofForXi) {
+	public void setProofForXi(XMLKnowledgeProof proofForXi) {
 		this.proofForXi = proofForXi;
 	}
-	public String getHi() {
+	public XMLGqElement getHi() {
 		return hi;
 	}
-	public void setHi(String hi) {
+	public void setHi(XMLGqElement hi) {
 		this.hi = hi;
 	}
-	public String getBi() {
+	public XMLGqElement getBi() {
 		return bi;
 	}
-	public void setBi(String bi) {
+	public void setBi(XMLGqElement bi) {
 		this.bi = bi;
 	}
-	public String getProofValidVote() {
+	public XMLValidityProof getProofValidVote() {
 		return proofValidVote;
 	}
-	public void setProofValidVote(String proofValidVote) {
+	public void setProofValidVote(XMLValidityProof proofValidVote) {
 		this.proofValidVote = proofValidVote;
 	}
-	public String getHiHat() {
+	public XMLGqElement getHiHat() {
 		return hiHat;
 	}
-	public void setHiHat(String hiHat) {
+	public void setHiHat(XMLGqElement hiHat) {
 		this.hiHat = hiHat;
 	}
-	public String getHiHatPowXi() {
+	public XMLGqElement getHiHatPowXi() {
 		return hiHatPowXi;
 	}
-	public void setHiHatPowXi(String hiHatPowXi) {
+	public void setHiHatPowXi(XMLGqElement hiHatPowXi) {
 		this.hiHatPowXi = hiHatPowXi;
 	}
-	public String getProofForHiHat() {
+	public XMLEqualityProof getProofForHiHat() {
 		return proofForHiHat;
 	}
-	public void setProofForHiHat(String proofForHiHat) {
+	public void setProofForHiHat(XMLEqualityProof proofForHiHat) {
 		this.proofForHiHat = proofForHiHat;
 	}
 
