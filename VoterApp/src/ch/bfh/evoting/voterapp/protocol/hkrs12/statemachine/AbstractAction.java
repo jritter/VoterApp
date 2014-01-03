@@ -117,6 +117,8 @@ public abstract class AbstractAction implements Action {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			
+			if(actionTerminated) return;
 
 			//Get the message
 			ProtocolMessageContainer message = (ProtocolMessageContainer) intent.getSerializableExtra("message");

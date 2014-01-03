@@ -155,6 +155,8 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 			@Override
 			protected Object doInBackground(Object... arg0) {
 				//Do some protocol specific stuff
+				//reset state if another protocol was run before
+				reset();
 				stateMachineManager = new StateMachineManager(context, (ProtocolPoll)poll);
 				new Thread(stateMachineManager).start();
 				return null;
@@ -285,7 +287,13 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 		return this.stateMachineManager;
 	}
 
+	/**
+	 * Reset the state machine
+	 * This unregisters the broadcast receivers registered in all actions
+	 */
 	public void reset(){
+		if(stateMachineManager!=null)
+			this.stateMachineManager.reset();
 		this.stateMachineManager = null;
 	}
 

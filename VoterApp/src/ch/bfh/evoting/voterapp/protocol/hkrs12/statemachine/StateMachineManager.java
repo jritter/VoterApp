@@ -136,4 +136,15 @@ public class StateMachineManager implements Runnable {
 		return sm;
 	}
 	
+	/**
+	 * Reset all actions
+	 */
+	public void reset(){
+		this.setupRoundAction.reset();
+		this.commitmentRoundAction.reset();
+		this.votingRoundAction.reset();
+		this.recoveryRoundAction.reset();
+		this.tallyingAction.reset();
+	}
+	
 }

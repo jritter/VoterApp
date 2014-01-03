@@ -37,7 +37,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 		super(context);
 		HandlerThread busThread = new HandlerThread("BusHandler");
 		busThread.start();
-		mBusHandler = new BusHandler(busThread.getLooper(), context);
+		mBusHandler = new BusHandler(busThread.getLooper(), context, AndroidApplication.DEBUG);
 
 		// Listening for arriving messages
 		LocalBroadcastManager.getInstance(context).registerReceiver(mMessageReceiver, new IntentFilter("messageArrived"));
@@ -240,10 +240,10 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 			} else if (status == 3){
 				for(int i=0; i < 2; i++)
 					Toast.makeText(context, context.getString(R.string.toast_join_error_voter), Toast.LENGTH_SHORT).show();
-					//TODO
-//				HandlerThread busThread = new HandlerThread("BusHandler");
-//				busThread.start();
-//				BusHandler mBusHandler2 = new BusHandler(busThread.getLooper(), context);
+				//TODO
+				//				HandlerThread busThread = new HandlerThread("BusHandler");
+				//				busThread.start();
+				//				BusHandler mBusHandler2 = new BusHandler(busThread.getLooper(), context);
 			} else if (status == 4){
 				for(int i=0; i < 2; i++)
 					Toast.makeText(context, context.getString(R.string.toast_join_error_voter_network), Toast.LENGTH_SHORT).show();
@@ -259,21 +259,26 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 	 * @return a random string of 10 lower case chars
 	 */
 	private String generatePassword(){
-		//Inspired from: http://stackoverflow.com/questions/5683327/how-to-generate-a-random-string-of-20-characters
-		char[] chars = "abcdefghijklmnopqrstuvwxyz".toCharArray();
-		StringBuilder sb = new StringBuilder();
+		if(AndroidApplication.DEBUG){
+			return "debugpassword";
+		} else {
+			//Inspired from: http://stackoverflow.com/questions/5683327/how-to-generate-a-random-string-of-20-characters
+			char[] chars = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+			StringBuilder sb = new StringBuilder();
 
-		SecureRandom random = new SecureRandom();
-		for (int i = 0; i < 10; i++) {
-			int pos = random.generateSeed(1)[0]%26;
-			if(pos<0)pos=pos+26;
+			SecureRandom random = new SecureRandom();
+			for (int i = 0; i < 10; i++) {
+				int pos = random.generateSeed(1)[0]%26;
+				if(pos<0)pos=pos+26;
 
-			sb.append(chars[pos]);
+				sb.append(chars[pos]);
+			}
+			return sb.toString();
 		}
-		return sb.toString();
 	}
 
 	public void connectionTimeOut(long time){
+		//TODO is this needed
 		new Handler().postDelayed(new Runnable() {
 
 			public void run() {  
@@ -281,7 +286,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 					mBusHandler.sendEmptyMessage(BusHandler.DISCONNECT);
 					HandlerThread busThread = new HandlerThread("BusHandler");
 					busThread.start();
-					mBusHandler = new BusHandler(busThread.getLooper(), context);
+					mBusHandler = new BusHandler(busThread.getLooper(), context, AndroidApplication.DEBUG);
 					LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent("networkConnectionFailed"));
 				}
 				feedbackReceived = false;

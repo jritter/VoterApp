@@ -56,6 +56,8 @@ public class CommitmentRoundAction extends AbstractAction {
 	@SuppressWarnings("unused")
 	private AsyncTask<Object, Object, Object> sendVotesTask;
 	public boolean stopSendingUpdateVote = false;
+	private Timer timer;
+	private TaskTimer timerTask;
 
 	public CommitmentRoundAction(final Context context, String messageTypeToListenTo, final ProtocolPoll poll) {
 		super(context, messageTypeToListenTo, poll, 0);
@@ -175,8 +177,8 @@ public class CommitmentRoundAction extends AbstractAction {
 			Log.e(TAG,e.getMessage());
 			e.printStackTrace();
 		}
-		Timer timer = new Timer();
-		TaskTimer timerTask = new TaskTimer();
+		timer = new Timer();
+		timerTask = new TaskTimer();
 		timer.schedule(timerTask, 5000);
 	}
 	
@@ -250,6 +252,16 @@ public class CommitmentRoundAction extends AbstractAction {
 			goToNextState();
 		}
 
+	}
+	
+	@Override
+	public void reset(){
+		if(timer!=null)
+			timer.cancel();
+		if(timerTask!=null)
+			timerTask.cancel();
+		stopSendingUpdateVote = true;
+		super.reset();
 	}
 
 }

@@ -39,11 +39,14 @@ import ch.bfh.evoting.voterapp.util.Utility;
  */
 public class AndroidApplication extends Application {
 
+	public static final boolean DEBUG = true;
+	
 	public static final String PREFS_NAME = "network_preferences";
 	public static final Level LEVEL = Level.DEBUG;
 	private static final String TAG = null;
 	public static final String FOLDER = "/MobiVote/";
 	public static final String EXTENSION = ".mobix";
+	
 
 	private static AndroidApplication instance;
 	private SerializationUtil su;

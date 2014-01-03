@@ -76,11 +76,14 @@ public class VotingRoundAction extends AbstractAction {
 	protected void goToNextState() {
 		super.goToNextState();
 
+		StateMachineManager smm = ((HKRS12ProtocolInterface)AndroidApplication.getInstance().getProtocolInterface()).getStateMachineManager();
 		try {
 			if(poll.getExcludedParticipants().isEmpty()){
-				((HKRS12ProtocolInterface)AndroidApplication.getInstance().getProtocolInterface()).getStateMachineManager().getStateMachine().applyEvent(new AllVotingMessagesReceivedEvent(null));
+				if(smm!=null)
+					smm.getStateMachine().applyEvent(new AllVotingMessagesReceivedEvent(null));
 			} else {
-				((HKRS12ProtocolInterface)AndroidApplication.getInstance().getProtocolInterface()).getStateMachineManager().getStateMachine().applyEvent(new NotAllMessageReceivedEvent(null));
+				if(smm!=null)
+					smm.getStateMachine().applyEvent(new NotAllMessageReceivedEvent(null));
 			}
 		} catch (FiniteStateException e) {
 			Log.e(TAG,e.getMessage());
