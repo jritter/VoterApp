@@ -1,5 +1,7 @@
 package ch.bfh.evoting.voterapp.util;
 
+import android.content.Intent;
+
 
 /**
  * Class listing local broadcast intent types that are sent in the application
@@ -153,6 +155,14 @@ public class BroadcastIntentTypes {
 	 * - "sender" sender of the key share
 	 */
 	public static final String keyShare = "keyShare";
+	
+	/**
+	 * Intent type sent when a key share commitment has arrived
+	 * Extras:
+	 * - "keyShareCommitment" key share for the participant
+	 * - "sender" sender of the key share
+	 */
+	public static final String keyShareCommitment = "keyShareCommitment";
 	
 	/**
 	 * Intent type sent when a part decryption has

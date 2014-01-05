@@ -40,6 +40,8 @@ public class WaitForVotesAdminActivity extends Activity implements OnClickListen
 	private Poll poll;
 	private Button btnCancelPoll;
 	private AlertDialog cancelPollDialog;
+	
+	private WaitForVotesFragment fragment;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +74,7 @@ public class WaitForVotesAdminActivity extends Activity implements OnClickListen
 		}
 
 		FragmentManager fm = getFragmentManager();
-		WaitForVotesFragment fragment = new WaitForVotesFragment();
+		fragment = new WaitForVotesFragment();
 		Bundle bundle = new Bundle();
 		bundle.putSerializable("poll", poll);
 		fragment.setArguments(bundle);

@@ -95,6 +95,14 @@ public abstract class AbstractNetworkInterface implements NetworkInterface {
 			LocalBroadcastManager.getInstance(context).sendBroadcast(messageArrivedIntent);
 			break;
 			
+		case VOTE_MESSAGE_KEY_SHARE_COMMITMENT:
+			// notify the UI that a coefficient commitment has arrived
+			messageArrivedIntent = new Intent(BroadcastIntentTypes.keyShareCommitment);
+			messageArrivedIntent.putExtra("keyShareCommitment", voteMessage.getMessageContent());
+			messageArrivedIntent.putExtra("sender", voteMessage.getSenderUniqueId());
+			LocalBroadcastManager.getInstance(context).sendBroadcast(messageArrivedIntent);
+			break;
+			
 		case VOTE_MESSAGE_PART_DECRYPTION:
 			messageArrivedIntent = new Intent(BroadcastIntentTypes.partDecryption);
 			messageArrivedIntent.putExtra("partDecryption", voteMessage.getMessageContent());
