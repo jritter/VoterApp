@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +47,6 @@ import ch.bfh.unicrypt.math.algebra.dualistic.classes.ZMod;
 import ch.bfh.unicrypt.math.algebra.dualistic.classes.ZModElement;
 import ch.bfh.unicrypt.math.algebra.dualistic.classes.ZModPrime;
 import ch.bfh.unicrypt.math.algebra.dualistic.interfaces.DualisticElement;
-import ch.bfh.unicrypt.math.algebra.general.classes.BooleanElement;
 import ch.bfh.unicrypt.math.algebra.general.classes.FiniteByteArrayElement;
 import ch.bfh.unicrypt.math.algebra.general.classes.Pair;
 import ch.bfh.unicrypt.math.algebra.general.classes.ProductSemiGroup;
@@ -70,8 +70,6 @@ public class CGS97Protocol extends ProtocolInterface {
 	private final BigInteger P = new BigInteger(
 			"24421817481307177449647246484681681783337829412862177682538435312071281569646025606745584903210775224457523457768723824442724616998787110952108654428565400454402598245210227144929556256697593550903247924055714937916514526166092438066936693296218391429342957961400667273342778842895486447440287639065428393782477303395870298962805975752198304889507138990179204870133839847367098792875574662446712567387387134946911523722735147628746206081844500879809860996360597720571611720620174658556850893276934140542331691801045622505813030592119908356317756153773900818965668280464355085745552657819811997912683349698802670648319");
 
-	
-
 	private ProtocolPoll protocolPoll;
 
 	private GStarModSafePrime gQ = GStarModSafePrime.getInstance(P);
@@ -79,33 +77,32 @@ public class CGS97Protocol extends ProtocolInterface {
 	private GStarModElement publicKey = gQ.getIdentityElement();
 
 	private ZModPrime zQ = (ZModPrime) gQ.getZModOrder();
-	
+
 	private GStarModElement productLeft = gQ.getIdentityElement();
 	private GStarModElement productRight = gQ.getIdentityElement();
 
-
 	private ConcurrentHashMap<String, ZModElement> receivedShares = new ConcurrentHashMap<String, ZModElement>();
-	
+
 	private ConcurrentHashMap<String, GStarModElement> receivedShareCommitments = new ConcurrentHashMap<String, GStarModElement>();
 
 	private ConcurrentHashMap<String, ProtocolBallot> ballots = new ConcurrentHashMap<String, ProtocolBallot>();
 
-	private ConcurrentHashMap<String, GStarModElement> partDecryptions = new ConcurrentHashMap<String, GStarModElement>();
-	
+	private ConcurrentHashMap<String, ProtocolPartDecryption> partDecryptions = new ConcurrentHashMap<String, ProtocolPartDecryption>();
+
 	private ConcurrentHashMap<GStarModElement, ZModElement> combinationsMap = new ConcurrentHashMap<GStarModElement, ZModElement>();
 
 	private BroadcastReceiver voteReceiver;
 
 	private BroadcastReceiver partDecryptionReceiver;
-	
+
 	private BroadcastReceiver stopReceiver;
-	
+
 	private BroadcastReceiver coefficientCommitReceiver;
 
 	private BroadcastReceiver keyShareReceiver;
-	
+
 	private BroadcastReceiver keyShareCommitmentReceiver;
-	
+
 	private int numberOfBitsPerOption;
 
 	private ElGamalEncryptionScheme<GStarMod, GStarModElement> elGamal;
@@ -122,7 +119,9 @@ public class CGS97Protocol extends ProtocolInterface {
 
 	protected boolean resultFound;
 
-	
+	private boolean tallied;
+
+	private ZModElement keyShare = zQ.getIdentityElement();
 
 	public CGS97Protocol(Context context) {
 		super(context);
@@ -171,33 +170,29 @@ public class CGS97Protocol extends ProtocolInterface {
 				handleReceiveVote(ballot, intent.getStringExtra("voter"));
 			}
 		};
-		
 
 		partDecryptionReceiver = new BroadcastReceiver() {
 
 			@Override
 			public void onReceive(Context arg0, Intent intent) {
 
-				GStarModElement partDecryption = (GStarModElement) intent
+				ProtocolPartDecryption protocolPartDecryption = (ProtocolPartDecryption) intent
 						.getSerializableExtra("partDecryption");
-				handlePartDecryption(partDecryption,
+				handlePartDecryption(protocolPartDecryption,
 						intent.getStringExtra("sender"));
 			}
 		};
-		
 
 		// Register a BroadcastReceiver on stop poll order events
 		stopReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context arg0, Intent intent) {
+				tally();
 				partDecrypt(protocolPoll);
 			}
 		};
-		
 
 	}
-
-
 
 	@Override
 	public void showReview(Poll poll) {
@@ -241,30 +236,29 @@ public class CGS97Protocol extends ProtocolInterface {
 
 	@Override
 	public void beginVotingPeriod(Poll poll) {
-		
+
 		LocalBroadcastManager.getInstance(context).registerReceiver(
 				coefficientCommitReceiver,
 				new IntentFilter(BroadcastIntentTypes.coefficientCommitment));
-		
+
 		LocalBroadcastManager.getInstance(context).registerReceiver(
 				keyShareReceiver,
 				new IntentFilter(BroadcastIntentTypes.keyShare));
-		
+
 		LocalBroadcastManager.getInstance(context).registerReceiver(
-				keyShareCommitmentReceiver, new IntentFilter(BroadcastIntentTypes.keyShareCommitment));
-		
+				keyShareCommitmentReceiver,
+				new IntentFilter(BroadcastIntentTypes.keyShareCommitment));
+
 		LocalBroadcastManager.getInstance(context).registerReceiver(
 				voteReceiver, new IntentFilter(BroadcastIntentTypes.newVote));
-		
+
 		LocalBroadcastManager.getInstance(context).registerReceiver(
 				partDecryptionReceiver,
 				new IntentFilter(BroadcastIntentTypes.partDecryption));
-		
+
 		LocalBroadcastManager.getInstance(context).registerReceiver(
 				stopReceiver, new IntentFilter(BroadcastIntentTypes.stopVote));
-		
-		
-		
+
 		this.protocolPoll = (ProtocolPoll) poll;
 
 		receivedShares.clear();
@@ -273,11 +267,14 @@ public class CGS97Protocol extends ProtocolInterface {
 		partDecryptions.clear();
 		combinationsMap.clear();
 		voteUpdaterThread = null;
-		
+		tallied = false;
+
 		publicKey = gQ.getIdentityElement();
 		productLeft = gQ.getIdentityElement();
 		productRight = gQ.getIdentityElement();
-		
+		keyShare = zQ.getIdentityElement();
+
+		elGamal = ElGamalEncryptionScheme.getInstance(gQ);
 
 		if (AndroidApplication.getInstance().isAdmin()) {
 			// called when admin want to begin voting period
@@ -310,97 +307,104 @@ public class CGS97Protocol extends ProtocolInterface {
 			// .putExtra("poll", poll));
 		}
 
-		new AsyncTask<Object, Object, Object>() {
+		if (isContainedInParticipants(AndroidApplication.getInstance()
+				.getNetworkInterface().getMyUniqueId(), poll.getParticipants()
+				.values())) {
+			new AsyncTask<Object, Object, Object>() {
 
-			@Override
-			protected Object doInBackground(Object... arg0) {
+				@Override
+				protected Object doInBackground(Object... arg0) {
 
-				// Distributed Key generation
+					// Distributed Key generation
 
-				PolynomialElement polynomial = PolynomialRing.getInstance(zQ)
-						.getRandomElement(protocolPoll.getThreshold() - 1);
+					PolynomialElement polynomial = PolynomialRing.getInstance(
+							zQ).getRandomElement(
+							protocolPoll.getThreshold() - 1);
 
-				// Generate an array of commitments to the coefficients and
-				// broadcast it
+					// Generate an array of commitments to the coefficients and
+					// broadcast it
 
-				GStarModElement[] coefficientCommitments = new GStarModElement[polynomial
-						.getDegree() + 1];
+					GStarModElement[] coefficientCommitments = new GStarModElement[polynomial
+							.getDegree() + 1];
 
-				for (int i = 0; i <= polynomial.getDegree(); i++) {
-					coefficientCommitments[i] = gQ.getDefaultGenerator().power(
-							polynomial.getCoefficient(i));
-				}
+					for (int i = 0; i <= polynomial.getDegree(); i++) {
+						coefficientCommitments[i] = gQ.getDefaultGenerator()
+								.power(polynomial.getCoefficient(i));
+					}
 
-				Log.d(this.getClass().getSimpleName(), "I AM: "
-						+ AndroidApplication.getInstance()
-								.getNetworkInterface().getMyUniqueId());
-				Log.d(this.getClass().getSimpleName(),
-						"broadcasting commitments... ");
-				AndroidApplication
-						.getInstance()
-						.getNetworkInterface()
-						.sendMessage(
-								new VoteMessage(
-										VoteMessage.Type.VOTE_MESSAGE_COEFFICIENT_COMMITMENT,
-										coefficientCommitments));
-
-				// Create a share for each participant and distribute it using
-				// unicast
-
-				ZModElement[] shares = new ZModElement[protocolPoll
-						.getParticipants().size()];
-
-				int k = 0;
-				for (Map.Entry<String, Participant> entry : protocolPoll
-						.getParticipants().entrySet()) {
-					Participant participant = entry.getValue();
-
-					StringElement id = StringMonoid.getInstance(
-							Alphabet.PRINTABLE_ASCII).getElement(
-							participant.getUniqueId());
-					FiniteByteArrayElement trusteeId = id.getHashValue();
+					Log.d(this.getClass().getSimpleName(), "I AM: "
+							+ AndroidApplication.getInstance()
+									.getNetworkInterface().getMyUniqueId());
 					Log.d(this.getClass().getSimpleName(),
-							"generate: trusteeID for "
-									+ entry.getKey()
-									+ ": "
-									+ ModuloFunction.getInstance(
-											trusteeId.getSet(), zQ).apply(
-											trusteeId));
-
-					shares[k] = (ZModElement) polynomial
-							.evaluate(ModuloFunction.getInstance(
-									trusteeId.getSet(), zQ).apply(trusteeId));
+							"broadcasting commitments... ");
 					AndroidApplication
 							.getInstance()
 							.getNetworkInterface()
 							.sendMessage(
 									new VoteMessage(
-											VoteMessage.Type.VOTE_MESSAGE_KEY_SHARE,
-											shares[k]),
-									participant.getUniqueId());
-					
-					k++;
+											VoteMessage.Type.VOTE_MESSAGE_COEFFICIENT_COMMITMENT,
+											coefficientCommitments));
+
+					// Create a share for each participant and distribute it
+					// using
+					// unicast
+
+					ZModElement[] shares = new ZModElement[protocolPoll
+							.getParticipants().size()];
+
+					int k = 0;
+					for (Map.Entry<String, Participant> entry : protocolPoll
+							.getParticipants().entrySet()) {
+						Participant participant = entry.getValue();
+
+						StringElement id = StringMonoid.getInstance(
+								Alphabet.PRINTABLE_ASCII).getElement(
+								participant.getUniqueId());
+						FiniteByteArrayElement trusteeId = id.getHashValue();
+						Log.d(this.getClass().getSimpleName(),
+								"generate: trusteeID for "
+										+ entry.getKey()
+										+ ": "
+										+ ModuloFunction.getInstance(
+												trusteeId.getSet(), zQ).apply(
+												trusteeId));
+
+						shares[k] = (ZModElement) polynomial
+								.evaluate(ModuloFunction.getInstance(
+										trusteeId.getSet(), zQ)
+										.apply(trusteeId));
+						AndroidApplication
+								.getInstance()
+								.getNetworkInterface()
+								.sendMessage(
+										new VoteMessage(
+												VoteMessage.Type.VOTE_MESSAGE_KEY_SHARE,
+												shares[k]),
+										participant.getUniqueId());
+
+						k++;
+					}
+
+					final int NUMBER_OF_OPTIONS = protocolPoll.getOptions()
+							.size();
+
+					numberOfBitsPerOption = (int) Math.ceil(Math
+							.log(protocolPoll.getNumberOfParticipants())
+							/ Math.log(2));
+
+					possibleMessages = new GStarModElement[NUMBER_OF_OPTIONS];
+					BigInteger shiftedBigInteger;
+					for (int i = 0; i < NUMBER_OF_OPTIONS; i++) {
+						shiftedBigInteger = BigInteger.valueOf(1).shiftLeft(
+								i * numberOfBitsPerOption);
+						possibleMessages[i] = gQ.getDefaultGenerator().power(
+								shiftedBigInteger);
+					}
+
+					return null;
 				}
-
-				final int NUMBER_OF_OPTIONS = protocolPoll.getOptions().size();
-
-				numberOfBitsPerOption = (int) Math.ceil(Math.log(protocolPoll
-						.getNumberOfParticipants()) / Math.log(2));
-
-				possibleMessages = new GStarModElement[NUMBER_OF_OPTIONS];
-				BigInteger shiftedBigInteger;
-				for (int i = 0; i < NUMBER_OF_OPTIONS; i++) {
-					shiftedBigInteger = BigInteger.valueOf(1).shiftLeft(
-							i * numberOfBitsPerOption);
-					possibleMessages[i] = gQ.getDefaultGenerator().power(
-							shiftedBigInteger);
-				}
-
-				elGamal = ElGamalEncryptionScheme.getInstance(gQ);
-
-				return null;
-			}
-		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+			}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+		}
 	}
 
 	@Override
@@ -438,7 +442,8 @@ public class CGS97Protocol extends ProtocolInterface {
 
 				Log.d(CGS97Protocol.this.getClass().getSimpleName(),
 						"encrypt ballot using the following public key:");
-				Log.d(CGS97Protocol.this.getClass().getSimpleName(), publicKey.toString());
+				Log.d(CGS97Protocol.this.getClass().getSimpleName(),
+						publicKey.toString());
 
 				int index = poll.getOptions().indexOf(selectedOption);
 
@@ -471,7 +476,8 @@ public class CGS97Protocol extends ProtocolInterface {
 						ballotEncryption, proof);
 
 				// send the vote over the network
-				Log.d(CGS97Protocol.this.getClass().getSimpleName(), "send ballot...");
+				Log.d(CGS97Protocol.this.getClass().getSimpleName(),
+						"send ballot...");
 				AndroidApplication
 						.getInstance()
 						.getNetworkInterface()
@@ -610,11 +616,27 @@ public class CGS97Protocol extends ProtocolInterface {
 			Log.d(this.getClass().getSimpleName(), "Key Share of " + sender
 					+ " NOT ok");
 		}
+
+		if (receivedShares.size() == protocolPoll.getNumberOfParticipants()) {
+			for (ZModElement share : receivedShares.values()) {
+				this.keyShare = this.keyShare.add(share);
+			}
+			Log.d(this.getClass().getSimpleName(),
+					"Broadcasting keyshare coefficient");
+			AndroidApplication
+					.getInstance()
+					.getNetworkInterface()
+					.sendMessage(
+							new VoteMessage(
+									VoteMessage.Type.VOTE_MESSAGE_KEY_SHARE_COMMITMENT,
+									elGamal.getGenerator().power(this.keyShare)));
+		}
 	}
-	
+
 	protected void handleReceiveShareCommitment(
 			GStarModElement keyShareCommitment, String sender) {
-		Log.d(this.getClass().getSimpleName(), "Got keyshare commitment from " + sender);
+		Log.d(this.getClass().getSimpleName(), "Got keyshare commitment from "
+				+ sender);
 		receivedShareCommitments.put(sender, keyShareCommitment);
 	}
 
@@ -654,54 +676,12 @@ public class CGS97Protocol extends ProtocolInterface {
 				.getCurrentActivity());
 		progressDialog.setMessage("Starting tallying process...");
 
-		// context.stopService(new Intent(context, VoteService.class));
-
-		// do some protocol specific stuff
-
-		// compute the product of all ballot ciphertexts
-
-		scg = ElGamalEncryptionValidityProofGenerator
-				.createNonInteractiveChallengeGenerator(elGamal,
-						possibleMessages.length);
-
-		Subset plaintexts = Subset.getInstance(gQ, possibleMessages);
-
-		pg = ElGamalEncryptionValidityProofGenerator.getInstance(scg, elGamal,
-				publicKey, plaintexts);
-		
-		productLeft = gQ.getIdentityElement();
-		productRight = gQ.getIdentityElement();
-
-		for (ProtocolBallot ballot : ballots.values()) {
-			if (pg.verify(ballot.getValidityProof(), ballot.getBallot())
-					.getBoolean()) {
-				Log.d(this.getClass().getSimpleName(), "Ballot ok, counting");
-				productLeft = productLeft.multiply((GStarModElement) ballot
-						.getBallot().getAt(0));
-				productRight = productRight.multiply((GStarModElement) ballot
-						.getBallot().getAt(1));
-			} else {
-				Log.d(this.getClass().getSimpleName(),
-						"Ballot NOT ok, NOT counting");
-			}
+		if (!tallied) {
+			tally();
 		}
 
-		// Do the part decryption
-		ZModElement keyShare = zQ.getIdentityElement();
-		
-		AndroidApplication
-		.getInstance()
-		.getNetworkInterface()
-		.sendMessage(
-				new VoteMessage(
-						VoteMessage.Type.VOTE_MESSAGE_KEY_SHARE_COMMITMENT,
-						elGamal.getGenerator().power(keyShare)));
-		
-
-		Log.d(this.getClass().getSimpleName(), "Number of shares combined: " + receivedShares.size());
-		for (ZModElement share : receivedShares.values()) {
-			keyShare = keyShare.add(share);
-		}
+		Log.d(this.getClass().getSimpleName(), "Number of shares combined: "
+				+ receivedShares.size());
 
 		Log.d(this.getClass().getSimpleName(), "My Keyshare: " + keyShare);
 
@@ -719,15 +699,15 @@ public class CGS97Protocol extends ProtocolInterface {
 
 		PreimageEqualityProofGenerator pg = PreimageEqualityProofGenerator
 				.getInstance(scg, f1, f2);
-	
-		Element privateInput = keyShare;
-		Element publicInput = Tuple
-				.getInstance(elGamal.getGenerator().power(keyShare), partDecryption);
+
+		Element privateInput = this.keyShare;
+		Element publicInput = Tuple.getInstance(
+				elGamal.getGenerator().power(this.keyShare), partDecryption);
 
 		Triple proof = pg.generate(privateInput, publicInput);
 
-		Log.d(this.getClass().getSimpleName(), "Part decryption proof valid: " + pg.verify(proof, publicInput));
-		
+		ProtocolPartDecryption protocolPartDecryption = new ProtocolPartDecryption(
+				partDecryption, proof);
 
 		AndroidApplication
 				.getInstance()
@@ -735,29 +715,85 @@ public class CGS97Protocol extends ProtocolInterface {
 				.sendMessage(
 						new VoteMessage(
 								VoteMessage.Type.VOTE_MESSAGE_PART_DECRYPTION,
-								partDecryption));
+								protocolPartDecryption));
 
 	}
 
-	protected void handlePartDecryption(GStarModElement partDecryption,
-			String sender) {
+	private synchronized void tally() {
+		productLeft = gQ.getIdentityElement();
+		productRight = gQ.getIdentityElement();
+		
+		scg = ElGamalEncryptionValidityProofGenerator
+				.createNonInteractiveChallengeGenerator(elGamal,
+						possibleMessages.length);
+
+		Subset plaintexts = Subset.getInstance(gQ, possibleMessages);
+
+		pg = ElGamalEncryptionValidityProofGenerator.getInstance(scg, elGamal,
+				publicKey, plaintexts);
+
+		for (ProtocolBallot ballot : ballots.values()) {
+			if (pg.verify(ballot.getValidityProof(), ballot.getBallot())
+					.getBoolean()) {
+				Log.d(this.getClass().getSimpleName(), "Ballot ok, counting");
+				productLeft = productLeft.multiply((GStarModElement) ballot
+						.getBallot().getAt(0));
+				productRight = productRight.multiply((GStarModElement) ballot
+						.getBallot().getAt(1));
+			} else {
+				Log.d(this.getClass().getSimpleName(),
+						"Ballot NOT ok, NOT counting");
+			}
+		}
+		tallied = true;
+	}
+
+	protected void handlePartDecryption(
+			ProtocolPartDecryption protocolPartDecryption, String sender) {
+
 		Log.d(this.getClass().getSimpleName(),
 				"handlePartDecryption started...");
 
 		Log.d(this.getClass().getSimpleName(), "Got part decryption from "
 				+ sender);
-		ProtocolParticipant senderParticipant = (ProtocolParticipant) protocolPoll
-				.getParticipants().get(sender);
 
-		senderParticipant.setPartDecryption(partDecryption);
-		partDecryptions.put(sender, partDecryption);
+		if (!tallied) {
+			tally();
+		}
 
-		if (partDecryptions.size() == protocolPoll.getThreshold()) {
+		Function f1 = GeneratorFunction.getInstance(elGamal.getGenerator());
+		Function f2 = GeneratorFunction.getInstance(productLeft);
+
+		ProductFunction f = ProductFunction.getInstance(f1, f2);
+
+		SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator
+				.getInstance(f.getCoDomain(),
+						(ProductSemiGroup) f.getCoDomain(),
+						ZMod.getInstance(f.getDomain().getMinimalOrder()));
+
+		PreimageEqualityProofGenerator pg = PreimageEqualityProofGenerator
+				.getInstance(scg, f1, f2);
+
+		Element publicInput = Tuple.getInstance(
+				receivedShareCommitments.get(sender),
+				protocolPartDecryption.getPartDecryption());
+
+		if (pg.verify(protocolPartDecryption.getProof(), publicInput)
+				.getBoolean()) {
+			Log.d(this.getClass().getSimpleName(), "Accepting part decryption");
+			// senderParticipant.setPartDecryption(partDecryption);
+			partDecryptions.put(sender, protocolPartDecryption);
+
+			if (partDecryptions.size() == protocolPoll.getThreshold()) {
+				Log.d(this.getClass().getSimpleName(),
+						"calling interpolateResult...");
+				LocalBroadcastManager.getInstance(context).unregisterReceiver(
+						partDecryptionReceiver);
+				interpolateResult();
+			}
+		} else {
 			Log.d(this.getClass().getSimpleName(),
-					"calling interpolateResult...");
-			LocalBroadcastManager.getInstance(context).unregisterReceiver(
-					partDecryptionReceiver);
-			interpolateResult();
+					"Rejecting partdecryption of " + sender);
 		}
 
 		Log.d(this.getClass().getSimpleName(),
@@ -767,17 +803,18 @@ public class CGS97Protocol extends ProtocolInterface {
 	private void interpolateResult() {
 
 		Log.d(this.getClass().getSimpleName(), "interpolateResult started...");
-		Log.d(this.getClass().getSimpleName(), "partdecryptions available: " + partDecryptions.size());
+		Log.d(this.getClass().getSimpleName(), "partdecryptions available: "
+				+ partDecryptions.size());
 
 		// converting the unique trustee id and the part decryption to a point
 		Pair[] pairs = new Pair[partDecryptions.size()];
 		int length = pairs.length;
 
-		Iterator<Entry<String, GStarModElement>> it = partDecryptions
+		Iterator<Entry<String, ProtocolPartDecryption>> it = partDecryptions
 				.entrySet().iterator();
 		int k = 0;
 		while (it.hasNext()) {
-			Entry<String, GStarModElement> entry = it.next();
+			Entry<String, ProtocolPartDecryption> entry = it.next();
 
 			StringElement id = StringMonoid.getInstance(
 					Alphabet.PRINTABLE_ASCII).getElement(entry.getKey());
@@ -785,7 +822,7 @@ public class CGS97Protocol extends ProtocolInterface {
 
 			pairs[k] = Pair.getInstance(
 					ModuloFunction.getInstance(trusteeId.getSet(), zQ).apply(
-							trusteeId), entry.getValue());
+							trusteeId), entry.getValue().getPartDecryption());
 			k++;
 		}
 
@@ -822,8 +859,6 @@ public class CGS97Protocol extends ProtocolInterface {
 						.getSecond()).power(lagrangeCoefficients[i]));
 			}
 		}
-		
-		
 
 		GStarModElement result = productRight.divide(product);
 
@@ -833,11 +868,10 @@ public class CGS97Protocol extends ProtocolInterface {
 		Log.d(this.getClass().getSimpleName(),
 				"Calling getCombinations with "
 						+ protocolPoll.getOptions().size() + " options and "
-						+ ballots.size() + " ballots and " + numberOfBitsPerOption + " Bits per option.");
+						+ ballots.size() + " ballots and "
+						+ numberOfBitsPerOption + " Bits per option.");
 		getCombinations(protocolPoll.getOptions().size(), new Stack<Integer>(),
 				ballots.size());
-		
-		Log.d(this.getClass().getSimpleName(), "Hashcode of combinationsMap: " + combinationsMap.hashCode());
 
 		Log.d(this.getClass().getSimpleName(), "Result: " + result);
 		Log.d(this.getClass().getSimpleName(),
@@ -911,7 +945,6 @@ public class CGS97Protocol extends ProtocolInterface {
 	}
 
 	private void getCombinations(int length, Stack<Integer> used, int val) {
-		Log.d(this.getClass().getSimpleName(), "getCombinations started...");
 		if (val == 0) {
 			Integer[] combination = new Integer[length];
 			combination = used.toArray(combination);
@@ -941,7 +974,25 @@ public class CGS97Protocol extends ProtocolInterface {
 				used.pop();
 			}
 		}
-		Log.d(this.getClass().getSimpleName(), "getCombinations finished");
+	}
+
+	/**
+	 * Indicate if the peer identified with the given string is contained in the
+	 * list of participants
+	 * 
+	 * @param uniqueId
+	 *            identifier of the peer
+	 * @return true if it is contained in the list of participants, false
+	 *         otherwise
+	 */
+	private boolean isContainedInParticipants(String uniqueId,
+			Collection<Participant> participants) {
+		for (Participant p : participants) {
+			if (p.getUniqueId().equals(uniqueId)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	class VoteUpdaterThread extends Thread {
