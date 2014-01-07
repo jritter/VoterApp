@@ -118,8 +118,8 @@ public class CGS97Protocol extends ProtocolInterface {
 	private VoteUpdaterThread voteUpdaterThread;
 
 	protected boolean resultFound;
-
-	private boolean tallied;
+	
+	private int partDecryptionRecections = 0;
 
 	private ZModElement keyShare = zQ.getIdentityElement();
 
@@ -138,6 +138,10 @@ public class CGS97Protocol extends ProtocolInterface {
 						intent.getStringExtra("sender"));
 			}
 		};
+		
+		LocalBroadcastManager.getInstance(context).registerReceiver(
+				coefficientCommitReceiver,
+				new IntentFilter(BroadcastIntentTypes.coefficientCommitment));
 
 		// Register a BroadcastReceiver for receiving the commitments to the
 		// coefficients during the key generation phase
@@ -149,6 +153,10 @@ public class CGS97Protocol extends ProtocolInterface {
 						intent.getStringExtra("sender"));
 			}
 		};
+		
+		LocalBroadcastManager.getInstance(context).registerReceiver(
+				keyShareReceiver,
+				new IntentFilter(BroadcastIntentTypes.keyShare));
 
 		keyShareCommitmentReceiver = new BroadcastReceiver() {
 			@Override
@@ -159,6 +167,10 @@ public class CGS97Protocol extends ProtocolInterface {
 						intent.getStringExtra("sender"));
 			}
 		};
+		
+		LocalBroadcastManager.getInstance(context).registerReceiver(
+				keyShareCommitmentReceiver,
+				new IntentFilter(BroadcastIntentTypes.keyShareCommitment));
 
 		voteReceiver = new BroadcastReceiver() {
 
@@ -170,6 +182,11 @@ public class CGS97Protocol extends ProtocolInterface {
 				handleReceiveVote(ballot, intent.getStringExtra("voter"));
 			}
 		};
+		
+		LocalBroadcastManager.getInstance(context).registerReceiver(
+				voteReceiver, new IntentFilter(BroadcastIntentTypes.newVote));
+		
+		
 
 		partDecryptionReceiver = new BroadcastReceiver() {
 
@@ -182,15 +199,21 @@ public class CGS97Protocol extends ProtocolInterface {
 						intent.getStringExtra("sender"));
 			}
 		};
+		
+		LocalBroadcastManager.getInstance(context).registerReceiver(
+				partDecryptionReceiver,
+				new IntentFilter(BroadcastIntentTypes.partDecryption));
 
 		// Register a BroadcastReceiver on stop poll order events
 		stopReceiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context arg0, Intent intent) {
-				tally();
 				partDecrypt(protocolPoll);
 			}
 		};
+		
+		LocalBroadcastManager.getInstance(context).registerReceiver(
+				stopReceiver, new IntentFilter(BroadcastIntentTypes.stopVote));
 
 	}
 
@@ -237,28 +260,6 @@ public class CGS97Protocol extends ProtocolInterface {
 	@Override
 	public void beginVotingPeriod(Poll poll) {
 
-		LocalBroadcastManager.getInstance(context).registerReceiver(
-				coefficientCommitReceiver,
-				new IntentFilter(BroadcastIntentTypes.coefficientCommitment));
-
-		LocalBroadcastManager.getInstance(context).registerReceiver(
-				keyShareReceiver,
-				new IntentFilter(BroadcastIntentTypes.keyShare));
-
-		LocalBroadcastManager.getInstance(context).registerReceiver(
-				keyShareCommitmentReceiver,
-				new IntentFilter(BroadcastIntentTypes.keyShareCommitment));
-
-		LocalBroadcastManager.getInstance(context).registerReceiver(
-				voteReceiver, new IntentFilter(BroadcastIntentTypes.newVote));
-
-		LocalBroadcastManager.getInstance(context).registerReceiver(
-				partDecryptionReceiver,
-				new IntentFilter(BroadcastIntentTypes.partDecryption));
-
-		LocalBroadcastManager.getInstance(context).registerReceiver(
-				stopReceiver, new IntentFilter(BroadcastIntentTypes.stopVote));
-
 		this.protocolPoll = (ProtocolPoll) poll;
 
 		receivedShares.clear();
@@ -267,7 +268,9 @@ public class CGS97Protocol extends ProtocolInterface {
 		partDecryptions.clear();
 		combinationsMap.clear();
 		voteUpdaterThread = null;
-		tallied = false;
+		scg = null;
+		pg = null;
+		partDecryptionRecections = 0;
 
 		publicKey = gQ.getIdentityElement();
 		productLeft = gQ.getIdentityElement();
@@ -471,6 +474,8 @@ public class CGS97Protocol extends ProtocolInterface {
 
 				Log.d(CGS97Protocol.this.getClass().getSimpleName(),
 						"creating protocol ballot...");
+				
+				//Log.d(CGS97Protocol.this.getClass().getSimpleName(), "selfvalidating of ballot is: " + pg.verify(proof, ballotEncryption));
 
 				ProtocolBallot ballot = new ProtocolBallot(voter,
 						ballotEncryption, proof);
@@ -570,67 +575,78 @@ public class CGS97Protocol extends ProtocolInterface {
 
 	}
 
-	public void handleReceiveShare(ZModElement keyShare, String sender) {
+	public void handleReceiveShare(final ZModElement keyShare,
+			final String sender) {
 		Log.d(this.getClass().getSimpleName(), "Got a keyshare from " + sender);
-		ProtocolParticipant senderParticipant = (ProtocolParticipant) protocolPoll
-				.getParticipants().get(sender);
-		if (senderParticipant.getCoefficientCommitments() == null) {
-			// receivedShares++;
-		}
-		senderParticipant.setKeyShareFrom(keyShare);
 
-		// Check the keyshares using the commitments sent earlier
+		new AsyncTask<Object, Object, Object>() {
 
-		GStarModElement[] coefficientCommitments = senderParticipant
-				.getCoefficientCommitments();
+			@Override
+			protected Object doInBackground(Object... params) {
+				ProtocolParticipant senderParticipant = (ProtocolParticipant) protocolPoll
+						.getParticipants().get(sender);
+				if (senderParticipant.getCoefficientCommitments() == null) {
+					// receivedShares++;
+				}
+				senderParticipant.setKeyShareFrom(keyShare);
 
-		StringElement id = StringMonoid.getInstance(Alphabet.PRINTABLE_ASCII)
-				.getElement(
+				// Check the keyshares using the commitments sent earlier
+
+				GStarModElement[] coefficientCommitments = senderParticipant
+						.getCoefficientCommitments();
+
+				StringElement id = StringMonoid.getInstance(
+						Alphabet.PRINTABLE_ASCII).getElement(
 						AndroidApplication.getInstance().getNetworkInterface()
 								.getMyUniqueId());
 
-		FiniteByteArrayElement trusteeId = id.getHashValue();
+				FiniteByteArrayElement trusteeId = id.getHashValue();
 
-		GStarModElement product = gQ.getIdentityElement();
+				GStarModElement product = gQ.getIdentityElement();
 
-		for (int i = 0; i < coefficientCommitments.length; i++) {
-			Log.d(this.getClass().getSimpleName(), "Coeff: "
-					+ coefficientCommitments[i]);
+				for (int i = 0; i < coefficientCommitments.length; i++) {
 
-			// coefficientCommitments[i] ^ trusteeId ^ degree
-			product = product.apply(coefficientCommitments[i]
-					.power(ModuloFunction.getInstance(trusteeId.getSet(), zQ)
-							.apply(trusteeId).power(i)));
-		}
 
-		Log.d(this.getClass().getSimpleName(), "Key Share from " + sender
-				+ ": " + keyShare);
+					// coefficientCommitments[i] ^ trusteeId ^ degree
+					product = product.apply(coefficientCommitments[i]
+							.power(ModuloFunction
+									.getInstance(trusteeId.getSet(), zQ)
+									.apply(trusteeId).power(i)));
+				}
 
-		if (gQ.getDefaultGenerator().power(keyShare).isEquivalent(product)) {
-			publicKey = publicKey.apply(coefficientCommitments[0]);
-			protocolPoll.setPublicKey(publicKey);
-			receivedShares.put(sender, keyShare);
-			Log.d(this.getClass().getSimpleName(), "Key Share of " + sender
-					+ " ok");
-		} else {
-			Log.d(this.getClass().getSimpleName(), "Key Share of " + sender
-					+ " NOT ok");
-		}
 
-		if (receivedShares.size() == protocolPoll.getNumberOfParticipants()) {
-			for (ZModElement share : receivedShares.values()) {
-				this.keyShare = this.keyShare.add(share);
+				if (gQ.getDefaultGenerator().power(keyShare)
+						.isEquivalent(product)) {
+					publicKey = publicKey.apply(coefficientCommitments[0]);
+					protocolPoll.setPublicKey(publicKey);
+					receivedShares.put(sender, keyShare);
+					Log.d(CGS97Protocol.this.getClass().getSimpleName(), "Key Share of "
+							+ sender + " ok");
+				} else {
+					Log.d(CGS97Protocol.this.getClass().getSimpleName(), "Key Share of "
+							+ sender + " NOT ok");
+				}
+
+				if (receivedShares.size() == protocolPoll
+						.getNumberOfParticipants()) {
+					for (ZModElement share : receivedShares.values()) {
+						CGS97Protocol.this.keyShare = CGS97Protocol.this.keyShare
+								.add(share);
+					}
+					Log.d(CGS97Protocol.this.getClass().getSimpleName(),
+							"Broadcasting keyshare coefficient");
+					AndroidApplication
+							.getInstance()
+							.getNetworkInterface()
+							.sendMessage(
+									new VoteMessage(
+											VoteMessage.Type.VOTE_MESSAGE_KEY_SHARE_COMMITMENT,
+											elGamal.getGenerator()
+													.power(CGS97Protocol.this.keyShare)));
+				}
+				return null;
 			}
-			Log.d(this.getClass().getSimpleName(),
-					"Broadcasting keyshare coefficient");
-			AndroidApplication
-					.getInstance()
-					.getNetworkInterface()
-					.sendMessage(
-							new VoteMessage(
-									VoteMessage.Type.VOTE_MESSAGE_KEY_SHARE_COMMITMENT,
-									elGamal.getGenerator().power(this.keyShare)));
-		}
+		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
 
 	protected void handleReceiveShareCommitment(
@@ -644,6 +660,30 @@ public class CGS97Protocol extends ProtocolInterface {
 		Log.d(this.getClass().getSimpleName(), "handleReceiveVote called...");
 		ballots.put(sender, ballot);
 		protocolPoll.getParticipants().get(sender).setHasVoted(true);
+		
+		if (scg == null) {
+			scg = ElGamalEncryptionValidityProofGenerator
+					.createNonInteractiveChallengeGenerator(elGamal,
+							possibleMessages.length);
+		}
+
+		if (pg == null){
+			Subset plaintexts = Subset.getInstance(gQ, possibleMessages);
+			pg = ElGamalEncryptionValidityProofGenerator.getInstance(scg, elGamal,
+					publicKey, plaintexts);
+		}
+		
+		if (pg.verify(ballot.getValidityProof(), ballot.getBallot())
+				.getBoolean()) {
+			Log.d(this.getClass().getSimpleName(), "Ballot ok, counting");
+			productLeft = productLeft.multiply((GStarModElement) ballot
+					.getBallot().getAt(0));
+			productRight = productRight.multiply((GStarModElement) ballot
+					.getBallot().getAt(1));
+		} else {
+			Log.d(this.getClass().getSimpleName(),
+					"Ballot NOT ok, NOT counting");
+		}
 
 		Intent i = new Intent(BroadcastIntentTypes.newIncomingVote);
 		i.putExtra("votes", ballots.size());
@@ -656,8 +696,6 @@ public class CGS97Protocol extends ProtocolInterface {
 
 		if (ballots.size() >= protocolPoll.getNumberOfParticipants()) {
 			Log.d(this.getClass().getSimpleName(), "calling partdecrypt...");
-			LocalBroadcastManager.getInstance(context).unregisterReceiver(
-					voteReceiver);
 			voteUpdaterThread.interrupt();
 			partDecrypt(protocolPoll);
 		} else {
@@ -675,81 +713,62 @@ public class CGS97Protocol extends ProtocolInterface {
 		progressDialog = new ProgressDialog(AndroidApplication.getInstance()
 				.getCurrentActivity());
 		progressDialog.setMessage("Starting tallying process...");
+		progressDialog.show();
 
-		if (!tallied) {
-			tally();
-		}
+		new AsyncTask<Object, Object, Object>() {
 
-		Log.d(this.getClass().getSimpleName(), "Number of shares combined: "
-				+ receivedShares.size());
+			@Override
+			protected Object doInBackground(Object... params) {
 
-		Log.d(this.getClass().getSimpleName(), "My Keyshare: " + keyShare);
+				Log.d(CGS97Protocol.this.getClass().getSimpleName(),
+						"Number of shares combined: " + receivedShares.size());
 
-		GStarModElement partDecryption = productLeft.power(keyShare);
+				Log.d(CGS97Protocol.this.getClass().getSimpleName(), "My Keyshare: "
+						+ keyShare);
 
-		Function f1 = GeneratorFunction.getInstance(elGamal.getGenerator());
-		Function f2 = GeneratorFunction.getInstance(productLeft);
+				Log.d(CGS97Protocol.this.getClass().getSimpleName(), "productLeft: " + productLeft);
+				GStarModElement partDecryption = productLeft.power(keyShare);
 
-		ProductFunction f = ProductFunction.getInstance(f1, f2);
+				Function f1 = GeneratorFunction.getInstance(elGamal
+						.getGenerator());
+				Function f2 = GeneratorFunction.getInstance(productLeft);
 
-		SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator
-				.getInstance(f.getCoDomain(),
-						(ProductSemiGroup) f.getCoDomain(),
-						ZMod.getInstance(f.getDomain().getMinimalOrder()));
+				ProductFunction f = ProductFunction.getInstance(f1, f2);
 
-		PreimageEqualityProofGenerator pg = PreimageEqualityProofGenerator
-				.getInstance(scg, f1, f2);
+				SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator
+						.getInstance(f.getCoDomain(), (ProductSemiGroup) f
+								.getCoDomain(), ZMod.getInstance(f.getDomain()
+								.getMinimalOrder()));
 
-		Element privateInput = this.keyShare;
-		Element publicInput = Tuple.getInstance(
-				elGamal.getGenerator().power(this.keyShare), partDecryption);
+				PreimageEqualityProofGenerator pg = PreimageEqualityProofGenerator
+						.getInstance(scg, f1, f2);
 
-		Triple proof = pg.generate(privateInput, publicInput);
+				Element privateInput = CGS97Protocol.this.keyShare;
+				Element publicInput = Tuple.getInstance(elGamal.getGenerator()
+						.power(CGS97Protocol.this.keyShare), partDecryption);
 
-		ProtocolPartDecryption protocolPartDecryption = new ProtocolPartDecryption(
-				partDecryption, proof);
+				Triple proof = pg.generate(privateInput, publicInput);
 
-		AndroidApplication
-				.getInstance()
-				.getNetworkInterface()
-				.sendMessage(
-						new VoteMessage(
-								VoteMessage.Type.VOTE_MESSAGE_PART_DECRYPTION,
-								protocolPartDecryption));
+				ProtocolPartDecryption protocolPartDecryption = new ProtocolPartDecryption(
+						partDecryption, proof);
 
-	}
-
-	private synchronized void tally() {
-		productLeft = gQ.getIdentityElement();
-		productRight = gQ.getIdentityElement();
-		
-		scg = ElGamalEncryptionValidityProofGenerator
-				.createNonInteractiveChallengeGenerator(elGamal,
-						possibleMessages.length);
-
-		Subset plaintexts = Subset.getInstance(gQ, possibleMessages);
-
-		pg = ElGamalEncryptionValidityProofGenerator.getInstance(scg, elGamal,
-				publicKey, plaintexts);
-
-		for (ProtocolBallot ballot : ballots.values()) {
-			if (pg.verify(ballot.getValidityProof(), ballot.getBallot())
-					.getBoolean()) {
-				Log.d(this.getClass().getSimpleName(), "Ballot ok, counting");
-				productLeft = productLeft.multiply((GStarModElement) ballot
-						.getBallot().getAt(0));
-				productRight = productRight.multiply((GStarModElement) ballot
-						.getBallot().getAt(1));
-			} else {
-				Log.d(this.getClass().getSimpleName(),
-						"Ballot NOT ok, NOT counting");
+				Log.d(CGS97Protocol.this.getClass().getSimpleName(), "Sending part decryption");
+				AndroidApplication
+						.getInstance()
+						.getNetworkInterface()
+						.sendMessage(
+								new VoteMessage(
+										VoteMessage.Type.VOTE_MESSAGE_PART_DECRYPTION,
+										protocolPartDecryption));
+				return null;
 			}
-		}
-		tallied = true;
+		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
 	}
 
 	protected void handlePartDecryption(
-			ProtocolPartDecryption protocolPartDecryption, String sender) {
+			final ProtocolPartDecryption protocolPartDecryption,
+			final String sender) {
 
 		Log.d(this.getClass().getSimpleName(),
 				"handlePartDecryption started...");
@@ -757,47 +776,99 @@ public class CGS97Protocol extends ProtocolInterface {
 		Log.d(this.getClass().getSimpleName(), "Got part decryption from "
 				+ sender);
 
-		if (!tallied) {
-			tally();
-		}
+		new AsyncTask<Object, Object, Object>() {
 
-		Function f1 = GeneratorFunction.getInstance(elGamal.getGenerator());
-		Function f2 = GeneratorFunction.getInstance(productLeft);
+			@Override
+			protected Object doInBackground(Object... params) {
+				Function f1 = GeneratorFunction.getInstance(elGamal
+						.getGenerator());
+				Function f2 = GeneratorFunction.getInstance(productLeft);
 
-		ProductFunction f = ProductFunction.getInstance(f1, f2);
+				ProductFunction f = ProductFunction.getInstance(f1, f2);
 
-		SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator
-				.getInstance(f.getCoDomain(),
-						(ProductSemiGroup) f.getCoDomain(),
-						ZMod.getInstance(f.getDomain().getMinimalOrder()));
+				SigmaChallengeGenerator scg = StandardNonInteractiveSigmaChallengeGenerator
+						.getInstance(f.getCoDomain(), (ProductSemiGroup) f
+								.getCoDomain(), ZMod.getInstance(f.getDomain()
+								.getMinimalOrder()));
 
-		PreimageEqualityProofGenerator pg = PreimageEqualityProofGenerator
-				.getInstance(scg, f1, f2);
+				PreimageEqualityProofGenerator pg = PreimageEqualityProofGenerator
+						.getInstance(scg, f1, f2);
 
-		Element publicInput = Tuple.getInstance(
-				receivedShareCommitments.get(sender),
-				protocolPartDecryption.getPartDecryption());
+				Element publicInput = Tuple.getInstance(
+						receivedShareCommitments.get(sender),
+						protocolPartDecryption.getPartDecryption());
 
-		if (pg.verify(protocolPartDecryption.getProof(), publicInput)
-				.getBoolean()) {
-			Log.d(this.getClass().getSimpleName(), "Accepting part decryption");
-			// senderParticipant.setPartDecryption(partDecryption);
-			partDecryptions.put(sender, protocolPartDecryption);
+				if (pg.verify(protocolPartDecryption.getProof(), publicInput)
+						.getBoolean()) {
+					Log.d(CGS97Protocol.this.getClass().getSimpleName(),
+							"Accepting part decryption of " + sender);
+					// senderParticipant.setPartDecryption(partDecryption);
+					partDecryptions.put(sender, protocolPartDecryption);
 
-			if (partDecryptions.size() == protocolPoll.getThreshold()) {
-				Log.d(this.getClass().getSimpleName(),
-						"calling interpolateResult...");
-				LocalBroadcastManager.getInstance(context).unregisterReceiver(
-						partDecryptionReceiver);
-				interpolateResult();
+					if (partDecryptions.size() == protocolPoll.getThreshold()) {
+						Log.d(CGS97Protocol.this.getClass().getSimpleName(),
+								"calling interpolateResult...");
+						interpolateResult();
+					}
+				} else {
+					partDecryptionRecections++;
+					
+					
+					Log.d(CGS97Protocol.this.getClass().getSimpleName(),
+							"Rejecting partdecryption of " + sender);
+				}
+
+				Log.d(CGS97Protocol.this.getClass().getSimpleName(),
+						"handlePartDecryption finished...");
+				return null;
 			}
-		} else {
-			Log.d(this.getClass().getSimpleName(),
-					"Rejecting partdecryption of " + sender);
-		}
 
-		Log.d(this.getClass().getSimpleName(),
-				"handlePartDecryption finished...");
+			@Override
+			protected void onPostExecute(Object result) {
+				
+				if (partDecryptionRecections > protocolPoll.getNumberOfParticipants() - protocolPoll.getThreshold()){
+					AlertDialog.Builder builder = new AlertDialog.Builder(
+							AndroidApplication.getInstance().getCurrentActivity());
+					// Add the buttons
+					builder.setNeutralButton(R.string.ok,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog, int id) {
+									dialog.dismiss();
+									context.startActivity(new Intent(AndroidApplication
+											.getInstance().getCurrentActivity(),
+											MainActivity.class).addFlags(
+											Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(
+											Intent.FLAG_ACTIVITY_CLEAR_TASK));
+								}
+							});
+					builder.setMessage(R.string.dialog_too_many_incorrect_decryptions);
+					AlertDialog dialog = builder.create();
+
+					dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+						@Override
+						public void onShow(DialogInterface dialog) {
+							Utility.setTextColor(dialog, context.getResources()
+									.getColor(R.color.theme_color));
+							((AlertDialog) dialog)
+									.getButton(AlertDialog.BUTTON_NEUTRAL)
+									.setBackgroundResource(
+											R.drawable.selectable_background_votebartheme);
+
+						}
+					});
+
+					dialog.show();
+				}
+				
+				
+				
+				super.onPostExecute(result);
+			}
+		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+		
+		
+		
+		
 	}
 
 	private void interpolateResult() {
@@ -908,40 +979,6 @@ public class CGS97Protocol extends ProtocolInterface {
 			resultFound = false;
 		}
 
-		if (resultFound == false) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(
-					AndroidApplication.getInstance().getCurrentActivity());
-			// Add the buttons
-			builder.setNeutralButton(R.string.ok,
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int id) {
-							dialog.dismiss();
-							context.startActivity(new Intent(AndroidApplication
-									.getInstance().getCurrentActivity(),
-									MainActivity.class).addFlags(
-									Intent.FLAG_ACTIVITY_NEW_TASK).addFlags(
-									Intent.FLAG_ACTIVITY_CLEAR_TASK));
-						}
-					});
-			builder.setMessage(R.string.dialog_decryption_error);
-			AlertDialog dialog = builder.create();
-
-			dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-				@Override
-				public void onShow(DialogInterface dialog) {
-					Utility.setTextColor(dialog, context.getResources()
-							.getColor(R.color.theme_color));
-					((AlertDialog) dialog)
-							.getButton(AlertDialog.BUTTON_NEUTRAL)
-							.setBackgroundResource(
-									R.drawable.selectable_background_votebartheme);
-
-				}
-			});
-
-			dialog.show();
-		}
-
 	}
 
 	private void getCombinations(int length, Stack<Integer> used, int val) {
@@ -1000,6 +1037,7 @@ public class CGS97Protocol extends ProtocolInterface {
 		@Override
 		public void run() {
 			while (!Thread.interrupted()) {
+				Log.d(this.getClass().getSimpleName(), "Sending vote update...");
 				Intent i = new Intent(BroadcastIntentTypes.newIncomingVote);
 				i.putExtra("votes", ballots.size());
 				i.putExtra("options", (Serializable) protocolPoll.getOptions());
