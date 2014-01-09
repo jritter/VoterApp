@@ -16,6 +16,11 @@ import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 
+/**
+ * This class implements a dummy protocol without security
+ * @author Philémon von Bergen
+ *
+ */
 public class DummyProtocolInterface extends ProtocolInterface {
 
 	private Context context;

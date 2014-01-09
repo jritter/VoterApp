@@ -1,9 +1,5 @@
 package ch.bfh.evoting.voterapp;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.concurrent.Callable;
 
 import android.app.Activity;

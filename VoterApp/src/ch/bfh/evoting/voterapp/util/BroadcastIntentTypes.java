@@ -1,7 +1,5 @@
 package ch.bfh.evoting.voterapp.util;
 
-import android.content.Intent;
-
 /**
  * Class listing local broadcast intent types that are sent in the application
  * @author Philémon von Bergen

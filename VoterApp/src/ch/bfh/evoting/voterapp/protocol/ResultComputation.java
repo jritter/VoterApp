@@ -13,8 +13,11 @@ import android.util.Log;
 import ch.bfh.unicrypt.math.algebra.dualistic.classes.ZMod;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
 
-
-
+/**
+ * This class is responsible for the computation of the result
+ * @author Philémon von Bergen
+ *
+ */
 public class ResultComputation {
 
 	private static final String TAG = ResultComputation.class.getSimpleName();

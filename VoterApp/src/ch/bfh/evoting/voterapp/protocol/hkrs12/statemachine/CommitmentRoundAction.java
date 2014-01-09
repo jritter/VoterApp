@@ -195,6 +195,10 @@ public class CommitmentRoundAction extends AbstractAction {
 		}
 	};
 
+	/**
+	 * Method executed when user has selected an option
+	 * @param data intent received in the broadcast receiver
+	 */
 	public void executeCallback(Intent data) {
 
 		me.setHasVoted(true);

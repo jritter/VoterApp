@@ -240,10 +240,6 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 			} else if (status == 3){
 				for(int i=0; i < 2; i++)
 					Toast.makeText(context, context.getString(R.string.toast_join_error_voter), Toast.LENGTH_SHORT).show();
-				//TODO
-				//				HandlerThread busThread = new HandlerThread("BusHandler");
-				//				busThread.start();
-				//				BusHandler mBusHandler2 = new BusHandler(busThread.getLooper(), context);
 			} else if (status == 4){
 				for(int i=0; i < 2; i++)
 					Toast.makeText(context, context.getString(R.string.toast_join_error_voter_network), Toast.LENGTH_SHORT).show();
@@ -277,8 +273,11 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 		}
 	}
 
+	/**
+	 * Helper method simulating a connection time out
+	 * @param time timeout time for the connection try
+	 */
 	public void connectionTimeOut(long time){
-		//TODO is this needed
 		new Handler().postDelayed(new Runnable() {
 
 			public void run() {  

@@ -12,6 +12,11 @@ import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 
+/**
+ * Class representing the interface between the graphical user interface and the protocol itself
+ * @author Philémon von Bergen
+ *
+ */
 public abstract class ProtocolInterface {
 
 	private Context context;
@@ -75,6 +80,7 @@ public abstract class ProtocolInterface {
 	 * create a file in the app data containing the protocol values. This file can then
 	 * be used to verify the vote outside of this app. 
 	 * @param file filename
+	 * @param poll poll object to export
 	 */
 	public abstract void exportToXML(File file, Poll poll);
 

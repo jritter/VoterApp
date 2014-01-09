@@ -16,20 +16,11 @@ import ch.bfh.unicrypt.crypto.proofgenerator.challengegenerator.classes.Standard
 import ch.bfh.unicrypt.crypto.proofgenerator.challengegenerator.interfaces.SigmaChallengeGenerator;
 import ch.bfh.unicrypt.crypto.proofgenerator.classes.PreimageEqualityProofGenerator;
 import ch.bfh.unicrypt.crypto.schemes.commitment.classes.StandardCommitmentScheme;
-import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringElement;
-import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringMonoid;
-import ch.bfh.unicrypt.math.algebra.dualistic.classes.ZMod;
-import ch.bfh.unicrypt.math.algebra.general.classes.ProductSemiGroup;
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
 import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarMod;
-import ch.bfh.unicrypt.math.function.classes.CompositeFunction;
-import ch.bfh.unicrypt.math.function.classes.MultiIdentityFunction;
-import ch.bfh.unicrypt.math.function.classes.PartiallyAppliedFunction;
 import ch.bfh.unicrypt.math.function.classes.ProductFunction;
-import ch.bfh.unicrypt.math.function.classes.SelfApplyFunction;
 import ch.bfh.unicrypt.math.function.interfaces.Function;
-import ch.bfh.unicrypt.math.helper.Alphabet;
 
 import com.continuent.tungsten.fsm.core.Entity;
 import com.continuent.tungsten.fsm.core.Event;

@@ -17,11 +17,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
-import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import ch.bfh.evoting.voterapp.AndroidApplication;
-import ch.bfh.evoting.voterapp.DisplayResultActivity;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
@@ -44,12 +42,16 @@ import ch.bfh.unicrypt.crypto.random.classes.PseudoRandomOracle;
 import ch.bfh.unicrypt.crypto.random.interfaces.RandomReferenceString;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.ByteArrayElement;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.ByteArrayMonoid;
-import ch.bfh.unicrypt.math.algebra.general.abstracts.AbstractSet;
 import ch.bfh.unicrypt.math.algebra.general.classes.FiniteByteArrayElement;
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
 import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarModElement;
 
+/**
+ * This class implements the HKRS12 protcol
+ * @author Philémon von Bergen
+ *
+ */
 public class HKRS12ProtocolInterface extends ProtocolInterface {
 
 	private static final String TAG = HKRS12ProtocolInterface.class.getSimpleName();

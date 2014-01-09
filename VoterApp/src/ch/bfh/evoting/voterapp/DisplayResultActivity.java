@@ -6,7 +6,6 @@ import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.FragmentTransaction;
 import android.app.PendingIntent;
 import android.content.DialogInterface;

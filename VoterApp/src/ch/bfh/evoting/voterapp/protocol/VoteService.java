@@ -17,6 +17,11 @@ import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 
+/**
+ * This class is the vote receiver service used by the dummy protocol
+ * @author Philémon von Bergen
+ *
+ */
 public class VoteService extends Service{
 
 	private static final String TAG = VoteService.class.getSimpleName();
@@ -43,14 +48,6 @@ public class VoteService extends Service{
 		super.onDestroy();
 	}
 
-	private void reset(){
-		LocalBroadcastManager.getInstance(this).unregisterReceiver(voteReceiver);
-		votesReceived = 0;
-		doWork=false;
-		if(sendVotesTask!=null)
-			sendVotesTask.cancel(true);
-	}
-
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		if(intent==null){
@@ -66,6 +63,7 @@ public class VoteService extends Service{
 			public void onReceive(Context arg0, Intent intent) {
 				Log.e("VoteService", "called");
 				
+				//Saving what was the vote for
 				String voter = intent.getStringExtra("sender");
 				if(poll.getParticipants().containsKey(voter) && !poll.getParticipants().get(voter).hasVoted()){
 					Log.e("VoteService", "vote++");
@@ -83,6 +81,7 @@ public class VoteService extends Service{
 					((DummyProtocolInterface)AndroidApplication.getInstance().getProtocolInterface()).computeResult(poll);
 				}
 
+				//sending update to GUI
 				sendVotesTask = new AsyncTask<Object, Object, Object>(){
 
 					@Override
@@ -123,6 +122,14 @@ public class VoteService extends Service{
 
 	public static VoteService getInstance(){
 		return instance;
+	}
+	
+	private void reset(){
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(voteReceiver);
+		votesReceived = 0;
+		doWork=false;
+		if(sendVotesTask!=null)
+			sendVotesTask.cancel(true);
 	}
 
 }

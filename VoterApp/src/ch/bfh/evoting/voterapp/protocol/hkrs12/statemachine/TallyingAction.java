@@ -11,9 +11,7 @@ import java.util.Collection;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.SystemClock;
@@ -21,7 +19,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.DisplayResultActivity;
-import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.protocol.HKRS12ProtocolInterface;
@@ -33,7 +30,6 @@ import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolPoll;
 import ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine.StateMachineManager.Round;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.ObservableTreeMap;
-import ch.bfh.evoting.voterapp.util.Utility;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
 
 import com.continuent.tungsten.fsm.core.Entity;
@@ -50,8 +46,6 @@ import com.continuent.tungsten.fsm.core.TransitionRollbackException;
  */
 public class TallyingAction extends AbstractAction {
 
-
-	private AlertDialog dialogResultComputed = null;
 	private ResultComputation rc;
 
 	public TallyingAction(Context context, String messageTypeToListenTo,

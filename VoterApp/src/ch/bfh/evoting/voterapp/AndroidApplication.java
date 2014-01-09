@@ -6,7 +6,6 @@ import org.apache.log4j.Level;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
-import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -133,11 +132,6 @@ public class AndroidApplication extends Application {
 	 * Initialize the Serialization method and the Network Component to use
 	 */
 	private void initializeInstance() {
-
-		//initialize ICE for AllJoyn
-		//This must be done on the main thread
-//		org.alljoyn.bus.alljoyn.DaemonInit.PrepareDaemon(this); 
-		//moved to alljoyn
 
 		new AsyncTask<Object, Object, Object>() {
 
@@ -535,7 +529,9 @@ public class AndroidApplication extends Application {
 		}
 	};
 
-
+	/**
+	 * this broadcast receiver listens for commands to show a wait dialog on the current activity
+	 */
 	private BroadcastReceiver waitDialogDismiss = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -543,14 +539,22 @@ public class AndroidApplication extends Application {
 		}
 	};
 
+	/**
+	 * this broadcast receiver listens for commands to remove a wait dialog on the current activity
+	 */
 	private BroadcastReceiver waitDialogShow = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			showDialog(currentActivity);
 		}
 	};
+	
 	public boolean backupDialogShown;
 
+	/**
+	 * Shows a wait dialog on the given activity
+	 * @param activity where to show the wait dialog
+	 */
 	private void showDialog(Activity activity){
 		if(waitDialog!=null && waitDialog.isShowing()) return;
 		//Prepare wait dialog
@@ -563,6 +567,10 @@ public class AndroidApplication extends Application {
 		dialogShown = true;
 	}
 
+	/**
+	 * Removes a wait dialog on the given activity
+	 * @param activity where to remove the wait dialog
+	 */
 	private void dismissDialog(){
 		if(waitDialog!=null && waitDialog.isShowing()){
 			try{
@@ -577,6 +585,10 @@ public class AndroidApplication extends Application {
 	}
 
 
+	/**
+	 * Android callback class
+	 * This class is used to manage the displaying of the wait dialog when activity changes occur 
+	 */
 	private class AndroidApplicationActivityLifecycleCallbacks implements ActivityLifecycleCallbacks {
 
 		private String connectedSSID = "";

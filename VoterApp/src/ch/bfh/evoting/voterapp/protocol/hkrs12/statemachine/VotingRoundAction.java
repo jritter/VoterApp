@@ -94,9 +94,4 @@ public class VotingRoundAction extends AbstractAction {
 			e.printStackTrace();
 		}
 	}
-
-
-
-
-
 }

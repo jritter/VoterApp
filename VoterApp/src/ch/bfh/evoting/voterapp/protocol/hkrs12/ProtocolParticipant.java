@@ -2,17 +2,12 @@ package ch.bfh.evoting.voterapp.protocol.hkrs12;
 
 import java.math.BigInteger;
 
-import android.util.Log;
-
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.ByteArrayElement;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.ByteArrayMonoid;
-import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringElement;
-import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringMonoid;
 import ch.bfh.unicrypt.math.algebra.dualistic.classes.N;
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
-import ch.bfh.unicrypt.math.helper.Alphabet;
 
 public class ProtocolParticipant extends Participant {
 

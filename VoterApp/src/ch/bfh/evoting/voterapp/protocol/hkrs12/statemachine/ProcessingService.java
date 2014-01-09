@@ -1,7 +1,5 @@
 package ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine;
 
-import java.math.BigInteger;
-
 import com.continuent.tungsten.fsm.core.StateMachine;
 
 import ch.bfh.evoting.voterapp.AndroidApplication;
@@ -19,28 +17,23 @@ import ch.bfh.unicrypt.crypto.proofgenerator.classes.PreimageEqualityProofGenera
 import ch.bfh.unicrypt.crypto.proofgenerator.classes.PreimageProofGenerator;
 import ch.bfh.unicrypt.crypto.schemes.commitment.classes.StandardCommitmentScheme;
 import ch.bfh.unicrypt.crypto.schemes.encryption.classes.ElGamalEncryptionScheme;
-import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringElement;
-import ch.bfh.unicrypt.math.algebra.concatenative.classes.StringMonoid;
-import ch.bfh.unicrypt.math.algebra.dualistic.classes.N;
-import ch.bfh.unicrypt.math.algebra.dualistic.classes.ZMod;
-import ch.bfh.unicrypt.math.algebra.general.classes.ProductSemiGroup;
 import ch.bfh.unicrypt.math.algebra.general.classes.Subset;
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
-import ch.bfh.unicrypt.math.algebra.general.interfaces.SemiGroup;
 import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarMod;
-import ch.bfh.unicrypt.math.function.classes.CompositeFunction;
-import ch.bfh.unicrypt.math.function.classes.MultiIdentityFunction;
-import ch.bfh.unicrypt.math.function.classes.PartiallyAppliedFunction;
 import ch.bfh.unicrypt.math.function.classes.ProductFunction;
-import ch.bfh.unicrypt.math.function.classes.SelfApplyFunction;
 import ch.bfh.unicrypt.math.function.interfaces.Function;
-import ch.bfh.unicrypt.math.helper.Alphabet;
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.SystemClock;
 import android.util.Log;
 
+/**
+ * This class is a service receiving messages to process in a queue
+ * It processes them one after the other
+ * @author Philémon von Bergen
+ *
+ */
 public class ProcessingService extends IntentService {
 
 	private static final String TAG = "ProcessingService";
@@ -158,7 +151,7 @@ public class ProcessingService extends IntentService {
 			break;
 		}
 
-
+		//notify the action that it message has been processed and pass the result to it
 		action.savedProcessedMessage(round, sender, message, exclude);
 
 		if(action.readyToGoToNextState()){
