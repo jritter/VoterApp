@@ -12,12 +12,16 @@ import java.util.TreeMap;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.core.Persister;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import ch.bfh.evoting.voterapp.AndroidApplication;
+import ch.bfh.evoting.voterapp.DisplayResultActivity;
 import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Participant;
 import ch.bfh.evoting.voterapp.entities.Poll;
@@ -40,6 +44,7 @@ import ch.bfh.unicrypt.crypto.random.classes.PseudoRandomOracle;
 import ch.bfh.unicrypt.crypto.random.interfaces.RandomReferenceString;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.ByteArrayElement;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.ByteArrayMonoid;
+import ch.bfh.unicrypt.math.algebra.general.abstracts.AbstractSet;
 import ch.bfh.unicrypt.math.algebra.general.classes.FiniteByteArrayElement;
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
@@ -50,6 +55,8 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 	private static final String TAG = HKRS12ProtocolInterface.class.getSimpleName();
 	private Context context;
 	private StateMachineManager stateMachineManager;
+	private Poll runningPoll;
+	private boolean passiveAdmin;
 
 	public HKRS12ProtocolInterface(Context context) {
 		super(context);
@@ -151,17 +158,34 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 
 		} 
 
-		new AsyncTask<Object, Object, Object>(){
-			@Override
-			protected Object doInBackground(Object... arg0) {
-				//Do some protocol specific stuff
-				//reset state if another protocol was run before
-				reset();
-				stateMachineManager = new StateMachineManager(context, (ProtocolPoll)poll);
-				new Thread(stateMachineManager).start();
-				return null;
-			}
-		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+		if(!poll.getParticipants().containsKey(AndroidApplication.getInstance().getNetworkInterface().getMyUniqueId()) &&
+				AndroidApplication.getInstance().isAdmin()){
+			//if admin not in electorate, do not start the state machine and show wait screen
+			//send broadcast to dismiss the wait dialog
+			Intent intent2 = new Intent(BroadcastIntentTypes.dismissWaitDialog);
+			LocalBroadcastManager.getInstance(context).sendBroadcast(intent2);
+
+			this.runningPoll = poll;
+			this.passiveAdmin = true;
+			//since the state machine is not started we have to simulate a vote receiver to notify about incoming votes
+			LocalBroadcastManager.getInstance(context).registerReceiver(simulatedVoteReceiver,
+					new IntentFilter(BroadcastIntentTypes.commitMessage));
+
+
+		} else {
+			new AsyncTask<Object, Object, Object>(){
+				@Override
+				protected Object doInBackground(Object... arg0) {
+					//Do some protocol specific stuff
+					//reset state if another protocol was run before
+					reset();
+					stateMachineManager = new StateMachineManager(context, (ProtocolPoll)poll);
+					new Thread(stateMachineManager).start();
+					return null;
+				}
+			}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+		}
 	}
 
 	@Override
@@ -173,7 +197,13 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 		//send broadcast containing the stop voting period event
 		Intent i = new Intent(BroadcastIntentTypes.stopVote);
 		LocalBroadcastManager.getInstance(context).sendBroadcast(i);
-		//The VoteService listens to this broadcast and a calls the computeResult method
+		
+		if(passiveAdmin){
+			Intent i2 = new Intent(BroadcastIntentTypes.showResultActivity);
+			i2.putExtra("resultNotComputable", true);
+			i2.putExtra("poll", runningPoll);
+			LocalBroadcastManager.getInstance(context).sendBroadcast(i2);
+		}
 	}
 
 	@Override
@@ -224,52 +254,37 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 					return null;
 				}
 
-				/*
-				 * Because of a modification of the SecureRandom in version 4.2 and higher of Android,
-				 * the RandomOracle of UniCrypt (at the current development stage) does not always return
-				 * the same generator as it is needed for the following check. So, if the version of Android is
-				 * 4.2 or higher, this check is disabled.
-				 * 
-				 * see: http://android-developers.blogspot.co.at/2013/02/security-enhancements-in-jelly-bean.html
-				 * New implementation of SecureRandom
-				 * Android 4.2 includes a new default implementation of SecureRandom based on OpenSSL.
-				 * In the older Bouncy Castle-based implementation, given a known seed, SecureRandom 
-				 * could technically (albeit incorrectly) be treated as a source of deterministic data. 
-				 * With the new OpenSSL-based implementation, this is no longer possible.
-				 *
-				 */
-				//if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN_MR1){
+			
+				//computes a generator depending on the text of the poll
+				String texts = poll.getQuestion();
+				Element[] representations = new Element[poll.getOptions().size()];
+				int i=0;
+				for(Option op:poll.getOptions()){
+					texts += op.getText();
+					representations[i]=((ProtocolOption)op).getRepresentation();
+					i++;
+				}
 
-					//computes a generator depending on the text of the poll
-					String texts = poll.getQuestion();
-					Element[] representations = new Element[poll.getOptions().size()];
-					int i=0;
-					for(Option op:poll.getOptions()){
-						texts += op.getText();
-						representations[i]=((ProtocolOption)op).getRepresentation();
-						i++;
-					}
+				Tuple tuple = Tuple.getInstance(representations);
+				FiniteByteArrayElement representationsElement = tuple.getHashValue();
+				ByteArrayElement textElement = ByteArrayMonoid.getInstance().getElement(texts.getBytes());
 
-					Tuple tuple = Tuple.getInstance(representations);
-					FiniteByteArrayElement representationsElement = tuple.getHashValue();
-					ByteArrayElement textElement = ByteArrayMonoid.getInstance().getElement(texts.getBytes());
+				ByteBuffer buffer = ByteBuffer.allocate(textElement.getByteArray().length+representationsElement.getByteArray().length);
+				buffer.put(textElement.getByteArray());
+				buffer.put(representationsElement.getByteArray());
+				buffer.flip(); 
 
-					ByteBuffer buffer = ByteBuffer.allocate(textElement.getByteArray().length+representationsElement.getByteArray().length);
-					buffer.put(textElement.getByteArray());
-					buffer.put(representationsElement.getByteArray());
-					buffer.flip(); 
+				ProtocolPoll pp = (ProtocolPoll)poll;
 
-					ProtocolPoll pp = (ProtocolPoll)poll;
-					
-					RandomReferenceString rrs = PseudoRandomOracle.getInstance().getRandomReferenceString(buffer.array());
-					GStarModElement verificationGenerator = pp.getG_q().getIndependentGenerator(1, rrs);
-					
-					if(!pp.getG_q().areEqual(pp.getGenerator(), verificationGenerator)){
-						LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(BroadcastIntentTypes.differentPolls));
-						Log.e(TAG, "There are some difference between the poll used by the admin and the one received");
-						return null;
-					}
-				//}
+				RandomReferenceString rrs = PseudoRandomOracle.getInstance().getRandomReferenceString(buffer.array());
+				GStarModElement verificationGenerator = pp.getG_q().getIndependentGenerator(1, rrs);
+
+				if(!pp.getG_q().areEqual(pp.getGenerator(), verificationGenerator)){
+					LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(BroadcastIntentTypes.differentPolls));
+					Log.e(TAG, "There are some difference between the poll used by the admin and the one received");
+					return null;
+				}
+				
 
 				//Send a broadcast to start the review activity
 				Intent intent = new Intent(BroadcastIntentTypes.showNextActivity);
@@ -281,6 +296,37 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
 	}
+
+	private BroadcastReceiver simulatedVoteReceiver  = new BroadcastReceiver() {
+
+		private ArrayList<String> simulatedVotesReceived = new ArrayList<String>();
+		private int simulatedNumberVotesReceived = 0;
+		
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			//increment number of votes received
+			if(!simulatedVotesReceived .contains(intent.getStringExtra("sender"))){
+
+				simulatedVotesReceived.add(intent.getStringExtra("sender"));
+				simulatedNumberVotesReceived++;
+
+				//notify UI about new incomed vote
+				Intent i = new Intent(BroadcastIntentTypes.newIncomingVote);
+				i.putExtra("votes", simulatedNumberVotesReceived);
+				i.putExtra("options", (Serializable)runningPoll.getOptions());
+				i.putExtra("participants", (Serializable)runningPoll.getParticipants());
+				LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+				
+				if(simulatedNumberVotesReceived == runningPoll.getNumberOfParticipants()){
+					Intent i2 = new Intent(BroadcastIntentTypes.showResultActivity);
+					i2.putExtra("resultNotComputable", true);
+					i2.putExtra("poll", runningPoll);
+					LocalBroadcastManager.getInstance(context).sendBroadcast(i2);
+				}
+				
+			}
+		}
+	};
 
 
 	public StateMachineManager getStateMachineManager(){
@@ -295,6 +341,7 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 		if(stateMachineManager!=null)
 			this.stateMachineManager.reset();
 		this.stateMachineManager = null;
+		LocalBroadcastManager.getInstance(context).unregisterReceiver(simulatedVoteReceiver);
 	}
 
 	@Override
@@ -344,7 +391,7 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 				for(Element e : subPart11.getAll()){
 					Tuple tuple = (Tuple)e;
 					XMLGqPair pair = new XMLGqPair(new XMLGqElement(tuple.getAt(0).getValue().toString(10)),
-											new XMLGqElement(tuple.getAt(1).getValue().toString(10)));
+							new XMLGqElement(tuple.getAt(1).getValue().toString(10)));
 					value11.add(pair);
 				}
 				List<XMLZqElement> value12 = new ArrayList<XMLZqElement>();

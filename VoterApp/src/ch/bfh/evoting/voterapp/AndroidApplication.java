@@ -137,6 +137,7 @@ public class AndroidApplication extends Application {
 		//initialize ICE for AllJoyn
 		//This must be done on the main thread
 //		org.alljoyn.bus.alljoyn.DaemonInit.PrepareDaemon(this); 
+		//moved to alljoyn
 
 		new AsyncTask<Object, Object, Object>() {
 

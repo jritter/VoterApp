@@ -307,6 +307,8 @@ public abstract class AbstractAction implements Action {
 
 		@Override
 		public void run() {
+			if(actionTerminated) return;
+			
 			stopTimer();
 			for(Participant p:poll.getParticipants().values()){
 				if(AbstractAction.this instanceof SetupRoundAction){
@@ -314,6 +316,7 @@ public abstract class AbstractAction implements Action {
 					Log.w(TAG, "Participant "+p.getIdentification()+" ("+p.getUniqueId()+") went out of the network before submitting the setup value, so he was completely excluded (also from recovery).");
 				} else if(!messagesReceived.containsKey(p.getUniqueId()) && !poll.getCompletelyExcludedParticipants().containsKey(p.getUniqueId())){
 					poll.getExcludedParticipants().put(p.getUniqueId(), p);
+					Log.w(TAG, "Excluding participant "+p.getIdentification()+" ("+p.getUniqueId()+") because not sending his message.");
 				}
 			}
 

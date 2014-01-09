@@ -78,6 +78,7 @@ public class SetupRoundAction extends AbstractAction {
 		senderParticipant.setProofForXi(message.getProof());
 		
 		if(exclude){
+			Log.w(TAG, "Excluding participant "+senderParticipant.getIdentification()+" ("+sender+") because of a message processing problem.");
 			poll.getExcludedParticipants().put(sender, senderParticipant);
 		}
 		

@@ -145,6 +145,9 @@
     <string name="dialog_different_polls">The content of the vote seem not to be the same for you and for the administrator. The vote will be cancelled.</string>
     <string name="dialog_title_different_protocols">Different protocols</string>
     <string name="dialog_different_protocols">Your app is not using the same cryptographic protocol as the app of the administrator. The vote will be cancelled.</string>
+    <string name="dialog_title_no_result">No result computed</string>
+    <string name="dialog_no_result">You were the administrator and were not included in the electorate, so you did not participate to the vote. Thus, no result can be computed.</string>
+    
 
     <!-- Help overlays -->
     <string name="overlay_close">Touch the screen to close this help</string>

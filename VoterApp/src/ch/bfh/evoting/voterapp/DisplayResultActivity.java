@@ -5,8 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.FragmentTransaction;
 import android.app.PendingIntent;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
@@ -57,6 +60,8 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 	private Button btnExport;
 
 	private boolean exported = false;
+
+	private AlertDialog dialogNoResult;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +121,35 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 			} else {
 				btnRedo.setText(R.string.action_clone_poll);
 			}
+		}
+		
+		
+		//Message if result is not computed because person was not in electorate
+		if(this.getIntent().getBooleanExtra("resultNotComputable", false)){
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			// Add the buttons
+			builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int id) {
+					dialogNoResult.dismiss();
+				}
+			});
+
+			builder.setTitle(R.string.dialog_title_no_result);
+			builder.setMessage(R.string.dialog_no_result);
+
+
+			dialogNoResult = builder.create();
+			dialogNoResult.setOnShowListener(new DialogInterface.OnShowListener() {
+				@Override
+				public void onShow(DialogInterface dialog) {
+					Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+					dialogNoResult.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
+							R.drawable.selectable_background_votebartheme);
+				}
+			});
+
+			// Create the AlertDialog
+			dialogNoResult.show();
 		}
 		
 		// Set a listener on the redo button

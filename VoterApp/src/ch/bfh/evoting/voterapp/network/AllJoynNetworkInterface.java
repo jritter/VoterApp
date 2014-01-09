@@ -122,7 +122,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 	@Override
 	public void joinGroup(String groupName) {
 
-		connectionTimeOut(10000);
+		connectionTimeOut(30000);
 
 		//Close previous connections
 		if(this.groupName!=null && this.groupName!=""){
