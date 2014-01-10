@@ -27,6 +27,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.support.v4.app.NavUtils;
@@ -93,6 +94,9 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		Poll serializedPoll = (Poll)intent.getSerializableExtra("poll");
 		if(serializedPoll!=null){
 			poll = serializedPoll;
+		} else if (poll==null){
+			SharedPreferences preferences = getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
+			poll = (Poll) AndroidApplication.getInstance().getSerializationUtil().deserialize(preferences.getString("poll", ""));
 		}
 
 		participants = AndroidApplication.getInstance().getNetworkInterface().getGroupParticipants();
