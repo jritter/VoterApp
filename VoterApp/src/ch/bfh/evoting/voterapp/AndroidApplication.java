@@ -597,6 +597,9 @@ public class AndroidApplication extends Application {
 			if(isVoteRunning()){
 				activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
 				activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+			} else {
+				activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+				activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 			}
 			if(dialogShown){
 				showDialog(activity);
@@ -615,15 +618,23 @@ public class AndroidApplication extends Application {
 		}
 
 		public void onActivityResumed(Activity activity) {
-			if(this.connectedSSID == null) return;
-			if(!this.connectedSSID.equals(networkMonitor.getConnectedSSID())){
-				Intent intent = new Intent(BroadcastIntentTypes.networkGroupDestroyedEvent);
-				LocalBroadcastManager.getInstance(AndroidApplication.this).sendBroadcast(intent);
+			if(isVoteRunning()){
+				activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+				activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+			} else {
+				activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+				activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 			}
 			if(backupDialogShown){
 				showDialog(activity);
 				backupDialogShown=false;
 			}
+			if(this.connectedSSID == null) return;
+			if(!this.connectedSSID.equals(networkMonitor.getConnectedSSID())){
+				Intent intent = new Intent(BroadcastIntentTypes.networkGroupDestroyedEvent);
+				LocalBroadcastManager.getInstance(AndroidApplication.this).sendBroadcast(intent);
+			}
+			
 		}
 
 		public void onActivitySaveInstanceState(Activity activity, Bundle outState) {

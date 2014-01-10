@@ -38,7 +38,7 @@ public class RecoveryRoundAction extends AbstractAction {
 
 	public RecoveryRoundAction(Context context, String messageTypeToListenTo,
 			ProtocolPoll poll) {
-		super(context, messageTypeToListenTo, poll, 20000);
+		super(context, messageTypeToListenTo, poll, 30000);
 	}
 
 	@Override
