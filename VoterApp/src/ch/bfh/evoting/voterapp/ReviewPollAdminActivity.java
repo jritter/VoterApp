@@ -18,6 +18,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.support.v4.app.NavUtils;
@@ -213,6 +214,8 @@ public class ReviewPollAdminActivity extends Activity implements OnClickListener
 	public void onClick(View view) {
 		if (view == btnStartPollPeriod) {
 			startVotePeriod();
+			SharedPreferences preferences = getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
+			preferences.edit().remove("poll").commit();
 		}
 	}
 
