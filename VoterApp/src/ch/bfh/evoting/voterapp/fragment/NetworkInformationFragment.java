@@ -382,7 +382,7 @@ public class NetworkInformationFragment extends Fragment implements
 	 */
 	public boolean writeTag(Tag tag, NdefMessage message) {
 
-		alertDialog = new AlertDialog.Builder(getActivity()).create();
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		alertDialog.setTitle(getResources().getString(R.string.dialog_nfc_write_failed));
 		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getResources().getString(R.string.ok),
 				new DialogInterface.OnClickListener() {

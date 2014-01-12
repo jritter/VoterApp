@@ -286,6 +286,8 @@
 			In this screen, you as creator of the vote (also called administrator), <b>have to select the people that will have the right to vote</b>.  
 			<br/><br/>
 			This screen shows you all the participants that are connected to the network session. Using the checkboxes on the right, you can select the participants that will be allowed to vote.
+			<br/><br/>
+			At the bottom of this screen, the threshold of the voting session can be defined. The threshold defines the number of participants which are required at least in order to correctly tally and reveal the final result of the vote. The value of the threshold has to lie between two and the number of allowed participants.
 		]]>
     </string>
     <string name="help_text_review_admin">
