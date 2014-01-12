@@ -380,6 +380,8 @@ public class NetworkInformationFragment extends Fragment implements
 	 * @return true if successful, false otherwise
 	 */
 	public boolean writeTag(Tag tag, NdefMessage message) {
+		
+		boolean retval = true;
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle(getResources().getString(R.string.dialog_nfc_write_failed));
@@ -396,8 +398,7 @@ public class NetworkInformationFragment extends Fragment implements
 				ndef.connect();
 				if (!ndef.isWritable()) {
 					builder.setMessage(getResources().getString(R.string.dialog_nfc_readonly));
-					
-					return false;
+					retval = false;
 				}
 
 				// work out how much space we need for the data
@@ -405,8 +406,7 @@ public class NetworkInformationFragment extends Fragment implements
 				if (ndef.getMaxSize() < size) {
 					builder
 							.setMessage(getResources().getString(R.string.dialog_nfc_not_enough_space));
-					
-					return false;
+					retval = false;
 				}
 
 				ndef.writeNdefMessage(message);
@@ -420,41 +420,40 @@ public class NetworkInformationFragment extends Fragment implements
 						format.format(message);
 					} catch (IOException e) {
 						builder.setMessage(getResources().getString(R.string.dialog_nfc_unable_format_ndef));
-						
-						return false;
-
+						retval = false;
 					}
 				} else {
 					builder
 							.setMessage(getResources().getString(R.string.dialog_nfc_no_ndef_support));
-					return false;
+					retval = false;
 				}
 			}
 		} catch (Exception e) {
-			return false;
+			retval = false;
 		}
-//		alertDialog.setTitle(R.string.nfc_success);
-//		alertDialog.setMessage(getResources().getString(R.string.nfc_write_success));
-		
-		
-		alertDialog = builder.create();
-		
-		alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
-			@Override
-			public void onShow(DialogInterface dialog) {
-				Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
-				alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundResource(
-						R.drawable.selectable_background_votebartheme);
 
+		
+		if (!retval){
+			alertDialog = builder.create();
+			
+			alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+				@Override
+				public void onShow(DialogInterface dialog) {
+					Utility.setTextColor(dialog, getResources().getColor(R.color.theme_color));
+					alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setBackgroundResource(
+							R.drawable.selectable_background_votebartheme);
+	
+				}
+			});
+			alertDialog.show();
+		}
+		
+		if (retval){
+			for(int i=0; i<2; i++){
+				Toast.makeText(this.getActivity(), R.string.toast_nfc_write_success, Toast.LENGTH_SHORT).show();
 			}
-		});
-		alertDialog.show();
-		
-		
-		for(int i=0; i<2; i++)
-			Toast.makeText(this.getActivity(), R.string.toast_nfc_write_success, Toast.LENGTH_SHORT).show();
-		
-		return true;
+		}
+		return retval;
 	}
 
 }
