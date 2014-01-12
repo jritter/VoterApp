@@ -9,6 +9,7 @@ import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.database.DataSetObserver;
@@ -287,6 +288,9 @@ public class PollDetailActivity extends Activity implements OnClickListener, Tex
 					Toast.makeText(this, getString(R.string.toast_wifi_is_disabled), Toast.LENGTH_SHORT).show();
 				return;
 			}
+			String pollB64 = AndroidApplication.getInstance().getSerializationUtil().serialize(poll);
+			SharedPreferences preferences = getSharedPreferences(AndroidApplication.PREFS_NAME, 0);
+			preferences.edit().putString("poll", pollB64).commit();
 			startVote();
 		}
 	}
