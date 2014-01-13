@@ -14,7 +14,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -24,7 +23,6 @@ import android.widget.Toast;
 import ch.bfh.evoting.voterapp.network.AllJoynNetworkInterface;
 import ch.bfh.evoting.voterapp.network.NetworkInterface;
 import ch.bfh.evoting.voterapp.network.NetworkMonitor;
-import ch.bfh.evoting.voterapp.protocol.DummyProtocolInterface;
 import ch.bfh.evoting.voterapp.protocol.ProtocolInterface;
 import ch.bfh.evoting.voterapp.protocol.cgs97.CGS97Protocol;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
@@ -41,6 +39,8 @@ public class AndroidApplication extends Application {
 
 	public static final String PREFS_NAME = "network_preferences";
 	public static final Level LEVEL = Level.DEBUG;
+	public static final String FOLDER = "/MobiVote/";
+    public static final String EXTENSION = ".mobix";
 
 	private static AndroidApplication instance;
 	private SerializationUtil su;

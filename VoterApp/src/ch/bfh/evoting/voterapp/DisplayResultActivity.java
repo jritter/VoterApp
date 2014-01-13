@@ -12,6 +12,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.nfc.NfcAdapter;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.content.LocalBroadcastManager;
@@ -42,7 +43,8 @@ import ch.bfh.evoting.voterapp.util.Utility;
  */
 public class DisplayResultActivity extends Activity implements OnClickListener {
 
-	private static final String TAG = DisplayResultActivity.class.getSimpleName();
+	private static final String TAG = DisplayResultActivity.class
+			.getSimpleName();
 	private NfcAdapter nfcAdapter;
 	private boolean nfcAvailable;
 	private PendingIntent pendingIntent;
@@ -53,6 +55,8 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 
 	private Button btnRedo;
 	private Button btnExport;
+
+	private boolean exported = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -73,12 +77,13 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 		AndroidApplication.getInstance().setVoteRunning(false);
 		if (AndroidApplication.getInstance().isAdmin()) {
 			AndroidApplication.getInstance().getNetworkInterface()
-			.unlockGroup();
+					.unlockGroup();
 		}
 
-		if( findViewById(R.id.chartfragment_container) != null){
+		if (findViewById(R.id.chartfragment_container) != null) {
 			ResultChartFragment newFragment = new ResultChartFragment();
-			FragmentTransaction transaction = getFragmentManager().beginTransaction();
+			FragmentTransaction transaction = getFragmentManager()
+					.beginTransaction();
 			transaction.add(R.id.chartfragment_container, newFragment);
 			transaction.commit();
 		}
@@ -114,7 +119,7 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 				btnRedo.setText(R.string.action_clone_poll);
 			}
 		}
-		
+
 		// Set a listener on the redo button
 		btnExport = (Button) findViewById(R.id.button_export);
 		btnExport.setOnClickListener(this);
@@ -133,18 +138,32 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 					poll.setId(newPollId);
 				}
 			} catch (DatabaseException e) {
-				Log.e(TAG,
-						"DB error: " + e.getMessage());
+				Log.e(TAG, "DB error: " + e.getMessage());
 				e.printStackTrace();
 			}
-			File directory = new File(Environment.getExternalStorageDirectory() + "/MobiVote/");
+			File directory = new File(Environment.getExternalStorageDirectory()
+					+ AndroidApplication.FOLDER);
 			directory.mkdirs();
-		    File file = new File(Environment.getExternalStorageDirectory() + "/MobiVote/" + poll.getStartTime()+".mobix");
-		    AndroidApplication.getInstance().getProtocolInterface().exportToXML(file, poll);
-			
+			final File file = new File(
+					Environment.getExternalStorageDirectory()
+							+ AndroidApplication.FOLDER + poll.getStartTime()
+							+ AndroidApplication.EXTENSION);
+			new AsyncTask<Void, Void, Void>() {
+
+				@Override
+				protected Void doInBackground(Void... params) {
+					Log.e(TAG,
+							"Saving xml file under " + file.getAbsolutePath());
+					AndroidApplication.getInstance().getProtocolInterface()
+							.exportToXML(file, poll);
+					exported = true;
+					Log.e(TAG, "Xml file saved under " + file.getAbsolutePath());
+					return null;
+				}
+			}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
 		}
-		
-		
+
 		// Is NFC available on this device?
 		nfcAvailable = this.getPackageManager().hasSystemFeature(
 				PackageManager.FEATURE_NFC);
@@ -159,7 +178,7 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 				// is tapped on the back
 				pendingIntent = PendingIntent.getActivity(this, 0, new Intent(
 						this, getClass())
-				.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+						.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 			} else {
 				nfcAvailable = false;
 			}
@@ -171,8 +190,7 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 	public void onBackPressed() {
 		if (!this.saveToDbNeeded) {
 			// if consulting an archive
-			startActivity(new Intent(this,
-					ListTerminatedPollsActivity.class));
+			startActivity(new Intent(this, ListTerminatedPollsActivity.class));
 		} else {
 			Intent i = new Intent(this, MainActivity.class);
 			startActivity(i);
@@ -259,11 +277,13 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 		getMenuInflater().inflate(R.menu.display_results, menu);
 
 		if (saveToDbNeeded) {
-			menu.findItem(R.id.action_redo_vote).setTitle(R.string.action_redo_poll);
+			menu.findItem(R.id.action_redo_vote).setTitle(
+					R.string.action_redo_poll);
 			menu.findItem(R.id.action_redo_vote).setVisible(
 					AndroidApplication.getInstance().isAdmin());
 		} else {
-			menu.findItem(R.id.action_redo_vote).setTitle(R.string.action_clone_poll);
+			menu.findItem(R.id.action_redo_vote).setTitle(
+					R.string.action_clone_poll);
 		}
 
 		if (getResources().getBoolean(R.bool.display_bottom_bar)) {
@@ -278,7 +298,7 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 	public void onClick(View view) {
 		if (view == btnRedo) {
 			redoVote();
-		} else if (view == btnExport){
+		} else if (view == btnExport) {
 			export();
 		}
 	}
@@ -291,7 +311,8 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 	@Override
 	public void onNewIntent(Intent intent) {
 		Intent broadcastIntent = new Intent(BroadcastIntentTypes.nfcTagTapped);
-		broadcastIntent.putExtra(NfcAdapter.EXTRA_TAG, intent.getParcelableExtra(NfcAdapter.EXTRA_TAG));
+		broadcastIntent.putExtra(NfcAdapter.EXTRA_TAG,
+				intent.getParcelableExtra(NfcAdapter.EXTRA_TAG));
 		LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
 	}
 
@@ -332,27 +353,40 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 		} catch (DatabaseException e) {
 			for (int i = 0; i < 2; i++)
 				Toast.makeText(DisplayResultActivity.this,
-						getString(R.string.toast_redo_impossible), Toast.LENGTH_LONG)
-						.show();
+						getString(R.string.toast_redo_impossible),
+						Toast.LENGTH_LONG).show();
 			e.printStackTrace();
 		}
 	}
-	
-	private void export(){
-		
-	    File file = new File(Environment.getExternalStorageDirectory() + "/MobiVote/" + poll.getStartTime()+".mobix");
-	    if (!file.exists()) {
-	    	for(int i=0; i<2;i++)
-	    		Toast.makeText(this, getString(R.string.toast_export_failed), Toast.LENGTH_SHORT).show();
-	        return;
-	    }
-	    for(int i=0; i<2;i++)
-			Toast.makeText(this, getString(R.string.toast_file_exported, Environment.getExternalStorageDirectory() + "/MobiVote/"+poll.getStartTime()+".mobix"), Toast.LENGTH_SHORT).show();
-		
+
+	private void export() {
+
+		if (!exported && saveToDbNeeded) {
+			Toast.makeText(this, getString(R.string.dialog_wait_wifi),
+					Toast.LENGTH_SHORT).show();
+			return;
+		}
+		File file = new File(Environment.getExternalStorageDirectory()
+				+ AndroidApplication.FOLDER + poll.getStartTime()
+				+ AndroidApplication.EXTENSION);
+		Log.d(TAG, "Looking for xml file under " + file.getAbsolutePath());
+		if (!file.exists()) {
+			for (int i = 0; i < 2; i++)
+				Toast.makeText(this, getString(R.string.toast_export_failed),
+						Toast.LENGTH_SHORT).show();
+			return;
+		}
+		for (int i = 0; i < 2; i++)
+			Toast.makeText(
+					this,
+					getString(R.string.toast_file_exported,
+							file.getAbsolutePath()), Toast.LENGTH_SHORT).show();
+
 		Intent sendIntent = new Intent();
 		sendIntent.setAction(Intent.ACTION_SEND);
 		sendIntent.setType("text/xml");
 		sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
-		startActivity(Intent.createChooser(sendIntent, getString(R.string.action_export)));
+		startActivity(Intent.createChooser(sendIntent,
+				getString(R.string.action_export)));
 	}
 }

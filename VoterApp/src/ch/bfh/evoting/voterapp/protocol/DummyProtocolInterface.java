@@ -53,7 +53,7 @@ public class DummyProtocolInterface extends ProtocolInterface {
 			//Do some protocol specific stuff
 
 			//start service listening to incoming votes and stop voting period events
-			context.startService(new Intent(context, VoteService.class).putExtra("poll", poll));
+			//context.startService(new Intent(context, VoteService.class).putExtra("poll", poll));
 
 			//Send a broadcast to start the review activity
 			Intent intent = new Intent(BroadcastIntentTypes.showNextActivity);
@@ -65,7 +65,7 @@ public class DummyProtocolInterface extends ProtocolInterface {
 			//Do some protocol specific stuff
 			
 			//start service listening to incoming votes and stop voting period events
-			context.startService(new Intent(context, VoteService.class).putExtra("poll", poll));
+			//context.startService(new Intent(context, VoteService.class).putExtra("poll", poll));
 		}
 	}
 
@@ -100,7 +100,7 @@ public class DummyProtocolInterface extends ProtocolInterface {
 	 */
 	public void computeResult(Poll poll){
 
-		context.stopService(new Intent(context, VoteService.class));
+		//context.stopService(new Intent(context, VoteService.class));
 
 		//do some protocol specific stuff
 		//go through compute result and set percentage result
@@ -152,12 +152,7 @@ public class DummyProtocolInterface extends ProtocolInterface {
 
 	@Override
 	public void cancelVotingPeriod() {
-		Intent i = new Intent(context, VoteService.class);
-		context.stopService(i);
+				
 	}
-
-
-
-
 
 }

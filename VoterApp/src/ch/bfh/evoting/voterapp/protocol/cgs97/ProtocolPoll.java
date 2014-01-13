@@ -1,7 +1,5 @@
 package ch.bfh.evoting.voterapp.protocol.cgs97;
 
-import java.util.List;
-
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarModElement;
 
@@ -9,7 +7,6 @@ public class ProtocolPoll extends Poll {
 	
 	
 	private GStarModElement publicKey;
-	private List<ProtocolBallot> ballots;
 	private int threshold;
 
 	/**
@@ -19,6 +16,7 @@ public class ProtocolPoll extends Poll {
 	
 	public ProtocolPoll(Poll poll){
         super(poll.getId(), poll.getQuestion(), poll.getStartTime(), poll.getOptions(), poll.getParticipants(), poll.isTerminated());
+        super.setNumberOfParticipants(poll.getNumberOfParticipants());
 	}
 
 	public GStarModElement getPublicKey() {
@@ -39,4 +37,12 @@ public class ProtocolPoll extends Poll {
 	public int getThreshold() {
 		return threshold;
 	}
+
+	@Override
+	public String toString() {
+		return "ProtocolPoll [publicKey=" + publicKey + ", threshold="
+				+ threshold + ", question=" + getQuestion()
+				+ ", options=" + getOptions() + "]";
+	}
+	
 }

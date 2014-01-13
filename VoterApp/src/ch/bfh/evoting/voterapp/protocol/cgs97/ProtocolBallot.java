@@ -7,23 +7,20 @@ import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 public class ProtocolBallot implements Serializable {
 	
 
-	private final ProtocolParticipant participant;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final Tuple ballot;
 	private final Tuple validityProof;
 	private final long timestamp;
 	
 	
-	public ProtocolBallot(ProtocolParticipant participant, Tuple ballot,
+	public ProtocolBallot(Tuple ballot,
 			Tuple validityProof) {
-		this.participant = participant;
 		this.ballot = ballot;
 		this.validityProof = validityProof;
 		this.timestamp = System.currentTimeMillis();
-	}
-
-
-	public ProtocolParticipant getParticipant() {
-		return participant;
 	}
 
 

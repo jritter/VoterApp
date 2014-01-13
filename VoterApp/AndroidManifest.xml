@@ -29,9 +29,6 @@
         android:label="@string/voter_app_app_name"
         android:theme="@style/Theme.Votebartheme" >
 
-        <!-- TODO remove when no more needed -->
-        <service android:name="ch.bfh.evoting.voterapp.protocol.VoteService" />
-
         <activity
             android:name="ch.bfh.evoting.voterapp.MainActivity"
             android:label="@string/voter_app_app_name" >
