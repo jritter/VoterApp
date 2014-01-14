@@ -13,6 +13,7 @@ import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import android.app.Activity;
 import android.app.ListFragment;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -40,6 +41,8 @@ public class WaitForVotesFragment extends ListFragment {
 
 	private BroadcastReceiver updateVoteReceiver;
 	private BroadcastReceiver showNextActivityListener;
+	
+	private ProgressDialog progressDialog = null;
 
 
 	@Override
@@ -138,6 +141,13 @@ public class WaitForVotesFragment extends ListFragment {
 		wpAdapter.addAll(poll.getParticipants().values());
 		wpAdapter.notifyDataSetChanged();
 		tvCastVotes.setText(getString(R.string.cast_votes, numberOfReceivedVotes, participants.size()));
-
+		
+		if (pb.getProgress() == pb.getMax()){
+			if (progressDialog == null){
+				progressDialog = new ProgressDialog(getActivity());
+				progressDialog.setMessage("Starting tallying process...");
+				progressDialog.show();
+			}
+		}
 	}
 }
