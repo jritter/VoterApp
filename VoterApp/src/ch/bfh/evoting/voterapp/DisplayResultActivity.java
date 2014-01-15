@@ -1,6 +1,7 @@
 package ch.bfh.evoting.voterapp;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -141,26 +142,36 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 				Log.e(TAG, "DB error: " + e.getMessage());
 				e.printStackTrace();
 			}
-			File directory = new File(Environment.getExternalStorageDirectory()
-					+ AndroidApplication.FOLDER);
-			directory.mkdirs();
-			final File file = new File(
-					Environment.getExternalStorageDirectory()
-							+ AndroidApplication.FOLDER + poll.getStartTime()
-							+ AndroidApplication.EXTENSION);
+			
 			new AsyncTask<Void, Void, Void>() {
 
 				@Override
 				protected Void doInBackground(Void... params) {
-					Log.e(TAG,
-							"Saving xml file under " + file.getAbsolutePath());
-					AndroidApplication.getInstance().getProtocolInterface()
-							.exportToXML(file, poll);
-					exported = true;
-					Log.e(TAG, "Xml file saved under " + file.getAbsolutePath());
+					
+					File directory = new File(Environment.getExternalStorageDirectory()
+							+ AndroidApplication.FOLDER);
+					directory.mkdirs();
+					File file = new File(
+							Environment.getExternalStorageDirectory()
+									+ AndroidApplication.FOLDER + poll.getStartTime()
+									+ AndroidApplication.EXTENSION);
+					try {
+						file.createNewFile();
+						Log.d(TAG,
+								"Saving xml file under " + file.getAbsolutePath());
+						AndroidApplication.getInstance().getProtocolInterface()
+								.exportToXML(file, poll);
+						exported = true;
+						Log.d(TAG, "Xml file saved under " + file.getAbsolutePath());
+					} catch (IOException e) {
+						Log.e(TAG, "Could not create export file");
+					}
+		
 					return null;
 				}
 			}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+			
+			
 
 		}
 

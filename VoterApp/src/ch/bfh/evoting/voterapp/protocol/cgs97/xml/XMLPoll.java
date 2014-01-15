@@ -13,22 +13,30 @@ public class XMLPoll {
         private List<XMLOption> options;
         @ElementList
         private List<XMLParticipant> participants;
-
         @Element
         private String p;
         @Element
+        private String q;
+        @Element
         private XMLGqElement generator;
+        @Element
+        private XMLGqElement publicKey;
+        @Element
+        private int threshold;
         
         public XMLPoll(){}
         
         public XMLPoll(String question, List<XMLOption> options,
-                        List<XMLParticipant> participants, String p, XMLGqElement generator) {
+                        List<XMLParticipant> participants, String p, String q, XMLGqElement generator, XMLGqElement publicKey, int threshold) {
                 super();
                 this.question = question;
                 this.options = options;
                 this.participants = participants;
                 this.p = p;
+                this.q = q;
                 this.generator = generator;
+                this.publicKey = publicKey;
+                this.threshold = threshold;
         }
         
         public String getQuestion() {
@@ -55,11 +63,33 @@ public class XMLPoll {
         public void setP(String p) {
                 this.p = p;
         }
+        public String getQ() {
+            return q;
+	    }
+	    public void setQ(String q) {
+	            this.q = q;
+	    }
         public XMLGqElement getGenerator() {
                 return generator;
         }
         public void setGenerator(XMLGqElement generator) {
                 this.generator = generator;
-        }        
+        }
+
+		public XMLGqElement getPublicKey() {
+			return publicKey;
+		}
+
+		public void setPublicKey(XMLGqElement publicKey) {
+			this.publicKey = publicKey;
+		}
+
+		public int getThreshold() {
+			return threshold;
+		}
+
+		public void setThreshold(int threshold) {
+			this.threshold = threshold;
+		}        
         
 }

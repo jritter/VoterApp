@@ -14,57 +14,46 @@ import org.simpleframework.xml.ElementList;
 
 public class XMLValidityProof {
 
-        @ElementList
-        private List<XMLGqPair> value11;
-        @ElementList
-        private List<XMLZqElement> value12;
-        @ElementList
-        private List<XMLZqElement> value13;
+	@ElementList
+	private List<XMLGqPair> valueT;
+	@ElementList
+	private List<XMLZqElement> valueC;
+	@ElementList
+	private List<XMLZqElement> valueS;
 
-        
-        public XMLValidityProof(){}
+	public XMLValidityProof() {
+	}
 
+	public XMLValidityProof(List<XMLGqPair> value11,
+			List<XMLZqElement> value12, List<XMLZqElement> value13) {
+		super();
+		this.valueT = value11;
+		this.valueC = value12;
+		this.valueS = value13;
+	}
 
-        public XMLValidityProof(List<XMLGqPair> value11,
-                        List<XMLZqElement> value12, List<XMLZqElement> value13) {
-                super();
-                this.value11 = value11;
-                this.value12 = value12;
-                this.value13 = value13;
-        }
+	public List<XMLGqPair> getValue11() {
+		return valueT;
+	}
 
+	public void setValue11(List<XMLGqPair> value11) {
+		this.valueT = value11;
+	}
 
-        public List<XMLGqPair> getValue11() {
-                return value11;
-        }
+	public List<XMLZqElement> getValue12() {
+		return valueC;
+	}
 
+	public void setValue12(List<XMLZqElement> value12) {
+		this.valueC = value12;
+	}
 
-        public void setValue11(List<XMLGqPair> value11) {
-                this.value11 = value11;
-        }
+	public List<XMLZqElement> getValue13() {
+		return valueS;
+	}
 
-
-        public List<XMLZqElement> getValue12() {
-                return value12;
-        }
-
-
-        public void setValue12(List<XMLZqElement> value12) {
-                this.value12 = value12;
-        }
-
-
-        public List<XMLZqElement> getValue13() {
-                return value13;
-        }
-
-
-        public void setValue13(List<XMLZqElement> value13) {
-                this.value13 = value13;
-        }
-
-        
-        
-
+	public void setValue13(List<XMLZqElement> value13) {
+		this.valueS = value13;
+	}
 
 }

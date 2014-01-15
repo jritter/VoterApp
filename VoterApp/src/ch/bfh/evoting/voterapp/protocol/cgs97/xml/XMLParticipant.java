@@ -1,41 +1,40 @@
 package ch.bfh.evoting.voterapp.protocol.cgs97.xml;
 
+import java.util.List;
+
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
+
 public class XMLParticipant {
 
+	@Element
 	private String identification;
+	@Element
 	private String uniqueId;
 
-	private XMLGqElement ai = null;
-	private XMLKnowledgeProof proofForXi = null;
-	private XMLGqElement hi = null;
-	private XMLGqElement bi = null;
-	private XMLValidityProof proofValidVote = null;
-	private XMLGqElement hiHat = null;
-	private XMLGqElement hiHatPowXi = null;
-	private XMLEqualityProof proofForHiHat = null;
-	private int protocolParticipantIndex;
+	@ElementList
+	private List<XMLGqElement> coefficientCommitments;
 
-	public XMLParticipant() {
+	@Element
+	private XMLGqElement keyShareCommitment;
 
-	}
+	@Element
+	private XMLPartDecryption partDecryption;
+
+	@Element
+	private XMLBallot ballot;
 
 	public XMLParticipant(String identification, String uniqueId,
-			XMLGqElement ai, XMLKnowledgeProof proofForXi, XMLGqElement hi,
-			XMLGqElement bi, XMLValidityProof proofValidVote,
-			XMLGqElement hiHat, XMLGqElement hiHatPowXi,
-			XMLEqualityProof proofForHiHat, int protocolParticipantIndex) {
+			List<XMLGqElement> coefficientCommitments,
+			XMLGqElement keyShareCommitment, XMLPartDecryption partDecryption,
+			XMLBallot ballot) {
 		super();
 		this.identification = identification;
 		this.uniqueId = uniqueId;
-		this.ai = ai;
-		this.proofForXi = proofForXi;
-		this.hi = hi;
-		this.bi = bi;
-		this.proofValidVote = proofValidVote;
-		this.hiHat = hiHat;
-		this.hiHatPowXi = hiHatPowXi;
-		this.proofForHiHat = proofForHiHat;
-		this.protocolParticipantIndex = protocolParticipantIndex;
+		this.coefficientCommitments = coefficientCommitments;
+		this.keyShareCommitment = keyShareCommitment;
+		this.partDecryption = partDecryption;
+		this.ballot = ballot;
 	}
 
 	public String getIdentification() {
@@ -54,75 +53,37 @@ public class XMLParticipant {
 		this.uniqueId = uniqueId;
 	}
 
-	public XMLGqElement getAi() {
-		return ai;
+	public List<XMLGqElement> getCoefficientCommitments() {
+		return coefficientCommitments;
 	}
 
-	public void setAi(XMLGqElement ai) {
-		this.ai = ai;
+	public void setCoefficientCommitments(
+			List<XMLGqElement> coefficientCommitments) {
+		this.coefficientCommitments = coefficientCommitments;
 	}
 
-	public XMLKnowledgeProof getProofForXi() {
-		return proofForXi;
+	public XMLGqElement getKeyShareCommitment() {
+		return keyShareCommitment;
 	}
 
-	public void setProofForXi(XMLKnowledgeProof proofForXi) {
-		this.proofForXi = proofForXi;
+	public void setKeyShareCommitment(XMLGqElement keyShareCommitment) {
+		this.keyShareCommitment = keyShareCommitment;
 	}
 
-	public XMLGqElement getHi() {
-		return hi;
+	public XMLPartDecryption getPartDecryption() {
+		return partDecryption;
 	}
 
-	public void setHi(XMLGqElement hi) {
-		this.hi = hi;
+	public void setPartDecryption(XMLPartDecryption partDecryption) {
+		this.partDecryption = partDecryption;
 	}
 
-	public XMLGqElement getBi() {
-		return bi;
+	public XMLBallot getBallot() {
+		return ballot;
 	}
 
-	public void setBi(XMLGqElement bi) {
-		this.bi = bi;
+	public void setBallot(XMLBallot ballot) {
+		this.ballot = ballot;
 	}
 
-	public XMLValidityProof getProofValidVote() {
-		return proofValidVote;
-	}
-
-	public void setProofValidVote(XMLValidityProof proofValidVote) {
-		this.proofValidVote = proofValidVote;
-	}
-
-	public XMLGqElement getHiHat() {
-		return hiHat;
-	}
-
-	public void setHiHat(XMLGqElement hiHat) {
-		this.hiHat = hiHat;
-	}
-
-	public XMLGqElement getHiHatPowXi() {
-		return hiHatPowXi;
-	}
-
-	public void setHiHatPowXi(XMLGqElement hiHatPowXi) {
-		this.hiHatPowXi = hiHatPowXi;
-	}
-
-	public XMLEqualityProof getProofForHiHat() {
-		return proofForHiHat;
-	}
-
-	public void setProofForHiHat(XMLEqualityProof proofForHiHat) {
-		this.proofForHiHat = proofForHiHat;
-	}
-
-	public int getProtocolParticipantIndex() {
-		return protocolParticipantIndex;
-	}
-
-	public void setProtocolParticipantIndex(int protocolParticipantIndex) {
-		this.protocolParticipantIndex = protocolParticipantIndex;
-	}
 }
