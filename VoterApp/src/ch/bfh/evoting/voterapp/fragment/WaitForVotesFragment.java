@@ -145,7 +145,7 @@ public class WaitForVotesFragment extends ListFragment {
 		if (pb.getProgress() == pb.getMax()){
 			if (progressDialog == null){
 				progressDialog = new ProgressDialog(getActivity());
-				progressDialog.setMessage("Starting tallying process...");
+				progressDialog.setMessage(getString(R.string.dialog_tallying_vote));
 				progressDialog.show();
 			}
 		}

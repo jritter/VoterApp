@@ -247,6 +247,8 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onPause() {
 		active = false;
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(participantsDiscoverer);
+		
 		super.onPause();
 
 		if (nfcAvailable) {

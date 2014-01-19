@@ -383,7 +383,7 @@ public class CGS97Protocol extends ProtocolInterface {
 								Alphabet.PRINTABLE_ASCII).getElement(
 								participant.getUniqueId());
 						FiniteByteArrayElement trusteeId = id.getHashValue();
-						Log.d(this.getClass().getSimpleName(),
+						Log.d(CGS97Protocol.this.getClass().getSimpleName(),
 								"generate: trusteeID for "
 										+ entry.getKey()
 										+ ": "
@@ -395,6 +395,9 @@ public class CGS97Protocol extends ProtocolInterface {
 								.evaluate(ModuloFunction.getInstance(
 										trusteeId.getSet(), zQ)
 										.apply(trusteeId));
+						
+						Log.d(CGS97Protocol.this.getClass().getSimpleName(), "Sending key share to " + participant.getUniqueId());
+						
 						AndroidApplication
 								.getInstance()
 								.getNetworkInterface()
@@ -1083,7 +1086,7 @@ public class CGS97Protocol extends ProtocolInterface {
 
 	}
 
-	private void interpolateResult() {
+	private synchronized void interpolateResult() {
 
 		Log.d(this.getClass().getSimpleName(), "interpolateResult started...");
 		Log.d(this.getClass().getSimpleName(), "partdecryptions available: "

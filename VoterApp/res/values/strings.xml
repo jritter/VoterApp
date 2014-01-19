@@ -139,8 +139,9 @@
     <string name="dialog_title_result_chart">Result chart</string>
     <string name="dialog_title_poll_canceled">Vote cancelled</string>
     <string name="dialog_poll_canceled">The administrator has canceled the vote. You will be redirected to the main screen.</string>
-    <string name="dialog_decryption_error">An error occured during decryption of the result. You will be redirected to the main screen.</string>
+    <string name="dialog_decryption_error">An error occurred during decryption of the result. You will be redirected to the main screen.</string>
     <string name="dialog_too_many_incorrect_decryptions">Too many participants misbehaved during tallying, cannot decrypt result. You will be redirected to the main screen.</string>
+    <string name="dialog_tallying_vote">Tallying vote&#8230;</string>
     
     <!-- Help overlays -->
     <string name="overlay_close">Touch the screen to close this help</string>
@@ -168,6 +169,7 @@
     
     <!-- Activity subtitles -->
     <string name="subtitle_welcome">Welcome to MobiVote</string>
+    <string name="subtitle_edition">CGS97 Edition</string>
     <string name="subtitle_check_electorate">Please wait&#8230;</string>
     <string name="subtitle_wait_votes">Thanks for voting!\nWaiting for ballots&#8230;</string>
     <string name="subtitle_wait_votes_admin">Thanks for voting!\nWaiting for ballots&#8230;</string>
