@@ -637,7 +637,7 @@ public class CGS97Protocol extends ProtocolInterface {
 				xmlPartDecryption = new XMLPartDecryption(
 						partDecryptionValue, xmlEqualityProof);
 			
-			}{
+			} else {
 				// Handling the case where not all part decryptions were used...
 				XMLGqElement partDecryptionValue = new XMLGqElement("N/A");
 				XMLGqElement valueT1 = new XMLGqElement("N/A");
@@ -650,45 +650,58 @@ public class CGS97Protocol extends ProtocolInterface {
 				xmlPartDecryption = new XMLPartDecryption(
 						partDecryptionValue, xmlEqualityProof);
 			}
+			
+			XMLBallot xmlBallot;
 
-			XMLGqElement xmlLeft = new XMLGqElement(ballots
-					.get(p.getUniqueId()).getBallot().getAt(0).getValue()
-					.toString(10));
-			XMLGqElement xmlRight = new XMLGqElement(ballots
-					.get(p.getUniqueId()).getBallot().getAt(1).getValue()
-					.toString(10));
-
-			XMLGqPair xmlBallotEncryption = new XMLGqPair(xmlLeft, xmlRight);
-
-			Tuple validityProof = ballots.get(p.getUniqueId())
-					.getValidityProof();
-			Tuple subPartT = (Tuple) validityProof.getAt(0); // list of Gq pairs
-			Tuple subPartC = (Tuple) validityProof.getAt(1); // list
-																// ZModElements
-			Tuple subPartS = (Tuple) validityProof.getAt(2); // list
-																// ZModElements
-			List<XMLGqPair> valueListT = new ArrayList<XMLGqPair>();
-			for (Element e : subPartT.getAll()) {
-				Tuple tuple = (Tuple) e;
-				XMLGqPair pair = new XMLGqPair(new XMLGqElement(tuple.getAt(0)
-						.getValue().toString(10)), new XMLGqElement(tuple
-						.getAt(1).getValue().toString(10)));
-				valueListT.add(pair);
+			if (ballots.get(p.getUniqueId()) != null){
+				XMLGqElement xmlLeft = new XMLGqElement(ballots
+						.get(p.getUniqueId()).getBallot().getAt(0).getValue()
+						.toString(10));
+				XMLGqElement xmlRight = new XMLGqElement(ballots
+						.get(p.getUniqueId()).getBallot().getAt(1).getValue()
+						.toString(10));
+	
+				XMLGqPair xmlBallotEncryption = new XMLGqPair(xmlLeft, xmlRight);
+	
+				Tuple validityProof = ballots.get(p.getUniqueId())
+						.getValidityProof();
+				Tuple subPartT = (Tuple) validityProof.getAt(0); // list of Gq pairs
+				Tuple subPartC = (Tuple) validityProof.getAt(1); // list
+																	// ZModElements
+				Tuple subPartS = (Tuple) validityProof.getAt(2); // list
+																	// ZModElements
+				List<XMLGqPair> valueListT = new ArrayList<XMLGqPair>();
+				for (Element e : subPartT.getAll()) {
+					Tuple tuple = (Tuple) e;
+					XMLGqPair pair = new XMLGqPair(new XMLGqElement(tuple.getAt(0)
+							.getValue().toString(10)), new XMLGqElement(tuple
+							.getAt(1).getValue().toString(10)));
+					valueListT.add(pair);
+				}
+				List<XMLZqElement> valueListC = new ArrayList<XMLZqElement>();
+				for (Element e : subPartC.getAll()) {
+					valueListC.add(new XMLZqElement(e.getValue().toString(10)));
+				}
+				List<XMLZqElement> valueListS = new ArrayList<XMLZqElement>();
+				for (Element e : subPartS.getAll()) {
+					valueListS.add(new XMLZqElement(e.getValue().toString(10)));
+				}
+	
+				XMLValidityProof xmlValidityProof = new XMLValidityProof(
+						valueListT, valueListC, valueListS);
+	
+				xmlBallot = new XMLBallot(xmlBallotEncryption,
+						xmlValidityProof);
 			}
-			List<XMLZqElement> valueListC = new ArrayList<XMLZqElement>();
-			for (Element e : subPartC.getAll()) {
-				valueListC.add(new XMLZqElement(e.getValue().toString(10)));
+			else {
+				XMLGqPair xmlBallotEncryption = new XMLGqPair(new XMLGqElement("N/A"), new XMLGqElement("N/A"));
+				XMLValidityProof xmlValidityProof = new XMLValidityProof(
+						new ArrayList<XMLGqPair>(), new ArrayList<XMLZqElement>(), new ArrayList<XMLZqElement>());
+				
+				xmlBallot = new XMLBallot(xmlBallotEncryption,
+						xmlValidityProof);
 			}
-			List<XMLZqElement> valueListS = new ArrayList<XMLZqElement>();
-			for (Element e : subPartS.getAll()) {
-				valueListS.add(new XMLZqElement(e.getValue().toString(10)));
-			}
-
-			XMLValidityProof xmlValidityProof = new XMLValidityProof(
-					valueListT, valueListC, valueListS);
-
-			XMLBallot xmlBallot = new XMLBallot(xmlBallotEncryption,
-					xmlValidityProof);
+			
 
 			XMLParticipant xmlParticipant = new XMLParticipant(
 					p.getIdentification(), p.getUniqueId(),
