@@ -1,6 +1,7 @@
 package ch.bfh.evoting.voterapp.protocol.cgs97;
 
 import java.io.Serializable;
+import java.util.List;
 
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 
@@ -11,21 +12,21 @@ public class ProtocolBallot implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private final Tuple ballot;
+	private final List<ProtocolBallotOption> options;
 	private final Tuple validityProof;
 	private final long timestamp;
 	
 	
-	public ProtocolBallot(Tuple ballot,
+	public ProtocolBallot(List<ProtocolBallotOption> options,
 			Tuple validityProof) {
-		this.ballot = ballot;
+		this.options = options;
 		this.validityProof = validityProof;
 		this.timestamp = System.currentTimeMillis();
 	}
 
 
-	public Tuple getBallot() {
-		return ballot;
+	public List<ProtocolBallotOption> getOptions() {
+		return options;
 	}
 
 
