@@ -1111,18 +1111,17 @@ public class CGS97Protocol extends ProtocolInterface {
 
 		Iterator<Entry<String, ProtocolPartDecryption>> it = partDecryptions
 				.entrySet().iterator();
-		int k = 0;
-		while (it.hasNext()) {
+		
+		for (int i = 0; i < pairs.length; i++){
 			Entry<String, ProtocolPartDecryption> entry = it.next();
 
 			StringElement id = StringMonoid.getInstance(
 					Alphabet.PRINTABLE_ASCII).getElement(entry.getKey());
 			FiniteByteArrayElement trusteeId = id.getHashValue();
 
-			pairs[k] = Pair.getInstance(
+			pairs[i] = Pair.getInstance(
 					ModuloFunction.getInstance(trusteeId.getSet(), zQ).apply(
 							trusteeId), entry.getValue().getPartDecryption());
-			k++;
 		}
 
 		// Calculating the lagrange coefficients for each point we got
