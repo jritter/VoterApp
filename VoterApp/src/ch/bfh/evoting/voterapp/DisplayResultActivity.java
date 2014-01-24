@@ -34,6 +34,7 @@ import ch.bfh.evoting.voterapp.entities.Option;
 import ch.bfh.evoting.voterapp.entities.Poll;
 import ch.bfh.evoting.voterapp.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.fragment.ResultChartFragment;
+import ch.bfh.evoting.voterapp.protocol.HKRS12ProtocolInterface;
 import ch.bfh.evoting.voterapp.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.util.Utility;
 
@@ -97,6 +98,10 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 		Poll intentPoll = (Poll) this.getIntent().getSerializableExtra("poll");
 		if (intentPoll != null) {
 			this.poll = intentPoll;
+		} else {
+			//the poll was just finished and not transmitted in the extras
+			//so we have to get it
+			this.poll = ((HKRS12ProtocolInterface)AndroidApplication.getInstance().getProtocolInterface()).getRunningPoll();
 		}
 
 		saveToDbNeeded = this.getIntent().getBooleanExtra("saveToDb", false);

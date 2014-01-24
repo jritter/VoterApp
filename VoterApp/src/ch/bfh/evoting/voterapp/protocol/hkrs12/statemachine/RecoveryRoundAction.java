@@ -38,7 +38,7 @@ public class RecoveryRoundAction extends AbstractAction {
 
 	public RecoveryRoundAction(Context context, String messageTypeToListenTo,
 			ProtocolPoll poll) {
-		super(context, messageTypeToListenTo, poll, 30000);
+		super(context, messageTypeToListenTo, poll, 20000);
 	}
 
 	@Override
@@ -48,7 +48,7 @@ public class RecoveryRoundAction extends AbstractAction {
 		super.doAction(message, entity, transition, actionType);
 		Log.d(TAG,"Recovery round started");
 
-		if(poll.getExcludedParticipants().size()==1 && poll.getExcludedParticipants().containsKey(me.getUniqueId())){
+		if(/*poll.getExcludedParticipants().size()==1 &&*/ poll.getExcludedParticipants().containsKey(me.getUniqueId())){
 			//this means that I was excluded
 			//so I have nothing to do here
 			return;
@@ -68,13 +68,17 @@ public class RecoveryRoundAction extends AbstractAction {
 
 		me.setHiHat(productNumerator.applyInverse(productDenominator));
 		
-		StandardCommitmentScheme<GStarMod, Element> csRecovery = StandardCommitmentScheme.getInstance(me.getHiHat());	
+		//TODO
+//		StandardCommitmentScheme<GStarMod, Element> csRecovery = StandardCommitmentScheme.getInstance(me.getHiHat());	
+		StandardCommitmentScheme csRecovery = StandardCommitmentScheme.getInstance(me.getHiHat());	
 		me.setHiHatPowXi(csRecovery.commit(me.getXi()));
 
 		//compute proof of equality between discrete logs
 		
 		//Function g^r
-		StandardCommitmentScheme<GStarMod, Element> csSetup = StandardCommitmentScheme.getInstance(poll.getGenerator());	
+		//TODO
+//		StandardCommitmentScheme<GStarMod, Element> csSetup = StandardCommitmentScheme.getInstance(poll.getGenerator());	
+		StandardCommitmentScheme csSetup = StandardCommitmentScheme.getInstance(poll.getGenerator());	
 		Function f1 = csSetup.getCommitmentFunction();
 
 		//Function h_hat^r

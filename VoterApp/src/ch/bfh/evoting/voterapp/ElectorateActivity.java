@@ -212,6 +212,8 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onPause() {
 		active = false;
+		LocalBroadcastManager.getInstance(this).unregisterReceiver(participantsDiscoverer);
+
 		super.onPause();
 
 		if (nfcAvailable) {
@@ -408,7 +410,6 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 				Toast.makeText(this, R.string.toast_not_enough_participant_selected, Toast.LENGTH_SHORT).show();
 			return;
 		}
-		//TODO pk null
 		poll.setParticipants(finalParticipants);
 
 		//if this is a modification of the poll, reset all the acceptations received

@@ -97,7 +97,7 @@ public class CommitmentRoundAction extends AbstractAction {
 						for(Participant p:poll.getParticipants().values()){
 							if(!messagesReceived.containsKey(p.getUniqueId()) && !poll.getCompletelyExcludedParticipants().containsKey(p.getUniqueId())){
 								poll.getExcludedParticipants().put(p.getUniqueId(), p);
-								Log.w(TAG, "Excluding "+p.getIdentification()+"("+p.getUniqueId()+")");
+								Log.w(TAG, "Excluding "+p.getIdentification()+"("+p.getUniqueId()+") at end of voting period");
 							}
 						}
 						goToNextState();
@@ -160,6 +160,8 @@ public class CommitmentRoundAction extends AbstractAction {
 		if(exclude){
 			Log.w(TAG, "Excluding participant "+senderParticipant.getIdentification()+" ("+sender+") because of a message processing problem.");
 			poll.getExcludedParticipants().put(sender, senderParticipant);
+		} else {
+			Log.w(TAG, "Saving message for participant "+senderParticipant.getIdentification()+" ("+sender+").");
 		}
 		super.savedProcessedMessage(round, sender, message, exclude);
 
@@ -236,7 +238,9 @@ public class CommitmentRoundAction extends AbstractAction {
 			i++;
 		}
 
-		ElGamalEncryptionScheme<GStarMod, Element> ees = ElGamalEncryptionScheme.getInstance(poll.getGenerator());
+		//TODO
+//		ElGamalEncryptionScheme<GStarMod, Element> ees = ElGamalEncryptionScheme.getInstance(poll.getGenerator());
+		ElGamalEncryptionScheme ees = ElGamalEncryptionScheme.getInstance(poll.getGenerator());
 		Tuple otherInput = Tuple.getInstance(me.getDataToHash(), poll.getDataToHash());
 
 		

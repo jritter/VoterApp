@@ -27,6 +27,7 @@ public class ResultComputation {
 	private final ExecutorService pool = Executors.newFixedThreadPool(1);
 	private boolean interrupt;
 	private Element searchedResult = null;
+	private int numberOfCombination = 0;
 
 	/**
 	 * Start the computation of the discrete logarithm
@@ -37,17 +38,23 @@ public class ResultComputation {
 	 * @param Z_q the Zq group in which the number of votes must be represented
 	 */
 	public void startComputation(final int maxVotes, final int nbrOptions, final Element[] possiblePlainTexts, final Element generator, final ZMod Z_q){
-
+		numberOfCombination=0;
 		t = new Thread(){
 
 			public void run() {
 				Log.d(TAG,"Starting computing possible results");
+				long time0 = System.currentTimeMillis();
 				computePossibleResults(maxVotes,nbrOptions, possiblePlainTexts, generator, Z_q);
+				long time1 = System.currentTimeMillis();
 				computationTerminated = true;
 				synchronized (ResultComputation.this) {
 					ResultComputation.this.notifyAll();
 				}
-				Log.d(TAG,"Computation terminated");
+				if(interrupt){
+					Log.d(TAG,"Computation interrupted after "+numberOfCombination+" combinations and "+(time1-time0)+" ms");
+				} else {
+					Log.d(TAG,"Computation terminated in "+(time1-time0)+" ms for "+numberOfCombination+" combinations");
+				}
 			}
 		};
 		t.start();
@@ -131,6 +138,8 @@ public class ResultComputation {
 				tempResult = tempResult.apply(possiblePlainTexts[j].selfApply(Z_q.getElement(BigInteger.valueOf(array[j]))));
 			}
 			resultMap.put(generator.selfApply(tempResult), array.clone());
+			numberOfCombination++;
+			
 			//if searched result is set, look if it is already found
 			if(searchedResult!=null){
 				if(resultMap.containsKey(searchedResult)){

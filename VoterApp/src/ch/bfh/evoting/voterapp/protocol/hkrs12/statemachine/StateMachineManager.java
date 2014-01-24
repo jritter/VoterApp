@@ -1,6 +1,7 @@
 package ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine;
 
 import android.content.Context;
+import android.os.SystemClock;
 import android.util.Log;
 
 import ch.bfh.evoting.voterapp.protocol.hkrs12.ProtocolPoll;
@@ -118,6 +119,9 @@ public class StateMachineManager implements Runnable {
 		/*Start state machine*/
 		sm = new StateMachine(stmap, new EntityAdapter(this));
 		try {
+			//wait a little time to ensure that all other participant had time to create their state machine
+			//and register the needed listeners
+			SystemClock.sleep(2000);
 			sm.applyEvent(new StartProtocolEvent(null));
 		} catch (FiniteStateException e) {
 			Log.e(TAG, e.getMessage());

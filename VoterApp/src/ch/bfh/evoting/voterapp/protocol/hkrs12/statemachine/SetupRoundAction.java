@@ -1,6 +1,7 @@
 package ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine;
 
 import android.content.Context;
+import android.os.SystemClock;
 import android.util.Log;
 import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.entities.VoteMessage.Type;
@@ -34,7 +35,7 @@ public class SetupRoundAction extends AbstractAction {
 
 	public SetupRoundAction(Context context, String messageTypeToListenTo,
 			ProtocolPoll poll) {
-		super(context, messageTypeToListenTo, poll, 30000);
+		super(context, messageTypeToListenTo, poll, 20000);
 	}
 
 	@Override
@@ -46,7 +47,9 @@ public class SetupRoundAction extends AbstractAction {
 
 		me.setXi(poll.getZ_q().getRandomElement());
 
-		StandardCommitmentScheme<GStarMod, Element> cs = StandardCommitmentScheme.getInstance(poll.getGenerator());
+		//TODO
+//		StandardCommitmentScheme<GStarMod, Element> cs = StandardCommitmentScheme.getInstance(poll.getGenerator());
+		StandardCommitmentScheme cs = StandardCommitmentScheme.getInstance(poll.getGenerator());
 		me.setAi(cs.commit(me.getXi()));
 
 		//Generator and index of the participant has also to be hashed in the proof
@@ -59,6 +62,7 @@ public class SetupRoundAction extends AbstractAction {
 		me.setProofForXi(spg.generate(me.getXi(), me.getAi()));
 		
 		numberMessagesReceived++;
+		
 		ProtocolMessageContainer m = new ProtocolMessageContainer(me.getAi(), me.getProofForXi());
 		sendMessage(m, Type.VOTE_MESSAGE_SETUP);
 

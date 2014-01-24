@@ -1,5 +1,7 @@
 package ch.bfh.evoting.voterapp.protocol.hkrs12.statemachine;
 
+import java.io.Serializable;
+
 import com.continuent.tungsten.fsm.core.StateMachine;
 
 import ch.bfh.evoting.voterapp.AndroidApplication;
@@ -47,11 +49,13 @@ public class ProcessingService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-
+				
 		boolean exclude = false;
 		Round round = (Round) intent.getSerializableExtra("round");
 		String sender = intent.getStringExtra("sender");
 		ProtocolMessageContainer message = (ProtocolMessageContainer) intent.getSerializableExtra("message");
+
+		Log.e(TAG, "Processing service called for "+round);
 
 		AbstractAction action = ((AbstractAction)sm.getState().getEntryAction());
 		if(action==null || action instanceof ExitAction) return; //state machine was already terminated
@@ -61,13 +65,17 @@ public class ProcessingService extends IntentService {
 
 		ProtocolParticipant senderParticipant = (ProtocolParticipant)poll.getParticipants().get(sender);
 
+		Log.e(TAG, "Processing message for "+senderParticipant.getIdentification());
+
 
 		switch(round){
 		case setup:
 
 			//Verify proof of knowledge of xi
 
-			StandardCommitmentScheme<GStarMod, Element> csSetup = StandardCommitmentScheme.getInstance(poll.getGenerator());
+			StandardCommitmentScheme csSetup = StandardCommitmentScheme.getInstance(poll.getGenerator());
+			//TODO
+//			StandardCommitmentScheme<GStarMod, Element> csSetup = StandardCommitmentScheme.getInstance(poll.getGenerator());
 
 			//Generator and index of the participant has also to be hashed in the proof
 			Tuple otherInput = Tuple.getInstance(senderParticipant.getDataToHash(), poll.getDataToHash());
@@ -77,7 +85,9 @@ public class ProcessingService extends IntentService {
 			PreimageProofGenerator spg = PreimageProofGenerator.getInstance(scg, csSetup.getCommitmentFunction());
 
 			//if proof is false, exclude participant
-			if(!spg.verify(message.getProof(), message.getValue()).getBoolean()){
+			//TODO
+//			if(!spg.verify(message.getProof(), message.getValue()).getBoolean()){
+			if(!spg.verify(message.getProof(), message.getValue()).getValue()){
 				exclude = true;
 				Log.w(TAG, "Proof of knowledge for xi was false for participant "+senderParticipant.getIdentification()+" ("+sender+")");
 			}
@@ -88,36 +98,43 @@ public class ProcessingService extends IntentService {
 			break;
 		case voting:
 			//processing of voting messages directly depend on values received in commitment round, so we have to wait until commitment round is finished
-			while(!(action instanceof VotingRoundAction)){
-				SystemClock.sleep(100);
+			if(!(action instanceof VotingRoundAction)){
+				//put the message at the end of the queue
+				startService(intent);
+				return;
 			}
 
+			if(senderParticipant.getProofValidVote()==null) return;
+			
 			//Verify validity proof
-
+			Log.e(TAG, "Start validity proof");
 			Element[] possibleVotes = new Element[poll.getOptions().size()];
 			int i=0;
 			for(Option op:poll.getOptions()){
 				possibleVotes[i] = poll.getGenerator().selfApply(((ProtocolOption)op).getRepresentation());
 				i++;
 			}
-
-			ElGamalEncryptionScheme<GStarMod, Element> ees = ElGamalEncryptionScheme.getInstance(poll.getGenerator());
+			
+			//TODO
+//			ElGamalEncryptionScheme<GStarMod, Element> ees = ElGamalEncryptionScheme.getInstance(poll.getGenerator());
+			ElGamalEncryptionScheme ees = ElGamalEncryptionScheme.getInstance(poll.getGenerator());
 
 			Tuple otherInput2 = Tuple.getInstance(senderParticipant.getDataToHash(), poll.getDataToHash());
-
 			SigmaChallengeGenerator scg2 = ElGamalEncryptionValidityProofGenerator.createNonInteractiveChallengeGenerator(ees, possibleVotes.length, otherInput2);
 			Subset possibleVotesSet = Subset.getInstance(poll.getG_q(), possibleVotes);
+
 			ElGamalEncryptionValidityProofGenerator vpg = ElGamalEncryptionValidityProofGenerator.getInstance(
 					scg2, ees, message.getComplementaryValue(), possibleVotesSet);
 
 			//simulate the ElGamal cipher text (a,b) = (ai,bi);
 			Tuple publicInput = Tuple.getInstance(senderParticipant.getAi(), message.getValue());
 
-			if(!vpg.verify(senderParticipant.getProofValidVote(), publicInput).getBoolean()){
+			//TODO
+//			if(!vpg.verify(senderParticipant.getProofValidVote(), publicInput).getBoolean()){
+			if(!vpg.verify(senderParticipant.getProofValidVote(), publicInput).getValue()){
 				exclude = true;
 				Log.w(TAG, "Proof of validity was false for participant "+senderParticipant.getIdentification()+" ("+sender+")");
 			}
-
 
 			break;
 		case recovery:
@@ -125,11 +142,15 @@ public class ProcessingService extends IntentService {
 			//verify proof
 
 			//Function g^r
-			StandardCommitmentScheme<GStarMod, Element> cs3 = StandardCommitmentScheme.getInstance(poll.getGenerator());
+			//TODO
+//			StandardCommitmentScheme<GStarMod, Element> cs3 = StandardCommitmentScheme.getInstance(poll.getGenerator());
+			StandardCommitmentScheme cs3 = StandardCommitmentScheme.getInstance(poll.getGenerator());
 			Function f1 = cs3.getCommitmentFunction();
 
 			//Function h_hat^r
-			StandardCommitmentScheme<GStarMod, Element> cs4 = StandardCommitmentScheme.getInstance(message.getComplementaryValue());
+			//TODO
+//			StandardCommitmentScheme<GStarMod, Element> cs4 = StandardCommitmentScheme.getInstance(message.getComplementaryValue());
+			StandardCommitmentScheme cs4 = StandardCommitmentScheme.getInstance(message.getComplementaryValue());
 			Function f2 = cs4.getCommitmentFunction();
 			
 			ProductFunction f3 = ProductFunction.getInstance(f1, f2);
@@ -142,7 +163,9 @@ public class ProcessingService extends IntentService {
 
 			Tuple publicInput3 = Tuple.getInstance(senderParticipant.getAi(), message.getValue());
 
-			if(!piepg.verify(message.getProof(), publicInput3).getBoolean()){
+			//TODO
+//			if(!piepg.verify(message.getProof(), publicInput3).getBoolean()){
+			if(!piepg.verify(message.getProof(), publicInput3).getValue()){
 				Log.w(TAG, "Proof of equality between discrete logs was false for participant "+senderParticipant.getIdentification()+" ("+sender+")");
 				exclude = true;
 			}
@@ -150,6 +173,8 @@ public class ProcessingService extends IntentService {
 		default:
 			break;
 		}
+
+		Log.e(TAG, "Notifying back that processing done");
 
 		//notify the action that it message has been processed and pass the result to it
 		action.savedProcessedMessage(round, sender, message, exclude);

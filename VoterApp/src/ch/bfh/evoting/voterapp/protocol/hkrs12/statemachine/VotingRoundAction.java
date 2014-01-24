@@ -31,7 +31,7 @@ public class VotingRoundAction extends AbstractAction {
 
 	public VotingRoundAction(final Context context, String messageTypeToListenTo,
 			final ProtocolPoll poll) {
-		super(context, messageTypeToListenTo, poll, 30000);		
+		super(context, messageTypeToListenTo, poll, 20000);		
 
 	}
 

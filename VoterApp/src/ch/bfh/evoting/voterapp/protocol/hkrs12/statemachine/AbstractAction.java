@@ -43,6 +43,7 @@ public abstract class AbstractAction implements Action {
 
 	protected Map<String,ProtocolMessageContainer> messagesReceived;
 	protected int numberMessagesReceived = 0;
+	protected int numberOfProcessedMessages;
 
 
 	private boolean timerIsRunning = false;
@@ -153,6 +154,8 @@ public abstract class AbstractAction implements Action {
 			}
 
 			numberMessagesReceived++;
+			
+			Log.d(TAG, "Message received from "+poll.getParticipants().get(sender).getIdentification()+" ("+sender+"). Going to process it");
 
 			Round round = null;
 
@@ -173,6 +176,7 @@ public abstract class AbstractAction implements Action {
 				round = Round.recovery;
 			}
 
+			Log.e(TAG, "Sending to processing service");
 			Intent intent2 = new Intent(context, ProcessingService.class);
 			intent2.putExtra("round", (Serializable) round);
 			intent2.putExtra("message", (Serializable) message);
@@ -206,7 +210,7 @@ public abstract class AbstractAction implements Action {
 				}
 			}
 
-			if(readyToGoToNextState()){
+			if(readyToGoToNextState() && !actionTerminated){
 				goToNextState();
 			}
 		}
@@ -220,9 +224,10 @@ public abstract class AbstractAction implements Action {
 	 * @param exclude if the processing of the message done imply the exclusion of the participant
 	 */
 	public void savedProcessedMessage(Round round, String sender, ProtocolMessageContainer message, boolean exclude){
+		this.numberOfProcessedMessages++;
 		if(!messagesReceived.containsKey(sender)){
 			messagesReceived.put(sender, message);
-			Log.d(TAG, "Message received from "+sender);
+			Log.d(TAG, "Message received from "+poll.getParticipants().get(sender).getIdentification()+" ("+sender+") baack from processing.");
 		}
 	}
 
@@ -309,10 +314,18 @@ public abstract class AbstractAction implements Action {
 			if(actionTerminated) return;
 			
 			stopTimer();
+			if(numberOfProcessedMessages < numberMessagesReceived){
+				startTimer(10000);
+				Log.d(TAG, "Timer timed out by not all messages were processed. So restarting time out timer");
+				return;
+			}
+			
 			for(Participant p:poll.getParticipants().values()){
 				if(AbstractAction.this instanceof SetupRoundAction){
-					poll.getCompletelyExcludedParticipants().put(p.getUniqueId(), p);
-					Log.w(TAG, "Participant "+p.getIdentification()+" ("+p.getUniqueId()+") went out of the network before submitting the setup value, so he was completely excluded (also from recovery).");
+					if(!messagesReceived.containsKey(p.getUniqueId())){
+						poll.getCompletelyExcludedParticipants().put(p.getUniqueId(), p);
+					}
+					Log.w(TAG, "Participant "+p.getIdentification()+" ("+p.getUniqueId()+") did not responde before timed out for submitting the setup value, so he was completely excluded (also from recovery).");
 				} else if(!messagesReceived.containsKey(p.getUniqueId()) && !poll.getCompletelyExcludedParticipants().containsKey(p.getUniqueId())){
 					poll.getExcludedParticipants().put(p.getUniqueId(), p);
 					Log.w(TAG, "Excluding participant "+p.getIdentification()+" ("+p.getUniqueId()+") because not sending his message.");

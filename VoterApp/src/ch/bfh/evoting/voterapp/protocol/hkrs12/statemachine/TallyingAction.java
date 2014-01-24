@@ -78,6 +78,8 @@ public class TallyingAction extends AbstractAction {
 			TransitionFailureException {
 
 		Log.d(TAG,"Tally started");
+		
+		AndroidApplication.getInstance().setVoteRunning(false);
 
 		//compute result
 		Element product = poll.getG_q().getElement(BigInteger.valueOf(1));
@@ -164,7 +166,7 @@ public class TallyingAction extends AbstractAction {
 
 		//Send a broadcast to start the review activity
 		Intent intent = new Intent(BroadcastIntentTypes.showResultActivity);
-		intent.putExtra("poll", (Serializable)poll);
+//		intent.putExtra("poll", (Serializable)poll);
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 
 		try {

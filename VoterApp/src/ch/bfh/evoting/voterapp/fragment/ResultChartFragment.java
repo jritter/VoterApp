@@ -5,8 +5,10 @@ package ch.bfh.evoting.voterapp.fragment;
 
 import org.achartengine.GraphicalView;
 
+import ch.bfh.evoting.voterapp.AndroidApplication;
 import ch.bfh.evoting.voterapp.R;
 import ch.bfh.evoting.voterapp.entities.Poll;
+import ch.bfh.evoting.voterapp.protocol.HKRS12ProtocolInterface;
 import ch.bfh.evoting.voterapp.util.PieChartView;
 import android.app.Fragment;
 import android.os.Bundle;
@@ -28,6 +30,9 @@ public class ResultChartFragment extends Fragment {
 	public void onCreate(Bundle savedInstanceState) {
 		
 		poll = (Poll) getActivity().getIntent().getSerializableExtra("poll");
+		if(poll==null){
+			poll = ((HKRS12ProtocolInterface)AndroidApplication.getInstance().getProtocolInterface()).getRunningPoll();
+		}
 		
 		super.onCreate(savedInstanceState);
 	}

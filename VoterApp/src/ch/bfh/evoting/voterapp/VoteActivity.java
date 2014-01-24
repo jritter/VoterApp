@@ -183,7 +183,8 @@ public class VoteActivity extends Activity {
 
 				//start Review activity
 				Intent i = new Intent(context, DisplayResultActivity.class);
-				i.putExtras(intent.getExtras());
+				if(intent.getExtras()!=null)
+					i.putExtras(intent.getExtras());
 				i.putExtra("saveToDb", true);
 				startActivity(i);
 			}
