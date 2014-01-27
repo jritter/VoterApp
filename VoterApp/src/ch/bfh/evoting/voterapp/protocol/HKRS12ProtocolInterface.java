@@ -39,13 +39,14 @@ import ch.bfh.evoting.voterapp.util.xml.XMLPoll;
 import ch.bfh.evoting.voterapp.util.xml.XMLValidityProof;
 import ch.bfh.evoting.voterapp.util.xml.XMLZqElement;
 import ch.bfh.unicrypt.crypto.random.classes.PseudoRandomOracle;
-import ch.bfh.unicrypt.crypto.random.interfaces.RandomReferenceString;
+import ch.bfh.unicrypt.crypto.random.classes.ReferenceRandomByteSequence;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.ByteArrayElement;
 import ch.bfh.unicrypt.math.algebra.concatenative.classes.ByteArrayMonoid;
 import ch.bfh.unicrypt.math.algebra.general.classes.FiniteByteArrayElement;
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
 import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarModElement;
+import ch.bfh.unicrypt.math.helper.ByteArray;
 
 /**
  * This class implements the HKRS12 protcol
@@ -283,8 +284,8 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 				buffer.flip(); 
 
 				ProtocolPoll pp = (ProtocolPoll)poll;
-
-				RandomReferenceString rrs = PseudoRandomOracle.getInstance().getRandomReferenceString(buffer.array());
+				
+				ReferenceRandomByteSequence rrs = PseudoRandomOracle.getInstance().getReferenceRandomByteSequence(ByteArray.getInstance(buffer.array()));//.getRandomReferenceString(buffer.array());
 				GStarModElement verificationGenerator = pp.getG_q().getIndependentGenerator(1, rrs);
 
 				if(!pp.getG_q().areEqual(pp.getGenerator(), verificationGenerator)){

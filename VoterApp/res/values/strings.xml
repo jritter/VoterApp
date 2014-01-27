@@ -175,6 +175,7 @@
 
     <!-- Activity subtitles -->
     <string name="subtitle_welcome">Welcome to MobiVote</string>
+    <string name="subtitle_edition">HKRS12 Edition</string>
     <string name="subtitle_check_electorate">Please wait&#8230;</string>
     <string name="subtitle_wait_votes">Thanks for voting!\nWaiting for ballots&#8230;</string>
     <string name="subtitle_wait_votes_admin">Thanks for voting!\nWaiting for ballots&#8230;</string>
