@@ -4,6 +4,11 @@ import java.io.Serializable;
 
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
 
+/**
+ * Class representing a message send or received inside the protocol
+ * @author Philémon von Bergen
+ *
+ */
 public class ProtocolMessageContainer implements Serializable {
 	
 	/**
@@ -14,25 +19,48 @@ public class ProtocolMessageContainer implements Serializable {
 	private Element proof;
 	private Element complementaryValue;
 
+	/**
+	 * Constructs a message
+	 * @param value value to be sent
+	 * @param proof proof corresponding to the value sent
+	 */
 	public ProtocolMessageContainer(Element value, Element proof){
 		this.value = value;
 		this.proof = proof;
 	}
 	
+	/**
+	 * Constructs a message
+	 * @param value value to be sent
+	 * @param proof proof corresponding to the value sent
+	 * @param complementaryValue additional value needed to verify the proof
+	 */
 	public ProtocolMessageContainer(Element value, Element proof, Element complementaryValue){
 		this.value = value;
 		this.proof = proof;
 		this.complementaryValue = complementaryValue;
 	}
 
+	/**
+	 * Get the value stored in the message
+	 * @return the value stored in the message
+	 */
 	public Element getValue() {
 		return value;
 	}
 
+	/**
+	 * Get the proof stored in the message
+	 * @return the proof stored in the message
+	 */
 	public Element getProof() {
 		return proof;
 	}
 	
+	/**
+	 * Get the additional value stored in the message
+	 * @return the addtitional value stored in the message
+	 */
 	public Element getComplementaryValue() {
 		return complementaryValue;
 	}
@@ -82,8 +110,5 @@ public class ProtocolMessageContainer implements Serializable {
 		return "ProtocolMessageContainer [value=" + value + ", proof=" + proof
 				+ ", complementaryValue=" + complementaryValue + "]";
 	}
-
-	
-
 	
 }

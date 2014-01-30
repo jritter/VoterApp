@@ -5,6 +5,16 @@ import java.beans.PropertyChangeSupport;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Map that can observed by another object which is notified when a change is done in the map
+ * @author Philémon von Bergen
+ * Inspired from different sources:
+ * http://stackoverflow.com/questions/971927/should-i-add-support-for-propertychangesupport-and-propertychangelistener-in-a-j
+ * http://code.google.com/p/i-gnoramus/source/browse/trunk/I-gnoramus/src/org/ignoramus/common/map/ObservableTreeMap.java?spec=svn99&r=99
+ * 
+ * @param <K> Key of the map entry
+ * @param <V> Value contained in the map entry
+ */
 public class ObservableTreeMap<K, V> extends TreeMap<K, V> {
 
 	/**

@@ -18,7 +18,6 @@ import ch.bfh.unicrypt.crypto.proofgenerator.classes.PreimageEqualityProofGenera
 import ch.bfh.unicrypt.crypto.schemes.commitment.classes.StandardCommitmentScheme;
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
-import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarMod;
 import ch.bfh.unicrypt.math.function.classes.ProductFunction;
 import ch.bfh.unicrypt.math.function.interfaces.Function;
 
@@ -48,7 +47,7 @@ public class RecoveryRoundAction extends AbstractAction {
 		super.doAction(message, entity, transition, actionType);
 		Log.d(TAG,"Recovery round started");
 
-		if(/*poll.getExcludedParticipants().size()==1 &&*/ poll.getExcludedParticipants().containsKey(me.getUniqueId())){
+		if(poll.getExcludedParticipants().containsKey(me.getUniqueId())){
 			//this means that I was excluded
 			//so I have nothing to do here
 			return;
@@ -132,7 +131,5 @@ public class RecoveryRoundAction extends AbstractAction {
 			e.printStackTrace();
 		}
 	}
-
-
 
 }

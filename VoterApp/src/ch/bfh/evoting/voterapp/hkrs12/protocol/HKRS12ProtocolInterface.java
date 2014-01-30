@@ -363,7 +363,6 @@ public class HKRS12ProtocolInterface extends ProtocolInterface {
 			XMLOption xop = new XMLOption(pop.getText(), pop.getVotes(), new XMLZqElement(pop.getRepresentation().getBigInteger().toString(10)));
 			newOptions.add(xop);
 		}
-		Log.e(TAG,"XML options prepared");
 
 		List<XMLParticipant> newParticipant = new ArrayList<XMLParticipant>();
 		

@@ -35,7 +35,6 @@ public class VoteService extends Service{
 
 	@Override
 	public void onCreate() {
-		Log.e(TAG, "VoteService started" + votesReceived);
 		if(instance!=null) instance.stopSelf();
 		instance = this;
 		super.onCreate();
@@ -61,12 +60,10 @@ public class VoteService extends Service{
 
 			@Override
 			public void onReceive(Context arg0, Intent intent) {
-				Log.e("VoteService", "called");
 				
 				//Saving what was the vote for
 				String voter = intent.getStringExtra("sender");
 				if(poll.getParticipants().containsKey(voter) && !poll.getParticipants().get(voter).hasVoted()){
-					Log.e("VoteService", "vote++");
 					votesReceived++;
 					Option vote = (Option)intent.getSerializableExtra("message");
 					for(Option op : poll.getOptions()){

@@ -1,7 +1,6 @@
 package ch.bfh.evoting.voterapp.hkrs12.protocol.hkrs12.statemachine;
 
 import android.content.Context;
-import android.os.SystemClock;
 import android.util.Log;
 import ch.bfh.evoting.voterapp.hkrs12.AndroidApplication;
 import ch.bfh.evoting.voterapp.hkrs12.entities.VoteMessage.Type;
@@ -13,11 +12,8 @@ import ch.bfh.evoting.voterapp.hkrs12.protocol.hkrs12.statemachine.StateMachineM
 import ch.bfh.unicrypt.crypto.proofgenerator.challengegenerator.classes.StandardNonInteractiveSigmaChallengeGenerator;
 import ch.bfh.unicrypt.crypto.proofgenerator.challengegenerator.interfaces.SigmaChallengeGenerator;
 import ch.bfh.unicrypt.crypto.proofgenerator.classes.PreimageProofGenerator;
-import ch.bfh.unicrypt.crypto.random.classes.HybridRandomByteSequence;
 import ch.bfh.unicrypt.crypto.schemes.commitment.classes.StandardCommitmentScheme;
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
-import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
-import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarMod;
 
 import com.continuent.tungsten.fsm.core.Entity;
 import com.continuent.tungsten.fsm.core.Event;

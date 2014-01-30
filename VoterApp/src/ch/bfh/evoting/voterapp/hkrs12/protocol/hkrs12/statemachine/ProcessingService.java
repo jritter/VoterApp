@@ -1,7 +1,5 @@
 package ch.bfh.evoting.voterapp.hkrs12.protocol.hkrs12.statemachine;
 
-import java.io.Serializable;
-
 import com.continuent.tungsten.fsm.core.StateMachine;
 
 import ch.bfh.evoting.voterapp.hkrs12.AndroidApplication;
@@ -22,12 +20,10 @@ import ch.bfh.unicrypt.crypto.schemes.encryption.classes.ElGamalEncryptionScheme
 import ch.bfh.unicrypt.math.algebra.general.classes.Subset;
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
-import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarMod;
 import ch.bfh.unicrypt.math.function.classes.ProductFunction;
 import ch.bfh.unicrypt.math.function.interfaces.Function;
 import android.app.IntentService;
 import android.content.Intent;
-import android.os.SystemClock;
 import android.util.Log;
 
 /**
@@ -55,7 +51,7 @@ public class ProcessingService extends IntentService {
 		String sender = intent.getStringExtra("sender");
 		ProtocolMessageContainer message = (ProtocolMessageContainer) intent.getSerializableExtra("message");
 
-		Log.e(TAG, "Processing service called for "+round);
+		Log.d(TAG, "Processing service called for "+round);
 
 		AbstractAction action = ((AbstractAction)sm.getState().getEntryAction());
 		if(action==null || action instanceof ExitAction) return; //state machine was already terminated
@@ -65,7 +61,7 @@ public class ProcessingService extends IntentService {
 
 		ProtocolParticipant senderParticipant = (ProtocolParticipant)poll.getParticipants().get(sender);
 
-		Log.e(TAG, "Processing message for "+senderParticipant.getIdentification());
+		Log.d(TAG, "Processing message for "+senderParticipant.getIdentification());
 
 
 		switch(round){
@@ -103,7 +99,7 @@ public class ProcessingService extends IntentService {
 			if(senderParticipant.getProofValidVote()==null) return;
 			
 			//Verify validity proof
-			Log.e(TAG, "Start validity proof");
+			Log.d(TAG, "Start verification of validity proof");
 			Element[] possibleVotes = new Element[poll.getOptions().size()];
 			int i=0;
 			for(Option op:poll.getOptions()){
@@ -160,7 +156,7 @@ public class ProcessingService extends IntentService {
 			break;
 		}
 
-		Log.e(TAG, "Notifying back that processing done");
+		Log.d(TAG, "Processing done");
 
 		//notify the action that it message has been processed and pass the result to it
 		action.savedProcessedMessage(round, sender, message, exclude);

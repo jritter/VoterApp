@@ -3,7 +3,6 @@ package ch.bfh.evoting.voterapp.hkrs12.protocol.hkrs12.statemachine;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -166,7 +165,6 @@ public class TallyingAction extends AbstractAction {
 
 		//Send a broadcast to start the review activity
 		Intent intent = new Intent(BroadcastIntentTypes.showResultActivity);
-//		intent.putExtra("poll", (Serializable)poll);
 		LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
 
 		try {

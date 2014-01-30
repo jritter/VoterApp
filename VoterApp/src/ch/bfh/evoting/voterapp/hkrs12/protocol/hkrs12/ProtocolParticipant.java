@@ -197,6 +197,10 @@ public class ProtocolParticipant extends Participant {
 		this.proofForHiHat = proofForHiHat;
 	}
 	
+	/**
+	 * Return all the important data of this object that should be used in the hash used in ZK proofs
+	 * @return all the important data of this object that should be used in the hash used in ZK proofs
+	 */
 	public Tuple getDataToHash(){
 
 		Element index = N.getInstance().getElement(BigInteger.valueOf(this.getProtocolParticipantIndex()));

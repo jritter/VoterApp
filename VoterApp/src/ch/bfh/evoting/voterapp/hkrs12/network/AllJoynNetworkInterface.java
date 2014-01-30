@@ -38,7 +38,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 		super(context);
 		HandlerThread busThread = new HandlerThread("BusHandler");
 		busThread.start();
-		mBusHandler = new BusHandler(busThread.getLooper(), context, AndroidApplication.DEBUG);
+		mBusHandler = new BusHandler(busThread.getLooper(), context);
 
 		// Listening for arriving messages
 		LocalBroadcastManager.getInstance(context).registerReceiver(mMessageReceiver, new IntentFilter("messageArrived"));
@@ -256,10 +256,6 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 	 * @return a random string of 10 lower case chars
 	 */
 	private String generatePassword(){
-		//TODO remove debug
-		if(AndroidApplication.DEBUG){
-			return "debugpassword";
-		} else {
 			//Inspired from: http://stackoverflow.com/questions/5683327/how-to-generate-a-random-string-of-20-characters
 			char[] chars = "abcdefghijklmnopqrstuvwxyz".toCharArray();
 			StringBuilder sb = new StringBuilder();
@@ -272,7 +268,7 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 				sb.append(chars[pos]);
 			}
 			return sb.toString();
-		}
+		
 	}
 
 	/**
@@ -285,9 +281,10 @@ public class AllJoynNetworkInterface extends AbstractNetworkInterface{
 			public void run() {  
 				if(!mBusHandler.getConnected() && !feedbackReceived){
 					mBusHandler.sendEmptyMessage(BusHandler.DISCONNECT);
-					HandlerThread busThread = new HandlerThread("BusHandler");
-					busThread.start();
-					mBusHandler = new BusHandler(busThread.getLooper(), context, AndroidApplication.DEBUG);
+					//TODO remove
+//					HandlerThread busThread = new HandlerThread("BusHandler");
+//					busThread.start();
+//					mBusHandler = new BusHandler(busThread.getLooper(), context);
 					LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent("networkConnectionFailed"));
 				}
 				feedbackReceived = false;

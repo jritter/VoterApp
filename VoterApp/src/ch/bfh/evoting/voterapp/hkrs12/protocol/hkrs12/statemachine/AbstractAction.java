@@ -176,7 +176,7 @@ public abstract class AbstractAction implements Action {
 				round = Round.recovery;
 			}
 
-			Log.e(TAG, "Sending to processing service");
+			Log.d(TAG, "Sending to processing service");
 			Intent intent2 = new Intent(context, ProcessingService.class);
 			intent2.putExtra("round", (Serializable) round);
 			intent2.putExtra("message", (Serializable) message);

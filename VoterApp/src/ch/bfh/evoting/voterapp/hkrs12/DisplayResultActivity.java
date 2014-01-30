@@ -187,10 +187,9 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 
 				@Override
 				protected Void doInBackground(Void... params) {
-					Log.e(TAG, "Saving xml file under "+file.getAbsolutePath());
 					AndroidApplication.getInstance().getProtocolInterface().exportToXML(file, poll);
 				    exported = true;
-				    Log.e(TAG, "Xml file saved under "+file.getAbsolutePath());
+				    Log.d(TAG, "XML file saved under "+file.getAbsolutePath());
 					return null;
 				}
 			}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
