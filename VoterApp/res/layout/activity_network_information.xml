@@ -12,7 +12,7 @@
         android:layout_height="0dip"
         android:layout_margin="@dimen/margin"
         android:layout_weight="1"
-        class="ch.bfh.evoting.voterapp.fragment.NetworkInformationFragment" >
+        class="ch.bfh.evoting.voterapp.cgs97.fragment.NetworkInformationFragment" >
     </fragment>
 
     <LinearLayout

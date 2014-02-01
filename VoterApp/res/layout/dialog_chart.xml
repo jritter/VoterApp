@@ -19,7 +19,7 @@
         android:background="@color/theme_color" />
 
     <fragment
-        android:name="ch.bfh.evoting.voterapp.fragment.ResultChartFragment"
+        android:name="ch.bfh.evoting.voterapp.cgs97.fragment.ResultChartFragment"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:tag="resultChart" />

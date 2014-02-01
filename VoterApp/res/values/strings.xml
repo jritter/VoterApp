@@ -152,7 +152,7 @@
     <string name="overlay_previous_screen">Use this button to return to the previous screen.</string>
 
     <!-- Activity titles -->
-    <string name="voter_app_app_name">MobiVote</string>
+    <string name="voter_app_app_name">MobiVote CGS97</string>
     <string name="title_activity_check_electorate">Electorate</string>
     <string name="title_activity_wait_for_votes">Vote progress</string>
     <string name="title_activity_vote">Vote</string>

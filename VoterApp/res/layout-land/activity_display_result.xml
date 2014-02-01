@@ -44,7 +44,7 @@
             </RelativeLayout>
             <!-- <fragment
                 android:id="@+id/fragment_result_chart"
-                android:name="ch.bfh.evoting.voterapp.fragment.ResultChartFragment"
+                android:name="ch.bfh.evoting.voterapp.cgs97.fragment.ResultChartFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="@dimen/margin" />  -->

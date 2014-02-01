@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ch.bfh.evoting.voterapp"
+    package="ch.bfh.evoting.voterapp.cgs97"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -23,14 +23,14 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" /> -->
 
     <application
-        android:name="ch.bfh.evoting.voterapp.AndroidApplication"
+        android:name="ch.bfh.evoting.voterapp.cgs97.AndroidApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/voter_app_app_name"
         android:theme="@style/Theme.Votebartheme" >
 
         <activity
-            android:name="ch.bfh.evoting.voterapp.MainActivity"
+            android:name="ch.bfh.evoting.voterapp.cgs97.MainActivity"
             android:label="@string/voter_app_app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -42,100 +42,100 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:mimeType="application/ch.bfh.evoting.voterapp" />
+                <data android:mimeType="application/ch.bfh.evoting.voterapp.cgs97" />
             </intent-filter>
         </activity>
         <activity
-            android:name="ch.bfh.evoting.voterapp.PollActivity"
+            android:name="ch.bfh.evoting.voterapp.cgs97.PollActivity"
             android:label="@string/title_activity_poll"
-            android:parentActivityName="ch.bfh.evoting.voterapp.MainActivity" >
+            android:parentActivityName="ch.bfh.evoting.voterapp.cgs97.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.bfh.evoting.voterapp.MainActivity" />
+                android:value="ch.bfh.evoting.voterapp.cgs97.MainActivity" />
         </activity>
         <activity
-            android:name="ch.bfh.evoting.voterapp.PollDetailActivity"
+            android:name="ch.bfh.evoting.voterapp.cgs97.PollDetailActivity"
             android:label="@string/title_activity_poll_detail"
             android:launchMode="singleTop"
-            android:parentActivityName="ch.bfh.evoting.voterapp.PollActivity"
+            android:parentActivityName="ch.bfh.evoting.voterapp.cgs97.PollActivity"
             android:windowSoftInputMode="stateHidden|adjustResize" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.bfh.evoting.voterapp.PollActivity" />
+                android:value="ch.bfh.evoting.voterapp.cgs97.PollActivity" />
         </activity>
         <activity
-            android:name="ch.bfh.evoting.voterapp.NetworkConfigActivity"
+            android:name="ch.bfh.evoting.voterapp.cgs97.NetworkConfigActivity"
             android:label="@string/title_activity_network_config"
-            android:parentActivityName="ch.bfh.evoting.voterapp.PollDetailActivity"
+            android:parentActivityName="ch.bfh.evoting.voterapp.cgs97.PollDetailActivity"
             android:windowSoftInputMode="stateHidden" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.bfh.evoting.voterapp.PollDetailActivity" />
+                android:value="ch.bfh.evoting.voterapp.cgs97.PollDetailActivity" />
         </activity>
         <activity
-            android:name="ch.bfh.evoting.voterapp.NetworkInformationActivity"
+            android:name="ch.bfh.evoting.voterapp.cgs97.NetworkInformationActivity"
             android:label="@string/title_activity_network_informations"
-            android:parentActivityName="ch.bfh.evoting.voterapp.PollDetailActivity" >
+            android:parentActivityName="ch.bfh.evoting.voterapp.cgs97.PollDetailActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.bfh.evoting.voterapp.PollDetailActivity" />
+                android:value="ch.bfh.evoting.voterapp.cgs97.PollDetailActivity" />
         </activity>
         <activity
-            android:name="ch.bfh.evoting.voterapp.ElectorateActivity"
+            android:name="ch.bfh.evoting.voterapp.cgs97.ElectorateActivity"
             android:label="@string/title_activity_electorate"
-            android:parentActivityName="ch.bfh.evoting.voterapp.NetworkInformationActivity" >
+            android:parentActivityName="ch.bfh.evoting.voterapp.cgs97.NetworkInformationActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.bfh.evoting.voterapp.PollDetailActivity" />
+                android:value="ch.bfh.evoting.voterapp.cgs97.PollDetailActivity" />
         </activity>
         <activity
-            android:name="ch.bfh.evoting.voterapp.ReviewPollAdminActivity"
+            android:name="ch.bfh.evoting.voterapp.cgs97.ReviewPollAdminActivity"
             android:label="@string/title_activity_review_poll"
-            android:parentActivityName="ch.bfh.evoting.voterapp.NetworkInformationActivity" >
+            android:parentActivityName="ch.bfh.evoting.voterapp.cgs97.NetworkInformationActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.bfh.evoting.voterapp.ElectorateActivity" />
+                android:value="ch.bfh.evoting.voterapp.cgs97.ElectorateActivity" />
         </activity>
         <activity
-            android:name="ch.bfh.evoting.voterapp.WaitForVotesAdminActivity"
+            android:name="ch.bfh.evoting.voterapp.cgs97.WaitForVotesAdminActivity"
             android:label="@string/title_activity_wait_for_votes_admin" >
         </activity>
         <activity
-            android:name="ch.bfh.evoting.voterapp.ListTerminatedPollsActivity"
+            android:name="ch.bfh.evoting.voterapp.cgs97.ListTerminatedPollsActivity"
             android:label="@string/title_activity_list_terminated_polls" >
         </activity>
         <activity
-            android:name="ch.bfh.evoting.voterapp.DisplayResultActivity"
+            android:name="ch.bfh.evoting.voterapp.cgs97.DisplayResultActivity"
             android:label="@string/title_activity_display_result" >
         </activity>
         <activity
-            android:name="ch.bfh.evoting.voterapp.CheckElectorateActivity"
+            android:name="ch.bfh.evoting.voterapp.cgs97.CheckElectorateActivity"
             android:label="@string/title_activity_check_electorate"
-            android:parentActivityName="ch.bfh.evoting.voterapp.MainActivity" >
+            android:parentActivityName="ch.bfh.evoting.voterapp.cgs97.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.bfh.evoting.voterapp.MainActivity" />
+                android:value="ch.bfh.evoting.cgs97.voterapp.MainActivity" />
         </activity>
         <activity
-            android:name="ch.bfh.evoting.voterapp.ReviewPollVoterActivity"
+            android:name="ch.bfh.evoting.voterapp.cgs97.ReviewPollVoterActivity"
             android:label="@string/title_activity_review_poll" >
         </activity>
         <activity
-            android:name="ch.bfh.evoting.voterapp.VoteActivity"
+            android:name="ch.bfh.evoting.voterapp.cgs97.VoteActivity"
             android:label="@string/title_activity_vote" >
         </activity>
         <activity
-            android:name="ch.bfh.evoting.voterapp.WaitForVotesVoterActivity"
+            android:name="ch.bfh.evoting.voterapp.cgs97.WaitForVotesVoterActivity"
             android:label="@string/title_activity_wait_for_votes" >
         </activity>
         <!-- android:noHistory="true" > -->
         <activity
-            android:name="ch.bfh.evoting.voterapp.CreateNetworkActivity"
+            android:name="ch.bfh.evoting.voterapp.cgs97.CreateNetworkActivity"
             android:label="@string/title_activity_create_network"
-            android:parentActivityName="ch.bfh.evoting.voterapp.NetworkConfigActivity" >
+            android:parentActivityName="ch.bfh.evoting.voterapp.cgs97.NetworkConfigActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="ch.bfh.evoting.voterapp.NetworkConfigActivity" />
+                android:value="ch.bfh.evoting.voterapp.cgs97.NetworkConfigActivity" />
         </activity>
         <activity
             android:name="com.google.zxing.client.android.CaptureActivity"

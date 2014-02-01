@@ -27,7 +27,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@+id/separator_identification"
         android:layout_margin="@dimen/margin"
-        class="ch.bfh.evoting.voterapp.fragment.NetworkInformationFragment"
+        class="ch.bfh.evoting.voterapp.cgs97.fragment.NetworkInformationFragment"
         android:tag="networkInformation" />
 
 </RelativeLayout>
