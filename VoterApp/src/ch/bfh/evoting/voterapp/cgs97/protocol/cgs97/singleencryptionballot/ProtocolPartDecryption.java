@@ -1,4 +1,4 @@
-package ch.bfh.evoting.voterapp.cgs97.protocol.cgs97;
+package ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.singleencryptionballot;
 
 import java.io.Serializable;
 

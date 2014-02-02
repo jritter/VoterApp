@@ -1,5 +1,6 @@
 package ch.bfh.evoting.voterapp.cgs97;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
@@ -23,6 +24,7 @@ import android.view.MenuItem;
 import ch.bfh.evoting.voterapp.cgs97.R;
 import ch.bfh.evoting.voterapp.cgs97.adapters.NetworkParticipantListAdapter;
 import ch.bfh.evoting.voterapp.cgs97.entities.Participant;
+import ch.bfh.evoting.voterapp.cgs97.entities.Poll;
 import ch.bfh.evoting.voterapp.cgs97.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.cgs97.fragment.NetworkDialogFragment;
 import ch.bfh.evoting.voterapp.cgs97.util.BroadcastIntentTypes;
@@ -128,13 +130,27 @@ public class CheckElectorateActivity extends ListActivity {
 				LocalBroadcastManager.getInstance(CheckElectorateActivity.this).unregisterReceiver(this);
 				LocalBroadcastManager.getInstance(CheckElectorateActivity.this).unregisterReceiver(electorateReceiver);
 				LocalBroadcastManager.getInstance(CheckElectorateActivity.this).unregisterReceiver(networkParticipantUpdater);
-				//start Review activity
+				//start Review activity				
+				
 				Intent i = new Intent(context, ReviewPollVoterActivity.class);
 				i.putExtras(intent.getExtras());
 				startActivity(i);
 			}
 		};
 		LocalBroadcastManager.getInstance(this).registerReceiver(showNextActivityListener, new IntentFilter(BroadcastIntentTypes.showNextActivity));
+		
+		LocalBroadcastManager.getInstance(this).registerReceiver(
+				new BroadcastReceiver() {
+					@Override
+					public void onReceive(Context context, Intent intent) {
+						if(!AndroidApplication.getInstance().isAdmin()){
+							Poll poll = (Poll) intent.getSerializableExtra("poll");
+							// Poll is not in the DB, so reset the id
+							poll.setId(-1);
+							handleReceivedPoll(poll, intent.getStringExtra("sender"));
+						}
+					}
+				}, new IntentFilter(BroadcastIntentTypes.pollToReview));
 
 
 		// Is NFC available on this device?
@@ -286,5 +302,15 @@ public class CheckElectorateActivity extends ListActivity {
 
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 
+	}
+	
+	protected void handleReceivedPoll(Poll poll, String sender) {
+		
+		
+		// Send a broadcast to start the review activity
+		Intent intent = new Intent(BroadcastIntentTypes.showNextActivity);
+		intent.putExtra("poll", (Serializable) poll);
+		intent.putExtra("sender", sender);
+		LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 	}
 }

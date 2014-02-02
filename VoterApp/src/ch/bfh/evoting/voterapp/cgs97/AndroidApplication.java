@@ -18,14 +18,17 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 import ch.bfh.evoting.voterapp.cgs97.R;
+import ch.bfh.evoting.voterapp.cgs97.entities.Poll;
 import ch.bfh.evoting.voterapp.cgs97.network.AllJoynNetworkInterface;
 import ch.bfh.evoting.voterapp.cgs97.network.NetworkInterface;
 import ch.bfh.evoting.voterapp.cgs97.network.NetworkMonitor;
 import ch.bfh.evoting.voterapp.cgs97.protocol.ProtocolInterface;
-import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.CGS97Protocol;
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.multiencryptionballot.CGS97ProtocolMultiEncryption;
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.singleencryptionballot.CGS97ProtocolSingleEncryption;
 import ch.bfh.evoting.voterapp.cgs97.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.cgs97.util.JavaSerialization;
 import ch.bfh.evoting.voterapp.cgs97.util.SerializationUtil;
@@ -47,6 +50,8 @@ public class AndroidApplication extends Application {
 	private SerializationUtil su;
 	private NetworkInterface ni;
 	private ProtocolInterface pi;
+	private ProtocolInterface piSingle;
+	private ProtocolInterface piMulti;
 	private Activity currentActivity = null;
 	private boolean isAdmin = false;
 	private boolean voteRunning;
@@ -131,8 +136,9 @@ public class AndroidApplication extends Application {
 
 				su = new SerializationUtil(new JavaSerialization());
 				ni = new AllJoynNetworkInterface(AndroidApplication.this.getApplicationContext());///* new InstaCircleNetworkInterface(this.getApplicationContext());*/new SimulatedNetworkInterface(AndroidApplication.this.getApplicationContext());
-				pi = new CGS97Protocol(AndroidApplication.this.getApplicationContext());
 				
+				piSingle = new CGS97ProtocolSingleEncryption(getApplicationContext());
+				piMulti = new CGS97ProtocolMultiEncryption(getApplicationContext());
 				return null;
 			}
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -169,6 +175,10 @@ public class AndroidApplication extends Application {
 	public ProtocolInterface getProtocolInterface(){
 		return pi;
 	}
+	
+	public void setProtocolInterface (ProtocolInterface pi) {
+		this.pi = pi;
+	}
 
 	/**
 	 * Get the network monitor receiving wifi events
@@ -192,7 +202,6 @@ public class AndroidApplication extends Application {
 	 */
 	public void setCurrentActivity(Activity currentActivity){
 		this.currentActivity = currentActivity;
-
 		if(isVoteRunning()){
 			// Create a pending intent which will be invoked after tapping on the
 			// Android notification
@@ -440,5 +449,41 @@ public class AndroidApplication extends Application {
 		public void onActivityStopped(Activity activity) {
 		}
 	}
+	
+	public void setProtocol(final Poll poll) {
 
+		Log.d(this.getClass().getSimpleName(), "setProtocol(): Participants: " + poll.getNumberOfParticipants());
+		Log.d(this.getClass().getSimpleName(), "setProtocol(): Options: " + poll.getOptions().size());
+		
+		int n = poll.getOptions().size()
+				+ poll.getNumberOfParticipants() - 1;
+		int k = poll.getNumberOfParticipants() - 1;
+
+		int combinations = Utility.factorial(n)
+				/ (Utility.factorial((n - k)) * Utility.factorial(k));
+
+		Log.d(this.getClass().getSimpleName(),
+				"Number of combinations needed for singleencryptionballot: "
+						+ combinations);
+		
+		if (piSingle != null){
+			piSingle.deactivate();
+		}
+		
+		if (piMulti != null){
+			piMulti.deactivate();
+		}
+		
+		if (combinations < 16) {
+			setProtocolInterface(piSingle);
+			
+			Log.d(this.getClass().getSimpleName(),
+					"Using single encryption ballot strategy");
+		} else {
+			setProtocolInterface(piMulti);
+			Log.d(this.getClass().getSimpleName(),
+					"Using multi encryption ballot strategy");
+		}
+		pi.activate();
+	}
 }

@@ -6,21 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import ch.bfh.evoting.voterapp.cgs97.R;
-import ch.bfh.evoting.voterapp.cgs97.adapters.AdminNetworkParticipantListAdapter;
-import ch.bfh.evoting.voterapp.cgs97.entities.Participant;
-import ch.bfh.evoting.voterapp.cgs97.entities.Poll;
-import ch.bfh.evoting.voterapp.cgs97.entities.VoteMessage;
-import ch.bfh.evoting.voterapp.cgs97.fragment.HelpDialogFragment;
-import ch.bfh.evoting.voterapp.cgs97.fragment.NetworkDialogFragment;
-import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.ProtocolPoll;
-import ch.bfh.evoting.voterapp.cgs97.util.BroadcastIntentTypes;
-import ch.bfh.evoting.voterapp.cgs97.util.UniqueIdComparator;
-import ch.bfh.evoting.voterapp.cgs97.util.Utility;
-import android.nfc.NfcAdapter;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.os.SystemClock;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
@@ -32,6 +17,10 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.nfc.NfcAdapter;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -45,6 +34,16 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
+import ch.bfh.evoting.voterapp.cgs97.adapters.AdminNetworkParticipantListAdapter;
+import ch.bfh.evoting.voterapp.cgs97.entities.Participant;
+import ch.bfh.evoting.voterapp.cgs97.entities.Poll;
+import ch.bfh.evoting.voterapp.cgs97.entities.VoteMessage;
+import ch.bfh.evoting.voterapp.cgs97.fragment.HelpDialogFragment;
+import ch.bfh.evoting.voterapp.cgs97.fragment.NetworkDialogFragment;
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.ProtocolPoll;
+import ch.bfh.evoting.voterapp.cgs97.util.BroadcastIntentTypes;
+import ch.bfh.evoting.voterapp.cgs97.util.UniqueIdComparator;
+import ch.bfh.evoting.voterapp.cgs97.util.Utility;
 
 /**
  * Class displaying the activity that allows the administrator to select which participants to include in the electorate
@@ -71,6 +70,8 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 	private BroadcastReceiver participantsDiscoverer;
 	private AlertDialog dialogBack;
 	private BroadcastReceiver showNextActivityListener;
+	
+	private AndroidApplication androidApplication;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -86,10 +87,12 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		if(getResources().getBoolean(R.bool.display_bottom_bar) == false){
 			findViewById(R.id.layout_bottom_bar).setVisibility(View.GONE);
 		}
+		
+		androidApplication = AndroidApplication.getInstance();
 
-		AndroidApplication.getInstance().setCurrentActivity(this);
-		AndroidApplication.getInstance().setVoteRunning(true);
-		AndroidApplication.getInstance().getNetworkInterface().unlockGroup();
+		androidApplication.setCurrentActivity(this);
+		androidApplication.setVoteRunning(true);
+		androidApplication.getNetworkInterface().unlockGroup();
 
 		btnNext = (Button) findViewById(R.id.button_next);
 		btnNext.setOnClickListener(this);
@@ -421,7 +424,7 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 					Log.d("ElectorateActivity", "sending electorate "+participants);
 					//Send the list of participants in the network over the network
 					VoteMessage vm = new VoteMessage(VoteMessage.Type.VOTE_MESSAGE_ELECTORATE, (Serializable)participants);
-					AndroidApplication.getInstance().getNetworkInterface().sendMessage(vm);
+					androidApplication.getNetworkInterface().sendMessage(vm);
 					SystemClock.sleep(5000);
 
 				}
@@ -460,8 +463,9 @@ public class ElectorateActivity extends Activity implements OnClickListener {
 		
 		ProtocolPoll protocolPoll = new ProtocolPoll(poll);
 		protocolPoll.setThreshold(seekThreshold.getProgress());
-
-		AndroidApplication.getInstance().getProtocolInterface().showReview(protocolPoll);
+		androidApplication.setProtocol(protocolPoll);
+		
+		androidApplication.getProtocolInterface().showReview(protocolPoll);
 
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(participantsDiscoverer);
 	}

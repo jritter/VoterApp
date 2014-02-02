@@ -82,5 +82,15 @@ public abstract class ProtocolInterface {
 	 * Method called when the administrator wants to cancel the voting period
 	 */
 	public abstract void cancelVotingPeriod();
+	
+	/**
+	 * Method to register all receivers
+	 */
+	public abstract void activate();
+	
+	/**
+	 * Method to unregister all receivers
+	 */
+	public abstract void deactivate();
 
 }

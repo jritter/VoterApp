@@ -18,6 +18,7 @@ import android.content.pm.PackageManager;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,6 +28,8 @@ import ch.bfh.evoting.voterapp.cgs97.entities.Participant;
 import ch.bfh.evoting.voterapp.cgs97.entities.Poll;
 import ch.bfh.evoting.voterapp.cgs97.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.cgs97.fragment.PollReviewFragment;
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.multiencryptionballot.CGS97ProtocolMultiEncryption;
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.singleencryptionballot.CGS97ProtocolSingleEncryption;
 import ch.bfh.evoting.voterapp.cgs97.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.cgs97.util.Utility;
 
@@ -90,6 +93,8 @@ public class ReviewPollVoterActivity extends Activity {
 			poll = intentPoll;
 			sender = this.getIntent().getStringExtra("sender");
 		}
+		
+		AndroidApplication.getInstance().setProtocol(poll);
 
 		FragmentManager fm = getFragmentManager();
 		fragment = new PollReviewFragment();
@@ -130,7 +135,7 @@ public class ReviewPollVoterActivity extends Activity {
 
 			if(isContainedInParticipants(AndroidApplication.getInstance().getNetworkInterface().getMyUniqueId())){
 				poll.setStartTime(System.currentTimeMillis());
-
+				
 				AndroidApplication.getInstance().getProtocolInterface().beginVotingPeriod(poll);
 
 				Intent i = new Intent(ReviewPollVoterActivity.this, VoteActivity.class);
