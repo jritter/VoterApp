@@ -129,7 +129,7 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 		lv.setAdapter(new ResultAdapter(this, poll));
 
 		// Save the poll to the DB if needed
-		if (saveToDbNeeded) {
+		if (saveToDbNeeded && poll != null && AndroidApplication.getInstance().getProtocolInterface() != null) {
 			try {
 				if (pollId >= 0) {
 					PollDbHelper.getInstance(this).updatePoll(pollId, poll);
@@ -148,6 +148,8 @@ public class DisplayResultActivity extends Activity implements OnClickListener {
 
 				@Override
 				protected Void doInBackground(Void... params) {
+					
+					
 					
 					File directory = new File(Environment.getExternalStorageDirectory()
 							+ AndroidApplication.FOLDER);

@@ -178,6 +178,7 @@ public class AndroidApplication extends Application {
 	
 	public void setProtocolInterface (ProtocolInterface pi) {
 		this.pi = pi;
+		pi.activate();
 	}
 
 	/**
@@ -475,15 +476,28 @@ public class AndroidApplication extends Application {
 		}
 		
 		if (combinations < 16) {
-			setProtocolInterface(piSingle);
+			
+			while (true){
+				if (piSingle != null){
+					setProtocolInterface(piSingle);
+					break;
+				}
+			}
+			
+			
 			
 			Log.d(this.getClass().getSimpleName(),
 					"Using single encryption ballot strategy");
 		} else {
-			setProtocolInterface(piMulti);
+			while (true){
+				if (piMulti != null){
+					setProtocolInterface(piMulti);
+					break;
+				}
+			}
 			Log.d(this.getClass().getSimpleName(),
 					"Using multi encryption ballot strategy");
 		}
-		pi.activate();
+		
 	}
 }

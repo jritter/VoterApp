@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.simpleframework.xml.Serializer;
+import org.simpleframework.xml.core.Persister;
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -31,6 +34,12 @@ import ch.bfh.evoting.voterapp.cgs97.entities.Poll;
 import ch.bfh.evoting.voterapp.cgs97.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.cgs97.protocol.ProtocolInterface;
 import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.ProtocolPoll;
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.multiencryptionballot.xml.XMLBallot;
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.multiencryptionballot.xml.XMLPartDecryption;
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.multiencryptionballot.xml.XMLParticipant;
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.multiencryptionballot.xml.XMLMultiEncryptionPoll;
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.multiencryptionballot.xml.XMLOption;
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml.XMLGqElement;
 import ch.bfh.evoting.voterapp.cgs97.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.cgs97.util.Utility;
 import ch.bfh.unicrypt.crypto.proofgenerator.challengegenerator.classes.StandardNonInteractiveSigmaChallengeGenerator;
@@ -519,156 +528,62 @@ public class CGS97ProtocolMultiEncryption extends ProtocolInterface {
 
 	@Override
 	public void exportToXML(File file, Poll poll) {
-		// ProtocolPoll pp = (ProtocolPoll) poll;
-		//
-		// List<XMLOption> xmlOptions = new ArrayList<XMLOption>();
-		// for (Option op : pp.getOptions()) {
-		// XMLGqElement representation = new XMLGqElement(possibleMessages[pp
-		// .getOptions().indexOf(op)].getValue().toString(10));
-		// XMLOption xop = new XMLOption(op.getText(), op.getVotes(),
-		// representation);
-		// xmlOptions.add(xop);
-		// }
-		//
-		// List<XMLParticipant> xmlParticipants = new
-		// ArrayList<XMLParticipant>();
-		// for (Participant p : pp.getParticipants().values()) {
-		//
-		// List<XMLGqElement> xmlCoefficientCommitments = new
-		// ArrayList<XMLGqElement>();
-		// for (int i = 0; i < participantCoefficientCommitments.get(p
-		// .getUniqueId()).length; i++) {
-		// xmlCoefficientCommitments
-		// .add(new XMLGqElement(participantCoefficientCommitments
-		// .get(p.getUniqueId())[i].getValue()
-		// .toString(10)));
-		// }
-		//
-		// XMLGqElement xmlKeyShareCommitment = new XMLGqElement(
-		// receivedShareCommitments.get(p.getUniqueId()).getValue()
-		// .toString(10));
-		//
-		// XMLPartDecryption xmlPartDecryption = null;
-		// if (partDecryptions.get(p.getUniqueId()) != null){
-		// XMLGqElement partDecryptionValue = new XMLGqElement(partDecryptions
-		// .get(p.getUniqueId()).getPartDecryption().getValue()
-		// .toString(10));
-		//
-		// Tuple equalityProof = partDecryptions.get(p.getUniqueId())
-		// .getProof();
-		// XMLGqElement valueT1 = new XMLGqElement(
-		// ((Tuple) equalityProof.getAt(0)).getAt(0).getValue()
-		// .toString(10));
-		// XMLGqElement valueT2 = new XMLGqElement(
-		// ((Tuple) equalityProof.getAt(0)).getAt(1).getValue()
-		// .toString(10));
-		// XMLZqElement valueC = new XMLZqElement(equalityProof.getAt(1)
-		// .getValue().toString(10));
-		// XMLZqElement valueS = new XMLZqElement(equalityProof.getAt(2)
-		// .getValue().toString(10));
-		// XMLEqualityProof xmlEqualityProof = new XMLEqualityProof(valueT1,
-		// valueT2, valueC, valueS);
-		//
-		// xmlPartDecryption = new XMLPartDecryption(
-		// partDecryptionValue, xmlEqualityProof);
-		//
-		// } else {
-		// // Handling the case where not all part decryptions were used...
-		// XMLGqElement partDecryptionValue = new XMLGqElement("N/A");
-		// XMLGqElement valueT1 = new XMLGqElement("N/A");
-		// XMLGqElement valueT2 = new XMLGqElement("N/A");
-		// XMLZqElement valueC = new XMLZqElement("N/A");
-		// XMLZqElement valueS = new XMLZqElement("N/A");
-		// XMLEqualityProof xmlEqualityProof = new XMLEqualityProof(valueT1,
-		// valueT2, valueC, valueS);
-		//
-		// xmlPartDecryption = new XMLPartDecryption(
-		// partDecryptionValue, xmlEqualityProof);
-		// }
-		//
-		// XMLBallot xmlBallot;
-		//
-		// if (ballots.get(p.getUniqueId()) != null){
-		// XMLGqElement xmlLeft = new XMLGqElement(ballots
-		// .get(p.getUniqueId()).getBallot().getAt(0).getValue()
-		// .toString(10));
-		// XMLGqElement xmlRight = new XMLGqElement(ballots
-		// .get(p.getUniqueId()).getBallot().getAt(1).getValue()
-		// .toString(10));
-		//
-		// XMLGqPair xmlBallotEncryption = new XMLGqPair(xmlLeft, xmlRight);
-		//
-		// Tuple validityProof = ballots.get(p.getUniqueId())
-		// .getValidityProof();
-		// Tuple subPartT = (Tuple) validityProof.getAt(0); // list of Gq pairs
-		// Tuple subPartC = (Tuple) validityProof.getAt(1); // list
-		// // ZModElements
-		// Tuple subPartS = (Tuple) validityProof.getAt(2); // list
-		// // ZModElements
-		// List<XMLGqPair> valueListT = new ArrayList<XMLGqPair>();
-		// for (Element e : subPartT.getAll()) {
-		// Tuple tuple = (Tuple) e;
-		// XMLGqPair pair = new XMLGqPair(new XMLGqElement(tuple.getAt(0)
-		// .getValue().toString(10)), new XMLGqElement(tuple
-		// .getAt(1).getValue().toString(10)));
-		// valueListT.add(pair);
-		// }
-		// List<XMLZqElement> valueListC = new ArrayList<XMLZqElement>();
-		// for (Element e : subPartC.getAll()) {
-		// valueListC.add(new XMLZqElement(e.getValue().toString(10)));
-		// }
-		// List<XMLZqElement> valueListS = new ArrayList<XMLZqElement>();
-		// for (Element e : subPartS.getAll()) {
-		// valueListS.add(new XMLZqElement(e.getValue().toString(10)));
-		// }
-		//
-		// XMLValidityProof xmlValidityProof = new XMLValidityProof(
-		// valueListT, valueListC, valueListS);
-		//
-		// xmlBallot = new XMLBallot(xmlBallotEncryption,
-		// xmlValidityProof);
-		// }
-		// else {
-		// XMLGqPair xmlBallotEncryption = new XMLGqPair(new
-		// XMLGqElement("N/A"), new XMLGqElement("N/A"));
-		// XMLValidityProof xmlValidityProof = new XMLValidityProof(
-		// new ArrayList<XMLGqPair>(), new ArrayList<XMLZqElement>(), new
-		// ArrayList<XMLZqElement>());
-		//
-		// xmlBallot = new XMLBallot(xmlBallotEncryption,
-		// xmlValidityProof);
-		// }
-		//
-		//
-		// XMLParticipant xmlParticipant = new XMLParticipant(
-		// p.getIdentification(), p.getUniqueId(),
-		// xmlCoefficientCommitments, xmlKeyShareCommitment,
-		// xmlPartDecryption, xmlBallot);
-		// xmlParticipants.add(xmlParticipant);
-		// }
-		//
-		// XMLPoll xmlPoll = new XMLPoll(
-		// pp.getQuestion(),
-		// xmlOptions,
-		// xmlParticipants,
-		// gQ.getModulus().toString(10),
-		// gQ.getZModOrder().getModulus().toString(10),
-		// new XMLGqElement(elGamal.getGenerator().getValue().toString(10)),
-		// new XMLGqElement(publicKey.getValue().toString(10)), pp
-		// .getThreshold());
-		// Serializer serializer = new Persister();
-		// try {
-		// serializer.write(xmlPoll, file);
-		//
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
+		ProtocolPoll pp = (ProtocolPoll) poll;
+
+
+		List<XMLOption> xmlOptions = new ArrayList<XMLOption>();
+		for (Option op : pp.getOptions()) {
+			xmlOptions.add(new XMLOption(op));
+		}
+
+		List<XMLParticipant> xmlParticipants = new ArrayList<XMLParticipant>();
+		for (Participant p : pp.getParticipants().values()) {
+
+			List<XMLGqElement> xmlCoefficientCommitments = new ArrayList<XMLGqElement>();
+			
+			for (int i = 0; i < participantCoefficientCommitments.get(p.getUniqueId()).length; i++) {
+				xmlCoefficientCommitments
+						.add(new XMLGqElement(participantCoefficientCommitments
+								.get(p.getUniqueId())[i].getValue()
+								.toString(10)));
+			}
+
+			XMLGqElement xmlKeyShareCommitment = new XMLGqElement(
+					receivedShareCommitments.get(p.getUniqueId()).getValue()
+							.toString(10));
+						
+			XMLPartDecryption xmlPartDecryption = new XMLPartDecryption(partDecryptions.get(p.getUniqueId()));
+			
+			XMLBallot xmlBallot = new XMLBallot(ballots.get(p.getUniqueId()));
+
+			XMLParticipant xmlParticipant = new XMLParticipant(
+					p.getIdentification(), p.getUniqueId(),
+					xmlCoefficientCommitments, xmlKeyShareCommitment,
+					xmlPartDecryption, xmlBallot);
+			xmlParticipants.add(xmlParticipant);
+		}
+
+		XMLMultiEncryptionPoll xmlPoll = new XMLMultiEncryptionPoll(
+				pp.getQuestion(),
+				xmlOptions,
+				xmlParticipants,
+				gQ.getModulus().toString(10),
+				gQ.getZModOrder().getModulus().toString(10),
+				new XMLGqElement(((BigInteger)elGamal.getGenerator().getValue()).toString(10)),
+				new XMLGqElement(publicKey.getValue().toString(10)), pp
+						.getThreshold());
+		Serializer serializer = new Persister();
+		try {
+			serializer.write(xmlPoll, file);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void cancelVotingPeriod() {
-		// TODO Auto-generated method stub
-
+		
 	}
 
 	public void handleReceiveCommitments(

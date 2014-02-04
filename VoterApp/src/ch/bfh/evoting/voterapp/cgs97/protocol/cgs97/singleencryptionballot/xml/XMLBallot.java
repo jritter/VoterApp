@@ -1,6 +1,9 @@
-package ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml;
+package ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.singleencryptionballot.xml;
 
 import org.simpleframework.xml.Element;
+
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml.XMLGqPair;
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml.XMLValidityProof;
 
 public class XMLBallot {
 	@Element

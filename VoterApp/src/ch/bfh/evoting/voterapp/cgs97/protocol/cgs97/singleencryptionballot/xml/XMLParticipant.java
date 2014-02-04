@@ -1,9 +1,11 @@
-package ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml;
+package ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.singleencryptionballot.xml;
 
 import java.util.List;
 
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
+
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml.XMLGqElement;
 
 public class XMLParticipant {
 

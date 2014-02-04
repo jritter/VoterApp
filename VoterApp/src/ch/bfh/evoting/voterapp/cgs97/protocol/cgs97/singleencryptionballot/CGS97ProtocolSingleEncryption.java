@@ -35,14 +35,14 @@ import ch.bfh.evoting.voterapp.cgs97.entities.Poll;
 import ch.bfh.evoting.voterapp.cgs97.entities.VoteMessage;
 import ch.bfh.evoting.voterapp.cgs97.protocol.ProtocolInterface;
 import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.ProtocolPoll;
-import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml.XMLBallot;
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.singleencryptionballot.xml.XMLBallot;
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.singleencryptionballot.xml.XMLOption;
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.singleencryptionballot.xml.XMLPartDecryption;
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.singleencryptionballot.xml.XMLParticipant;
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.singleencryptionballot.xml.XMLSingleEncryptionPoll;
 import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml.XMLEqualityProof;
 import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml.XMLGqElement;
 import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml.XMLGqPair;
-import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml.XMLOption;
-import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml.XMLPartDecryption;
-import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml.XMLParticipant;
-import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml.XMLPoll;
 import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml.XMLValidityProof;
 import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml.XMLZqElement;
 import ch.bfh.evoting.voterapp.cgs97.util.BroadcastIntentTypes;
@@ -624,7 +624,7 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 			xmlParticipants.add(xmlParticipant);
 		}
 
-		XMLPoll xmlPoll = new XMLPoll(pp.getQuestion(), xmlOptions,
+		XMLSingleEncryptionPoll xmlPoll = new XMLSingleEncryptionPoll(pp.getQuestion(), xmlOptions,
 				xmlParticipants, gQ.getModulus().toString(10), gQ
 						.getZModOrder().getModulus().toString(10),
 				new XMLGqElement(elGamal.getGenerator().getBigInteger()

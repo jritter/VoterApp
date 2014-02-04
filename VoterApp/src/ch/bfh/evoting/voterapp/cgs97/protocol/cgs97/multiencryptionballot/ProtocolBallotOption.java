@@ -18,7 +18,6 @@ public class ProtocolBallotOption implements Serializable {
 		super();
 		this.ballotOptionEncryption = ballotOptionEncryption;
 		this.validityProof = validityProof;
-		
 	}
 	
 	public Pair getBallotOptionEncryption() {

@@ -1,12 +1,14 @@
-package ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml;
+package ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.singleencryptionballot.xml;
 
 import java.util.List;
 
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 
-public class XMLPoll {
+import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml.XMLGqElement;
 
+public class XMLSingleEncryptionPoll {
+		
         @Element
         private String question;
         @ElementList
@@ -24,9 +26,9 @@ public class XMLPoll {
         @Element
         private int threshold;
         
-        public XMLPoll(){}
+        public XMLSingleEncryptionPoll(){}
         
-        public XMLPoll(String question, List<XMLOption> options,
+        public XMLSingleEncryptionPoll(String question, List<XMLOption> options,
                         List<XMLParticipant> participants, String p, String q, XMLGqElement generator, XMLGqElement publicKey, int threshold) {
                 super();
                 this.question = question;
