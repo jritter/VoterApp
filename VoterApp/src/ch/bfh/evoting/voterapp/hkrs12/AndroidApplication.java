@@ -17,7 +17,6 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 import ch.bfh.evoting.voterapp.hkrs12.R;
@@ -41,7 +40,6 @@ public class AndroidApplication extends Application {
 
 	public static final String PREFS_NAME = "network_preferences";
 	public static final Level LEVEL = Level.DEBUG;
-	private static final String TAG = null;
 	public static final String FOLDER = "/MobiVote/";
 	public static final String EXTENSION = ".mobix";
 	
