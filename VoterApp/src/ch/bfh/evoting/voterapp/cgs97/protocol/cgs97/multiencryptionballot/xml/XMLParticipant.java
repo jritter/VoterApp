@@ -20,10 +20,10 @@ public class XMLParticipant {
 	@Element
 	private XMLGqElement keyShareCommitment;
 
-	@Element
+	@Element(required=false)
 	private XMLPartDecryption partDecryption;
 
-	@Element
+	@Element(required=false)
 	private XMLBallot ballot;
 
 	public XMLParticipant(String identification, String uniqueId,

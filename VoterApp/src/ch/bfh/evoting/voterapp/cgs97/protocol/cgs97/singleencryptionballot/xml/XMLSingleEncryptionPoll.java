@@ -4,9 +4,11 @@ import java.util.List;
 
 import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
 
 import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml.XMLGqElement;
 
+@Root(name="SingleEncryptionBallotVote")
 public class XMLSingleEncryptionPoll {
 		
         @Element

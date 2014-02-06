@@ -8,22 +8,22 @@ import ch.bfh.evoting.voterapp.cgs97.protocol.cgs97.xml.XMLGqElement;
 public class XMLPartDecryption {
 
 	@Element
-	private XMLGqElement partDecryption;
+	private XMLGqElement value;
 	@Element
 	private XMLEqualityProof proof;
 
-	public XMLPartDecryption(XMLGqElement partDecryption, XMLEqualityProof proof) {
+	public XMLPartDecryption(XMLGqElement value, XMLEqualityProof proof) {
 		super();
-		this.partDecryption = partDecryption;
+		this.value = value;
 		this.proof = proof;
 	}
 
-	public XMLGqElement getPartDecryption() {
-		return partDecryption;
+	public XMLGqElement getValue() {
+		return value;
 	}
 
-	public void setPartDecryption(XMLGqElement partDecryption) {
-		this.partDecryption = partDecryption;
+	public void setValue(XMLGqElement value) {
+		this.value = value;
 	}
 
 	public XMLEqualityProof getProof() {

@@ -211,27 +211,12 @@ public class CGS97ProtocolMultiEncryption extends ProtocolInterface {
 			AndroidApplication.getInstance().getNetworkInterface()
 					.sendMessage(vm);
 
-			// Do some protocol specific stuff
-
-			// start service listening to incoming votes and stop voting period
-			// events
-			// context.startService(new Intent(context, VoteService.class)
-			// .putExtra("poll", poll));
 
 			// Send a broadcast to start the review activity
 			Intent intent = new Intent(BroadcastIntentTypes.showNextActivity);
 			intent.putExtra("poll", (Serializable) poll);
 			LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-		} else {
-			// called when start message received from admin
-
-			// Do some protocol specific stuff
-
-			// start service listening to incoming votes and stop voting period
-			// events
-			// context.startService(new Intent(context, VoteService.class)
-			// .putExtra("poll", poll));
-		}
+		} 
 
 		if (isInElectorate) {
 			new AsyncTask<Object, Object, Object>() {
@@ -270,8 +255,7 @@ public class CGS97ProtocolMultiEncryption extends ProtocolInterface {
 											coefficientCommitments));
 
 					// Create a share for each participant and distribute it
-					// using
-					// unicast
+					// using unicast
 
 					ZModElement[] shares = new ZModElement[protocolPoll
 							.getParticipants().size()];
@@ -314,24 +298,6 @@ public class CGS97ProtocolMultiEncryption extends ProtocolInterface {
 
 						k++;
 					}
-
-					// final int NUMBER_OF_OPTIONS = protocolPoll.getOptions()
-					// .size();
-					//
-					// numberOfBitsPerOption = (int) Math.ceil(Math
-					// .log(protocolPoll.getNumberOfParticipants())
-					// / Math.log(2));
-					//
-					// possibleMessages = new
-					// GStarModElement[NUMBER_OF_OPTIONS];
-					// BigInteger shiftedBigInteger;
-					// for (int i = 0; i < NUMBER_OF_OPTIONS; i++) {
-					// shiftedBigInteger = BigInteger.valueOf(1).shiftLeft(
-					// i * numberOfBitsPerOption);
-					// possibleMessages[i] = gQ.getDefaultGenerator().power(
-					// shiftedBigInteger);
-					//
-					// }
 
 					possibleMessages = new GStarModElement[2];
 					possibleMessages[0] = ((GStarModElement) elGamal
@@ -554,8 +520,11 @@ public class CGS97ProtocolMultiEncryption extends ProtocolInterface {
 						
 			XMLPartDecryption xmlPartDecryption = new XMLPartDecryption(partDecryptions.get(p.getUniqueId()));
 			
-			XMLBallot xmlBallot = new XMLBallot(ballots.get(p.getUniqueId()));
-
+			XMLBallot xmlBallot = null;
+			if (ballots.get(p.getUniqueId()) != null){
+				 xmlBallot = new XMLBallot(ballots.get(p.getUniqueId()));
+			}
+			
 			XMLParticipant xmlParticipant = new XMLParticipant(
 					p.getIdentification(), p.getUniqueId(),
 					xmlCoefficientCommitments, xmlKeyShareCommitment,

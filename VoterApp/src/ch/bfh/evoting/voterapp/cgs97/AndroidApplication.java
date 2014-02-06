@@ -45,6 +45,8 @@ public class AndroidApplication extends Application {
 	public static final Level LEVEL = Level.DEBUG;
 	public static final String FOLDER = "/MobiVote/";
     public static final String EXTENSION = ".mobix";
+    
+    public static final int STEP_THRESHOLD = 10000;
 
 	private static AndroidApplication instance;
 	private SerializationUtil su;
@@ -471,33 +473,29 @@ public class AndroidApplication extends Application {
 			piSingle.deactivate();
 		}
 		
-		if (piMulti != null){
+		if (piMulti != null) {
 			piMulti.deactivate();
 		}
-		
-		if (combinations < 16) {
-			
-			while (true){
-				if (piSingle != null){
-					setProtocolInterface(piSingle);
-					break;
-				}
+
+		if (combinations < STEP_THRESHOLD) {
+
+			if (piSingle == null) {
+				piSingle = new CGS97ProtocolSingleEncryption(
+						getApplicationContext());
 			}
-			
-			
-			
+			setProtocolInterface(piSingle);
 			Log.d(this.getClass().getSimpleName(),
 					"Using single encryption ballot strategy");
+
 		} else {
-			while (true){
-				if (piMulti != null){
-					setProtocolInterface(piMulti);
-					break;
-				}
+			if (piMulti == null) {
+				piMulti = new CGS97ProtocolMultiEncryption(
+						getApplicationContext());
 			}
+			setProtocolInterface(piMulti);
 			Log.d(this.getClass().getSimpleName(),
 					"Using multi encryption ballot strategy");
 		}
-		
+
 	}
 }

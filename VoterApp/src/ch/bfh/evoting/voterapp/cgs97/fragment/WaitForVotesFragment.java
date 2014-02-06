@@ -41,6 +41,7 @@ public class WaitForVotesFragment extends ListFragment {
 
 	private BroadcastReceiver updateVoteReceiver;
 	private BroadcastReceiver showNextActivityListener;
+	private BroadcastReceiver stopReceiver;
 	
 	private ProgressDialog progressDialog = null;
 
@@ -115,6 +116,21 @@ public class WaitForVotesFragment extends ListFragment {
 			}
 		};
 		LocalBroadcastManager.getInstance(this.getActivity()).registerReceiver(showNextActivityListener, new IntentFilter(BroadcastIntentTypes.showResultActivity));
+		
+		// Register a BroadcastReceiver on stop poll order events
+		stopReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context arg0, Intent intent) {
+				if (progressDialog == null){
+					progressDialog = new ProgressDialog(getActivity());
+					progressDialog.setMessage(getString(R.string.dialog_tallying_vote));
+					progressDialog.show();
+				}
+			}
+		};
+
+		LocalBroadcastManager.getInstance(getActivity()).registerReceiver(
+				stopReceiver, new IntentFilter(BroadcastIntentTypes.stopVote));
 
 		return v;
 	}

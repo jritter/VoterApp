@@ -15,6 +15,7 @@ import android.os.SystemClock;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -54,7 +55,9 @@ public class VoteActivity extends Activity {
 	private BroadcastReceiver showNextActivityListener;
 	private BroadcastReceiver showNextActivityListener2;
 	private BroadcastReceiver cancelVotingPeriodListener;
-
+	private BroadcastReceiver stopReceiver;
+	
+	private ProgressDialog progressDialog = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -199,7 +202,7 @@ public class VoteActivity extends Activity {
 			nfcAdapter.disableForegroundDispatch(this);
 		}
 		LocalBroadcastManager.getInstance(VoteActivity.this).unregisterReceiver(cancelVotingPeriodListener);
-
+		LocalBroadcastManager.getInstance(VoteActivity.this).unregisterReceiver(stopReceiver);
 	}
 
 	@Override
@@ -256,6 +259,23 @@ public class VoteActivity extends Activity {
 			}
 		};
 		LocalBroadcastManager.getInstance(this).registerReceiver(cancelVotingPeriodListener, new IntentFilter(BroadcastIntentTypes.cancelVote));
+		
+		
+		// Register a BroadcastReceiver on stop poll order events
+		stopReceiver = new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context arg0, Intent intent) {
+				if (progressDialog == null){
+					progressDialog = new ProgressDialog(VoteActivity.this);
+					progressDialog.setMessage(getString(R.string.dialog_tallying_vote));
+					progressDialog.show();
+				}
+			}
+		};
+		
+		LocalBroadcastManager.getInstance(this).registerReceiver(
+				stopReceiver, new IntentFilter(BroadcastIntentTypes.stopVote));
+
 
 	}
 
