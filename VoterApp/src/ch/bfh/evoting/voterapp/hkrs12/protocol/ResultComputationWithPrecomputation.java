@@ -1,4 +1,5 @@
 package ch.bfh.evoting.voterapp.hkrs12.protocol;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import android.util.Log;
+
 
 import ch.bfh.unicrypt.math.algebra.dualistic.classes.ZMod;
 import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
@@ -53,9 +55,9 @@ public class ResultComputationWithPrecomputation {
 					ResultComputationWithPrecomputation.this.notifyAll();
 				}
 				if(interrupt){
-					Log.d(TAG,"Computation interrupted after "+numberOfCombination+" combinations and "+(time1-time0)+" ms");
+					Log.d(TAG,"Computation with precomputation interrupted after "+numberOfCombination+" combinations and "+(time1-time0)+" ms");
 				} else {
-					Log.d(TAG,"Computation terminated in "+(time1-time0)+" ms for "+numberOfCombination+" combinations");
+					Log.d(TAG,"Computation with precomputation terminated in "+(time1-time0)+" ms for "+numberOfCombination+" combinations");
 				}
 			}
 		};
@@ -74,7 +76,7 @@ public class ResultComputationWithPrecomputation {
 	    return pool.submit(new Callable<int[]>() {
 	        @Override
 	        public int[] call() throws Exception {
-				Log.d(TAG,"Setting searched discrete logarithm");
+	        	Log.d(TAG,"Setting searched discrete logarithm");
 	        	ResultComputationWithPrecomputation.this.searchedResult = searchedResult;
 	        	while(true){
 	        		int[] result = resultMap.get(searchedResult);
@@ -96,27 +98,45 @@ public class ResultComputationWithPrecomputation {
 	    });
 	}
 	
+	/**
+	 * Make the precomputations to speed up the tally
+	 * @param generator generator of the protocol
+	 * @param numberOfVotes number of votes submitted
+	 * @param numberOfOptions number of options in the poll
+	 */
 	private void doPrecomputations(Element generator, int numberOfVotes, int numberOfOptions){
+		//table containing the precomputations
 		precomputations = new Element[numberOfOptions][numberOfVotes+1];
-		int m = (int)Math.ceil(Math.log(numberOfVotes+1)/Math.log(2));
+		
+		//k is the refenrence to the column that must be squared in ordre to obtain the first value of next line
+		int k = 0;
+		for(int i=(int)Math.ceil(Math.log(numberOfVotes)/Math.log(2));i>=0;i--){
+			k = (int)Math.pow(2, i);
+			if(k<=numberOfVotes){
+				break;
+			}
+		}
+		
 		for(int i=0; i<numberOfOptions; i++){
 			for(int j=0; j<=numberOfVotes; j++){
+				//first line in the table => first option
 				if(i==0){
 					precomputations[i][j] = generator.selfApply(j);
 				} else {
+					//column 0 is always 1
 					if(j==0){
 						precomputations[i][j] = generator.selfApply(j);
+					} else if(j==1) {
+						//first column of the new line
+						precomputations[i][j] = precomputations[i-1][k].selfApply(BigInteger.valueOf(2));
 					} else {
-						Element tempResult = precomputations[i-1][j];
-						for(int k=0; k<m; k++){
-							tempResult = tempResult.selfApply(BigInteger.valueOf(2));
-						}
-						precomputations[i][j] = tempResult;
+						//other columns
+						precomputations[i][j] = precomputations[i][j-1].apply(precomputations[i][1]);
 					}
 				}
 			}
 		}
-		Log.d(TAG, "Precomputations done. Starting permutations");
+		Log.d(TAG,"Precomputations done. Starting permutations");
 
 	}
 
