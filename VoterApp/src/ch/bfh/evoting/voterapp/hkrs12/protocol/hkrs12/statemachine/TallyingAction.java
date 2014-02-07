@@ -21,7 +21,7 @@ import ch.bfh.evoting.voterapp.hkrs12.DisplayResultActivity;
 import ch.bfh.evoting.voterapp.hkrs12.entities.Option;
 import ch.bfh.evoting.voterapp.hkrs12.entities.Participant;
 import ch.bfh.evoting.voterapp.hkrs12.protocol.HKRS12ProtocolInterface;
-import ch.bfh.evoting.voterapp.hkrs12.protocol.ResultComputation;
+import ch.bfh.evoting.voterapp.hkrs12.protocol.ResultComputationWithPrecomputation;
 import ch.bfh.evoting.voterapp.hkrs12.protocol.hkrs12.ProtocolMessageContainer;
 import ch.bfh.evoting.voterapp.hkrs12.protocol.hkrs12.ProtocolOption;
 import ch.bfh.evoting.voterapp.hkrs12.protocol.hkrs12.ProtocolParticipant;
@@ -45,7 +45,7 @@ import com.continuent.tungsten.fsm.core.TransitionRollbackException;
  */
 public class TallyingAction extends AbstractAction {
 
-	private ResultComputation rc;
+	private ResultComputationWithPrecomputation rc;
 
 	public TallyingAction(Context context, String messageTypeToListenTo,
 			final ProtocolPoll poll) {
@@ -183,7 +183,7 @@ public class TallyingAction extends AbstractAction {
 	 */
 	private void createPrecomputationTask(){
 		if(rc!=null) rc.interrupt();
-		rc = new ResultComputation();
+		rc = new ResultComputationWithPrecomputation();
 		Element[] possiblePlainTexts = new Element[poll.getOptions().size()];
 		int i=0;
 		for(Option op:poll.getOptions()){

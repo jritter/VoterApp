@@ -10,6 +10,7 @@ import ch.bfh.evoting.voterapp.hkrs12.protocol.hkrs12.ProtocolOption;
 import ch.bfh.evoting.voterapp.hkrs12.protocol.hkrs12.ProtocolParticipant;
 import ch.bfh.evoting.voterapp.hkrs12.protocol.hkrs12.ProtocolPoll;
 import ch.bfh.evoting.voterapp.hkrs12.protocol.hkrs12.statemachine.StateMachineManager.Round;
+import ch.bfh.evoting.voterapp.hkrs12.util.BroadcastIntentTypes;
 import ch.bfh.unicrypt.crypto.proofgenerator.challengegenerator.classes.StandardNonInteractiveSigmaChallengeGenerator;
 import ch.bfh.unicrypt.crypto.proofgenerator.challengegenerator.interfaces.SigmaChallengeGenerator;
 import ch.bfh.unicrypt.crypto.proofgenerator.classes.ElGamalEncryptionValidityProofGenerator;
@@ -24,6 +25,7 @@ import ch.bfh.unicrypt.math.function.classes.ProductFunction;
 import ch.bfh.unicrypt.math.function.interfaces.Function;
 import android.app.IntentService;
 import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 /**
@@ -157,6 +159,11 @@ public class ProcessingService extends IntentService {
 		}
 
 		Log.d(TAG, "Processing done");
+		if(exclude){
+			LocalBroadcastManager.getInstance(AndroidApplication.getInstance())
+				.sendBroadcast(new Intent(BroadcastIntentTypes.proofVerificationFailed)
+					.putExtra("participant", senderParticipant.getIdentification()));
+		}
 
 		//notify the action that it message has been processed and pass the result to it
 		action.savedProcessedMessage(round, sender, message, exclude);

@@ -227,7 +227,7 @@ public abstract class AbstractAction implements Action {
 		this.numberOfProcessedMessages++;
 		if(!messagesReceived.containsKey(sender)){
 			messagesReceived.put(sender, message);
-			Log.d(TAG, "Message received from "+poll.getParticipants().get(sender).getIdentification()+" ("+sender+") baack from processing.");
+			Log.d(TAG, "Message received from "+poll.getParticipants().get(sender).getIdentification()+" ("+sender+") back from processing.");
 		}
 	}
 

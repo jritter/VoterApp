@@ -1,5 +1,7 @@
 package ch.bfh.evoting.voterapp.hkrs12.util;
 
+import android.content.Intent;
+
 /**
  * Class listing local broadcast intent types that are sent in the application
  * @author Philémon von Bergen
@@ -205,4 +207,11 @@ public class BroadcastIntentTypes {
 	 */
 	public static final String resultNotFound = "resultNotFound";
 	
+	/**
+	 * Intent type sent when the verification of a proof failed
+	 * Extras:
+	 * - participant: well-known name of the participant
+	 */
+	public static String proofVerificationFailed = "proofVerificationFailed";
+
 }

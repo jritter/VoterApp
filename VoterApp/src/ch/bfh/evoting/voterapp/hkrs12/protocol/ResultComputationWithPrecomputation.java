@@ -18,9 +18,9 @@ import ch.bfh.unicrypt.math.algebra.general.interfaces.Element;
  * @author Philémon von Bergen
  *
  */
-public class ResultComputation {
+public class ResultComputationWithPrecomputation {
 
-	private static final String TAG = ResultComputation.class.getSimpleName();
+	private static final String TAG = ResultComputationWithPrecomputation.class.getSimpleName();
 	private Thread t;
 	private boolean computationTerminated;
 	private Map<Element, int[]> resultMap = new ConcurrentHashMap<Element, int[]>();
@@ -28,6 +28,7 @@ public class ResultComputation {
 	private boolean interrupt;
 	private Element searchedResult = null;
 	private int numberOfCombination = 0;
+	private Element[][] precomputations;
 
 	/**
 	 * Start the computation of the discrete logarithm
@@ -42,13 +43,14 @@ public class ResultComputation {
 		t = new Thread(){
 
 			public void run() {
+				doPrecomputations(generator, maxVotes, nbrOptions);
 				Log.d(TAG,"Starting computing possible results");
 				long time0 = System.currentTimeMillis();
-				computePossibleResults(maxVotes,nbrOptions, possiblePlainTexts, generator, Z_q);
+				computePossibleResults(maxVotes,nbrOptions);
 				long time1 = System.currentTimeMillis();
 				computationTerminated = true;
-				synchronized (ResultComputation.this) {
-					ResultComputation.this.notifyAll();
+				synchronized (ResultComputationWithPrecomputation.this) {
+					ResultComputationWithPrecomputation.this.notifyAll();
 				}
 				if(interrupt){
 					Log.d(TAG,"Computation interrupted after "+numberOfCombination+" combinations and "+(time1-time0)+" ms");
@@ -73,7 +75,7 @@ public class ResultComputation {
 	        @Override
 	        public int[] call() throws Exception {
 				Log.d(TAG,"Setting searched discrete logarithm");
-	        	ResultComputation.this.searchedResult = searchedResult;
+	        	ResultComputationWithPrecomputation.this.searchedResult = searchedResult;
 	        	while(true){
 	        		int[] result = resultMap.get(searchedResult);
 	        		if(result!=null){
@@ -83,9 +85,9 @@ public class ResultComputation {
 	    	        	pool.shutdown();
 	        			return null;
 	        		} else {
-	        			synchronized (ResultComputation.this) {
+	        			synchronized (ResultComputationWithPrecomputation.this) {
 	        				Log.d(TAG,"Waiting as searched discrete logarithm not already comuted");
-	        				ResultComputation.this.wait();
+	        				ResultComputationWithPrecomputation.this.wait();
 	        				Log.d(TAG,"Notified that searched discrete logarithm was just comuted");
 						}
 	        		}
@@ -94,6 +96,30 @@ public class ResultComputation {
 	    });
 	}
 	
+	private void doPrecomputations(Element generator, int numberOfVotes, int numberOfOptions){
+		precomputations = new Element[numberOfOptions][numberOfVotes+1];
+		int m = (int)Math.ceil(Math.log(numberOfVotes+1)/Math.log(2));
+		for(int i=0; i<numberOfOptions; i++){
+			for(int j=0; j<=numberOfVotes; j++){
+				if(i==0){
+					precomputations[i][j] = generator.selfApply(j);
+				} else {
+					if(j==0){
+						precomputations[i][j] = generator.selfApply(j);
+					} else {
+						Element tempResult = precomputations[i-1][j];
+						for(int k=0; k<m; k++){
+							tempResult = tempResult.selfApply(BigInteger.valueOf(2));
+						}
+						precomputations[i][j] = tempResult;
+					}
+				}
+			}
+		}
+		Log.d(TAG, "Precomputations done. Starting permutations");
+
+	}
+
 	/**
 	 * Compute all combination of divide up MAX votes between Array.length candidate 
 	 * Optimized for most of the votes in first columns
@@ -103,7 +129,7 @@ public class ResultComputation {
 	 * @param idx Index of the column (start with 0)
 	 * @param result Obtained result of votes to find
 	 */	
-	private boolean computePossibleResults(int numberOfVotes, int numberOfOptions, Element[] possiblePlainTexts, Element generator, ZMod Z_q) {
+	private boolean computePossibleResults(int numberOfVotes, int numberOfOptions) {
 
 		//initialize array containing possible combination and the array receiving the result
 		int[] voteForCandidates = new int[numberOfOptions];
@@ -111,7 +137,7 @@ public class ResultComputation {
 			voteForCandidates[i]=0;
 		}
 
-		computePossibleResultsRecursion(voteForCandidates,numberOfVotes,numberOfVotes,0, possiblePlainTexts, generator, Z_q);
+		computePossibleResultsRecursion(voteForCandidates,numberOfVotes,numberOfVotes,0);
 		return true;
 	}
 
@@ -124,7 +150,7 @@ public class ResultComputation {
 	 * @param idx Index of the column (start with 0)
 	 * @param result Obtained result of votes to find
 	 */	
-	private void computePossibleResultsRecursion(int[] array, int resting, int max, int idx,  Element[] possiblePlainTexts, Element generator, ZMod Z_q) {
+	private void computePossibleResultsRecursion(int[] array, int resting, int max, int idx) {
 		if(interrupt) return;
 		
 		//stop condition for the recursion
@@ -133,19 +159,19 @@ public class ResultComputation {
 			//if the number of votes attributed < max => not interesting for us
 			if(arraySum(array)<max)return;
 			//compare combination and result of tally
-			Element tempResult = Z_q.getElement(BigInteger.ZERO);
-			for(int j=0;j<array.length;j++){
-				tempResult = tempResult.apply(possiblePlainTexts[j].selfApply(Z_q.getElement(BigInteger.valueOf(array[j]))));
+
+			Element tempResult = precomputations[0][array[0]];
+			for(int l=1; l<array.length; l++){
+				tempResult = tempResult.apply(precomputations[l][array[l]]);
 			}
-			resultMap.put(generator.selfApply(tempResult), array.clone());
-		
+			resultMap.put(tempResult, array.clone());
 			numberOfCombination++;
 			
 			//if searched result is set, look if it is already found
 			if(searchedResult!=null){
 				if(resultMap.containsKey(searchedResult)){
-					synchronized (ResultComputation.this) {
-						ResultComputation.this.notifyAll();
+					synchronized (ResultComputationWithPrecomputation.this) {
+						ResultComputationWithPrecomputation.this.notifyAll();
 					}
 					interrupt = true;
 				} else {
@@ -159,7 +185,7 @@ public class ResultComputation {
 		for (int i = resting; i >= 0; i--) {
 			if(interrupt) break;
 			array[idx] = i;
-			computePossibleResultsRecursion(array, resting-i, max, idx+1, possiblePlainTexts, generator, Z_q);
+			computePossibleResultsRecursion(array, resting-i, max, idx+1);
 		}
 		return;
 	}

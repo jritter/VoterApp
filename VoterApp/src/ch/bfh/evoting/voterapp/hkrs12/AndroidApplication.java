@@ -105,6 +105,7 @@ public class AndroidApplication extends Application {
 		LocalBroadcastManager.getInstance(this).registerReceiver(differentProtocolsReceiver, new IntentFilter(BroadcastIntentTypes.differentProtocols));
 		LocalBroadcastManager.getInstance(this).registerReceiver(differentPollsReceiver, new IntentFilter(BroadcastIntentTypes.differentPolls));
 		LocalBroadcastManager.getInstance(this).registerReceiver(resultComputationFailedReceiver, new IntentFilter(BroadcastIntentTypes.resultNotFound));
+		LocalBroadcastManager.getInstance(this).registerReceiver(proofVerificationFailedReceiver, new IntentFilter(BroadcastIntentTypes.proofVerificationFailed));
 
 	}
 
@@ -524,7 +525,43 @@ public class AndroidApplication extends Application {
 			dialogResultComputed.show();
 		}
 	};
+	
+	/**
+	 * this broadcast receiver listens for messages indicating that a proof verification failed
+	 */
+	private BroadcastReceiver proofVerificationFailedReceiver = new BroadcastReceiver() {
+		private AlertDialog dialogProof;
 
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(AndroidApplication.getInstance().getCurrentActivity());
+			// Add the buttons
+			builder.setNeutralButton(R.string.ok, new DialogInterface.OnClickListener() {
+
+				public void onClick(DialogInterface dialog, int id) {
+					dialogProof.dismiss();
+				}
+			});
+
+			builder.setTitle(R.string.dialog_title_proof_verification_failed);
+			builder.setMessage(getString(R.string.dialog_proof_verification_failed, intent.getStringExtra("participant")));
+
+			dialogProof = builder.create();
+			dialogProof.setOnShowListener(new DialogInterface.OnShowListener() {
+				@Override
+				public void onShow(DialogInterface dialog) {
+					Utility.setTextColor(dialog, AndroidApplication.getInstance().getResources().getColor(R.color.theme_color));
+					dialogProof.getButton(AlertDialog.BUTTON_NEUTRAL).setBackgroundResource(
+							R.drawable.selectable_background_votebartheme);
+				}
+			});
+
+			// Create the AlertDialog
+			dialogProof.show();
+		}
+	};
+	
 	/**
 	 * this broadcast receiver listens for commands to show a wait dialog on the current activity
 	 */
