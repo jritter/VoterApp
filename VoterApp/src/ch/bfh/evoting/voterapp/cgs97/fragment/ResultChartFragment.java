@@ -1,6 +1,4 @@
-/**
- * 
- */
+
 package ch.bfh.evoting.voterapp.cgs97.fragment;
 
 import org.achartengine.GraphicalView;
@@ -16,6 +14,13 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+/**
+ * 
+ * Fragment which displays the pie chart
+ * 
+ * @author Jürg Ritter
+ *
+ */
 public class ResultChartFragment extends Fragment {
 	
 	String [] labels;

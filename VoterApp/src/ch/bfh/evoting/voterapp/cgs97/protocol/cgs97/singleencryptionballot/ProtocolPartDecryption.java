@@ -5,6 +5,12 @@ import java.io.Serializable;
 import ch.bfh.unicrypt.math.algebra.general.classes.Triple;
 import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarModElement;
 
+/**
+ * 
+ * This class represents a part decryption used with the single encryption ballot encoding
+ * 
+ * @author Juerg Ritter
+ */
 public class ProtocolPartDecryption implements Serializable {
 	
 

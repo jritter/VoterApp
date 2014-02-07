@@ -21,6 +21,13 @@ import ch.bfh.evoting.voterapp.cgs97.fragment.HelpDialogFragment;
 import ch.bfh.evoting.voterapp.cgs97.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.cgs97.util.Utility;
 
+/**
+ * 
+ * Activity which displays the Network Information fragment in an activity instead of a dialog.
+ * 
+ * @author Jürg Ritter
+ *
+ */
 public class NetworkInformationActivity extends Activity implements OnClickListener {
 	
 	private NfcAdapter nfcAdapter;

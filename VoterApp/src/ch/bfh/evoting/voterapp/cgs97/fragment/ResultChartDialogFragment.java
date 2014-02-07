@@ -10,6 +10,13 @@ import android.content.DialogInterface.OnShowListener;
 import android.os.Bundle;
 import android.view.View;
 
+/**
+ * 
+ * Fragment which displays a dialog containing the pie chart
+ * 
+ * @author Jürg Ritter
+ *
+ */
 public class ResultChartDialogFragment extends DialogFragment {
 	
 	private static ResultChartDialogFragment instance = null;

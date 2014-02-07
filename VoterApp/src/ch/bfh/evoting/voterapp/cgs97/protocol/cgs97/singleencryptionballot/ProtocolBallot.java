@@ -4,6 +4,12 @@ import java.io.Serializable;
 
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 
+/**
+ * 
+ * This class represents a ballot with one overall encryption (single encryption ballot encoding)
+ * 
+ * @author Juerg Ritter
+ */
 public class ProtocolBallot implements Serializable {
 	
 

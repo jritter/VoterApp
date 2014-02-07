@@ -5,6 +5,13 @@ import java.io.Serializable;
 import ch.bfh.unicrypt.math.algebra.general.classes.Pair;
 import ch.bfh.unicrypt.math.algebra.general.classes.Tuple;
 
+/**
+ * 
+ * This class represents an option of a ProtocolBallot and contains an encryption and a validity proof.
+ * 
+ * @author Juerg Ritter
+ *
+ */
 public class ProtocolBallotOption implements Serializable {
 	
 	/**

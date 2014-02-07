@@ -10,6 +10,12 @@ import android.content.DialogInterface.OnShowListener;
 import android.os.Bundle;
 import android.view.View;
 
+/**
+ * 
+ * Dialog fragment displaying the network information fragment
+ * 
+ * @author Jürg Ritter
+ */
 public class NetworkDialogFragment extends DialogFragment {
 	
 	private AlertDialog dialog;

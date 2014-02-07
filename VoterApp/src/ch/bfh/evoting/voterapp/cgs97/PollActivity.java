@@ -36,6 +36,7 @@ import ch.bfh.evoting.voterapp.cgs97.util.Utility;
 /**
  * Class displaying all the available polls
  * 
+ * 
  */
 public class PollActivity extends Activity implements OnClickListener,
 		OnItemClickListener {

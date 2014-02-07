@@ -6,6 +6,12 @@ import java.util.List;
 import ch.bfh.unicrypt.math.algebra.general.classes.Triple;
 import ch.bfh.unicrypt.math.algebra.multiplicative.classes.GStarModElement;
 
+/**
+ * 
+ * This class represents a part decryption used with the multi encryption ballot encoding
+ * 
+ * @author Juerg Ritter
+ */
 public class ProtocolPartDecryption implements Serializable {
 	
 

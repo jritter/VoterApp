@@ -75,6 +75,14 @@ import ch.bfh.unicrypt.math.function.classes.ProductFunction;
 import ch.bfh.unicrypt.math.function.interfaces.Function;
 import ch.bfh.unicrypt.math.helper.Alphabet;
 
+/**
+ * 
+ * This class implements the CGS97 protocol, using a single encryption per ballot.
+ * This implementation of the protocol is used for small voting scenarios.
+ * 
+ * @author Juerg Ritter
+ *
+ */
 public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 
 	private Context context;
@@ -152,7 +160,6 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 
 	@Override
 	public void showReview(Poll poll) {
-		// Add protocol specific stuff to the poll
 
 		ProtocolPoll protocolPoll;
 		if (poll instanceof ProtocolPoll) {
@@ -177,6 +184,8 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 
 	@Override
 	public void beginVotingPeriod(Poll poll) {
+		
+		// Reset all the values for so that we can start from scratch
 
 		this.protocolPoll = (ProtocolPoll) poll;
 
@@ -207,7 +216,7 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 				.getParticipants().values());
 
 		if (AndroidApplication.getInstance().isAdmin()) {
-			// called when admin want to begin voting period
+			// called when admin starts voting period
 
 			// Send start poll signal over the network
 			VoteMessage vm = new VoteMessage(
@@ -215,28 +224,14 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 			AndroidApplication.getInstance().getNetworkInterface()
 					.sendMessage(vm);
 
-			// Do some protocol specific stuff
-
-			// start service listening to incoming votes and stop voting period
-			// events
-			// context.startService(new Intent(context, VoteService.class)
-			// .putExtra("poll", poll));
 
 			// Send a broadcast to start the review activity
 			Intent intent = new Intent(BroadcastIntentTypes.showNextActivity);
 			intent.putExtra("poll", (Serializable) poll);
 			LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-		} else {
-			// called when start message received from admin
-
-			// Do some protocol specific stuff
-
-			// start service listening to incoming votes and stop voting period
-			// events
-			// context.startService(new Intent(context, VoteService.class)
-			// .putExtra("poll", poll));
 		}
 
+		// only start the voting protocol if the administrator itsefl is in the electorate
 		if (isInElectorate) {
 			new AsyncTask<Object, Object, Object>() {
 
@@ -274,8 +269,7 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 											coefficientCommitments));
 
 					// Create a share for each participant and distribute it
-					// using
-					// unicast
+					// using unicast
 
 					ZModElement[] shares = new ZModElement[protocolPoll
 							.getParticipants().size()];
@@ -319,6 +313,7 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 						k++;
 					}
 
+					// calculating the bit length for each option in the message value
 					final int NUMBER_OF_OPTIONS = protocolPoll.getOptions()
 							.size();
 
@@ -326,6 +321,7 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 							.log(protocolPoll.getNumberOfParticipants())
 							/ Math.log(2));
 
+					// generating all possible messages for the vote
 					possibleMessages = new GStarModElement[NUMBER_OF_OPTIONS];
 					BigInteger shiftedBigInteger;
 					for (int i = 0; i < NUMBER_OF_OPTIONS; i++) {
@@ -358,7 +354,6 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 
 	@Override
 	public void vote(final Option selectedOption, final Poll poll) {
-		// do some protocol specific stuff
 		Log.d(this.getClass().getSimpleName(), "vote method started");
 
 		new AsyncTask<Object, Object, Object>() {
@@ -375,6 +370,7 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 			@Override
 			protected Object doInBackground(Object... arg0) {
 
+				// waiting for public key to be assembled
 				while (publicKeyComplete == false) {
 					try {
 						Log.d(CGS97ProtocolSingleEncryption.this.getClass()
@@ -394,11 +390,13 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 
 				int index = poll.getOptions().indexOf(selectedOption);
 
+				// encrypt the message according to the choice from the user
 				ZModElement randomization = zQ.getRandomElement();
 
 				Tuple ballotEncryption = elGamal.encrypt(publicKey,
 						possibleMessages[index], randomization);
 
+				// create the validity proof
 				Element proofElement = StringMonoid.getInstance(
 						Alphabet.PRINTABLE_ASCII).getElement(
 						protocolPoll.toString());
@@ -422,7 +420,7 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 				ProtocolBallot ballot = new ProtocolBallot(ballotEncryption,
 						proof);
 
-				// send the vote over the network
+				// send the ballot over the network
 				Log.d(CGS97ProtocolSingleEncryption.this.getClass()
 						.getSimpleName(), "send ballot...");
 				AndroidApplication
@@ -476,8 +474,6 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 
 		poll.setTerminated(true);
 
-		// progressDialog.dismiss();
-
 		// Send a broadcast to start the result activity
 		Intent intent = new Intent(BroadcastIntentTypes.showResultActivity);
 		intent.putExtra("poll", (Serializable) poll);
@@ -486,7 +482,6 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 
 	@Override
 	protected void handleReceivedPoll(Poll poll, String sender) {
-		// do some protocol specific stuff
 
 		// Send a broadcast to start the review activity
 		Intent intent = new Intent(BroadcastIntentTypes.showNextActivity);
@@ -497,161 +492,192 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 
 	@Override
 	public void exportToXML(File file, Poll poll) {
-		ProtocolPoll pp = (ProtocolPoll) poll;
 
-		List<XMLOption> xmlOptions = new ArrayList<XMLOption>();
-		for (Option op : pp.getOptions()) {
-			XMLGqElement representation = new XMLGqElement(possibleMessages[pp
-					.getOptions().indexOf(op)].getValue().toString(10));
-			XMLOption xop = new XMLOption(op.getText(), op.getVotes(),
-					representation);
-			xmlOptions.add(xop);
-		}
+		if (isInElectorate) {
+			// map all the elements to POJO objects and serialize them into a
+			// file
+			ProtocolPoll pp = (ProtocolPoll) poll;
 
-		List<XMLParticipant> xmlParticipants = new ArrayList<XMLParticipant>();
-		for (Participant p : pp.getParticipants().values()) {
+			List<XMLOption> xmlOptions = new ArrayList<XMLOption>();
+			for (Option op : pp.getOptions()) {
+				XMLGqElement representation = new XMLGqElement(
+						possibleMessages[pp.getOptions().indexOf(op)]
+								.getValue().toString(10));
+				XMLOption xop = new XMLOption(op.getText(), op.getVotes(),
+						representation);
+				xmlOptions.add(xop);
+			}
 
-			List<XMLGqElement> xmlCoefficientCommitments = new ArrayList<XMLGqElement>();
-			for (int i = 0; i < participantCoefficientCommitments.get(p
-					.getUniqueId()).length; i++) {
-				xmlCoefficientCommitments
-						.add(new XMLGqElement(participantCoefficientCommitments
-								.get(p.getUniqueId())[i].getValue()
+			List<XMLParticipant> xmlParticipants = new ArrayList<XMLParticipant>();
+			for (Participant p : pp.getParticipants().values()) {
+
+				List<XMLGqElement> xmlCoefficientCommitments = new ArrayList<XMLGqElement>();
+				for (int i = 0; i < participantCoefficientCommitments.get(p
+						.getUniqueId()).length; i++) {
+					xmlCoefficientCommitments
+							.add(new XMLGqElement(
+									participantCoefficientCommitments.get(p
+											.getUniqueId())[i].getValue()
+											.toString(10)));
+				}
+
+				XMLGqElement xmlKeyShareCommitment = new XMLGqElement(
+						receivedShareCommitments.get(p.getUniqueId())
+								.getValue().toString(10));
+
+				XMLPartDecryption xmlPartDecryption = null;
+				if (partDecryptions.get(p.getUniqueId()) != null) {
+					XMLGqElement partDecryptionValue = new XMLGqElement(
+							partDecryptions.get(p.getUniqueId())
+									.getPartDecryption().getValue()
+									.toString(10));
+
+					Tuple equalityProof = partDecryptions.get(p.getUniqueId())
+							.getProof();
+					XMLGqElement valueT1 = new XMLGqElement(
+							((Tuple) equalityProof.getAt(0)).getAt(0)
+									.getBigInteger().toString(10));
+					XMLGqElement valueT2 = new XMLGqElement(
+							((Tuple) equalityProof.getAt(0)).getAt(1)
+									.getBigInteger().toString(10));
+					XMLZqElement valueC = new XMLZqElement(equalityProof
+							.getAt(1).getBigInteger().toString(10));
+					XMLZqElement valueS = new XMLZqElement(equalityProof
+							.getAt(2).getBigInteger().toString(10));
+					XMLEqualityProof xmlEqualityProof = new XMLEqualityProof(
+							valueT1, valueT2, valueC, valueS);
+
+					xmlPartDecryption = new XMLPartDecryption(
+							partDecryptionValue, xmlEqualityProof);
+
+				} else {
+					// Handling the case where not all part decryptions were
+					// used...
+					XMLGqElement partDecryptionValue = new XMLGqElement("N/A");
+					XMLGqElement valueT1 = new XMLGqElement("N/A");
+					XMLGqElement valueT2 = new XMLGqElement("N/A");
+					XMLZqElement valueC = new XMLZqElement("N/A");
+					XMLZqElement valueS = new XMLZqElement("N/A");
+					XMLEqualityProof xmlEqualityProof = new XMLEqualityProof(
+							valueT1, valueT2, valueC, valueS);
+
+					xmlPartDecryption = new XMLPartDecryption(
+							partDecryptionValue, xmlEqualityProof);
+				}
+
+				XMLBallot xmlBallot;
+
+				if (ballots.get(p.getUniqueId()) != null) {
+					XMLGqElement xmlLeft = new XMLGqElement(ballots
+							.get(p.getUniqueId()).getBallot().getAt(0)
+							.getBigInteger().toString(10));
+					XMLGqElement xmlRight = new XMLGqElement(ballots
+							.get(p.getUniqueId()).getBallot().getAt(1)
+							.getBigInteger().toString(10));
+
+					XMLGqPair xmlBallotEncryption = new XMLGqPair(xmlLeft,
+							xmlRight);
+
+					Tuple validityProof = ballots.get(p.getUniqueId())
+							.getValidityProof();
+					Tuple subPartT = (Tuple) validityProof.getAt(0); // list of
+																		// Gq
+					// pairs
+					Tuple subPartC = (Tuple) validityProof.getAt(1); // list
+					// ZModElements
+					Tuple subPartS = (Tuple) validityProof.getAt(2); // list
+					// ZModElements
+					List<XMLGqPair> valueListT = new ArrayList<XMLGqPair>();
+					for (Element e : subPartT.getAll()) {
+						Tuple tuple = (Tuple) e;
+						XMLGqPair pair = new XMLGqPair(new XMLGqElement(tuple
+								.getAt(0).getBigInteger().toString(10)),
+								new XMLGqElement(tuple.getAt(1).getBigInteger()
+										.toString(10)));
+						valueListT.add(pair);
+					}
+					List<XMLZqElement> valueListC = new ArrayList<XMLZqElement>();
+					for (Element e : subPartC.getAll()) {
+						valueListC.add(new XMLZqElement(e.getBigInteger()
 								.toString(10)));
-			}
+					}
+					List<XMLZqElement> valueListS = new ArrayList<XMLZqElement>();
+					for (Element e : subPartS.getAll()) {
+						valueListS.add(new XMLZqElement(e.getBigInteger()
+								.toString(10)));
+					}
 
-			XMLGqElement xmlKeyShareCommitment = new XMLGqElement(
-					receivedShareCommitments.get(p.getUniqueId()).getValue()
-							.toString(10));
+					XMLValidityProof xmlValidityProof = new XMLValidityProof(
+							valueListT, valueListC, valueListS);
 
-			XMLPartDecryption xmlPartDecryption = null;
-			if (partDecryptions.get(p.getUniqueId()) != null) {
-				XMLGqElement partDecryptionValue = new XMLGqElement(
-						partDecryptions.get(p.getUniqueId())
-								.getPartDecryption().getValue().toString(10));
+					xmlBallot = new XMLBallot(xmlBallotEncryption,
+							xmlValidityProof);
+				} else {
+					XMLGqPair xmlBallotEncryption = new XMLGqPair(
+							new XMLGqElement("N/A"), new XMLGqElement("N/A"));
+					XMLValidityProof xmlValidityProof = new XMLValidityProof(
+							new ArrayList<XMLGqPair>(),
+							new ArrayList<XMLZqElement>(),
+							new ArrayList<XMLZqElement>());
 
-				Tuple equalityProof = partDecryptions.get(p.getUniqueId())
-						.getProof();
-				XMLGqElement valueT1 = new XMLGqElement(
-						((Tuple) equalityProof.getAt(0)).getAt(0)
-								.getBigInteger().toString(10));
-				XMLGqElement valueT2 = new XMLGqElement(
-						((Tuple) equalityProof.getAt(0)).getAt(1)
-								.getBigInteger().toString(10));
-				XMLZqElement valueC = new XMLZqElement(equalityProof.getAt(1)
-						.getBigInteger().toString(10));
-				XMLZqElement valueS = new XMLZqElement(equalityProof.getAt(2)
-						.getBigInteger().toString(10));
-				XMLEqualityProof xmlEqualityProof = new XMLEqualityProof(
-						valueT1, valueT2, valueC, valueS);
-
-				xmlPartDecryption = new XMLPartDecryption(partDecryptionValue,
-						xmlEqualityProof);
-
-			} else {
-				// Handling the case where not all part decryptions were used...
-				XMLGqElement partDecryptionValue = new XMLGqElement("N/A");
-				XMLGqElement valueT1 = new XMLGqElement("N/A");
-				XMLGqElement valueT2 = new XMLGqElement("N/A");
-				XMLZqElement valueC = new XMLZqElement("N/A");
-				XMLZqElement valueS = new XMLZqElement("N/A");
-				XMLEqualityProof xmlEqualityProof = new XMLEqualityProof(
-						valueT1, valueT2, valueC, valueS);
-
-				xmlPartDecryption = new XMLPartDecryption(partDecryptionValue,
-						xmlEqualityProof);
-			}
-
-			XMLBallot xmlBallot;
-
-			if (ballots.get(p.getUniqueId()) != null) {
-				XMLGqElement xmlLeft = new XMLGqElement(ballots
-						.get(p.getUniqueId()).getBallot().getAt(0)
-						.getBigInteger().toString(10));
-				XMLGqElement xmlRight = new XMLGqElement(ballots
-						.get(p.getUniqueId()).getBallot().getAt(1)
-						.getBigInteger().toString(10));
-
-				XMLGqPair xmlBallotEncryption = new XMLGqPair(xmlLeft, xmlRight);
-
-				Tuple validityProof = ballots.get(p.getUniqueId())
-						.getValidityProof();
-				Tuple subPartT = (Tuple) validityProof.getAt(0); // list of Gq
-				// pairs
-				Tuple subPartC = (Tuple) validityProof.getAt(1); // list
-				// ZModElements
-				Tuple subPartS = (Tuple) validityProof.getAt(2); // list
-				// ZModElements
-				List<XMLGqPair> valueListT = new ArrayList<XMLGqPair>();
-				for (Element e : subPartT.getAll()) {
-					Tuple tuple = (Tuple) e;
-					XMLGqPair pair = new XMLGqPair(new XMLGqElement(tuple
-							.getAt(0).getBigInteger().toString(10)),
-							new XMLGqElement(tuple.getAt(1).getBigInteger()
-									.toString(10)));
-					valueListT.add(pair);
-				}
-				List<XMLZqElement> valueListC = new ArrayList<XMLZqElement>();
-				for (Element e : subPartC.getAll()) {
-					valueListC.add(new XMLZqElement(e.getBigInteger().toString(
-							10)));
-				}
-				List<XMLZqElement> valueListS = new ArrayList<XMLZqElement>();
-				for (Element e : subPartS.getAll()) {
-					valueListS.add(new XMLZqElement(e.getBigInteger().toString(
-							10)));
+					xmlBallot = new XMLBallot(xmlBallotEncryption,
+							xmlValidityProof);
 				}
 
-				XMLValidityProof xmlValidityProof = new XMLValidityProof(
-						valueListT, valueListC, valueListS);
-
-				xmlBallot = new XMLBallot(xmlBallotEncryption, xmlValidityProof);
-			} else {
-				XMLGqPair xmlBallotEncryption = new XMLGqPair(new XMLGqElement(
-						"N/A"), new XMLGqElement("N/A"));
-				XMLValidityProof xmlValidityProof = new XMLValidityProof(
-						new ArrayList<XMLGqPair>(),
-						new ArrayList<XMLZqElement>(),
-						new ArrayList<XMLZqElement>());
-
-				xmlBallot = new XMLBallot(xmlBallotEncryption, xmlValidityProof);
+				XMLParticipant xmlParticipant = new XMLParticipant(
+						p.getIdentification(), p.getUniqueId(),
+						xmlCoefficientCommitments, xmlKeyShareCommitment,
+						xmlPartDecryption, xmlBallot);
+				xmlParticipants.add(xmlParticipant);
 			}
 
-			XMLParticipant xmlParticipant = new XMLParticipant(
-					p.getIdentification(), p.getUniqueId(),
-					xmlCoefficientCommitments, xmlKeyShareCommitment,
-					xmlPartDecryption, xmlBallot);
-			xmlParticipants.add(xmlParticipant);
-		}
+			XMLSingleEncryptionPoll xmlPoll = new XMLSingleEncryptionPoll(
+					pp.getQuestion(), xmlOptions, xmlParticipants, gQ
+							.getModulus().toString(10), gQ.getZModOrder()
+							.getModulus().toString(10),
+					new XMLGqElement(elGamal.getGenerator().getBigInteger()
+							.toString(10)), new XMLGqElement(publicKey
+							.getValue().toString(10)), pp.getThreshold());
+			Serializer serializer = new Persister();
+			try {
+				serializer.write(xmlPoll, file);
 
-		XMLSingleEncryptionPoll xmlPoll = new XMLSingleEncryptionPoll(pp.getQuestion(), xmlOptions,
-				xmlParticipants, gQ.getModulus().toString(10), gQ
-						.getZModOrder().getModulus().toString(10),
-				new XMLGqElement(elGamal.getGenerator().getBigInteger()
-						.toString(10)), new XMLGqElement(publicKey.getValue()
-						.toString(10)), pp.getThreshold());
-		Serializer serializer = new Persister();
-		try {
-			serializer.write(xmlPoll, file);
-
-		} catch (Exception e) {
-			e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 	@Override
 	public void cancelVotingPeriod() {
-		// TODO Auto-generated method stub
 
 	}
 
+	/**
+	 * Method is called when coefficient commitments from other participants arrive
+	 * 
+	 * @param coefficientCommitments
+	 * 			the array of coefficient commitments
+	 * @param sender
+	 * 			the unique id of the sender
+	 */
 	public void handleReceiveCommitments(
 			GStarModElement[] coefficientCommitments, String sender) {
+		
+		// adding the coefficient commitments from the other participants to the hash map
 		Log.d(this.getClass().getSimpleName(), "Got commitments from " + sender);
 		participantCoefficientCommitments.put(sender, coefficientCommitments);
 
 	}
 
+	/**
+	 * Method is called when a keyshare from another participant arrives
+	 * 
+	 * @param keyShare
+	 * 			the key share element
+	 * @param sender
+	 * 			the unique id of the sender
+	 */
 	public void handleReceiveShare(final ZModElement keyShare,
 			final String sender) {
 		Log.d(this.getClass().getSimpleName(), "Got a keyshare from " + sender);
@@ -723,6 +749,14 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
 
+	/**
+	 * Method is called when a commitment to a keyshare from another participant arrives
+	 * 
+	 * @param keyShareCommitment
+	 * 			the key share commitment element
+	 * @param sender
+	 * 			the unique id of the sender
+	 */
 	protected void handleReceiveShareCommitment(
 			GStarModElement keyShareCommitment, String sender) {
 		Log.d(this.getClass().getSimpleName(), "Got keyshare commitment from "
@@ -730,6 +764,14 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 		receivedShareCommitments.put(sender, keyShareCommitment);
 	}
 
+	/**
+	 * Method is called when a ballot from another participant arrives
+	 * 
+	 * @param ballot
+	 * 			the ballot object
+	 * @param sender
+	 * 			the unique id of the sender
+	 */
 	protected void handleReceiveVote(final ProtocolBallot ballot,
 			final String sender) {
 
@@ -743,8 +785,10 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 
 					Log.d(CGS97ProtocolSingleEncryption.this.getClass()
 							.getSimpleName(), "Got ballot from " + sender);
-
+					
 					if (isInElectorate) {
+						
+						// the public key needs to be completely available, otherwise we can't verify
 						while (publicKeyComplete == false) {
 							try {
 								Log.d(CGS97ProtocolSingleEncryption.this
@@ -759,6 +803,7 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 						protocolPoll.getParticipants().get(sender)
 								.setHasVoted(true);
 
+						// verify the validity proof
 						Element proofElement = StringMonoid.getInstance(
 								Alphabet.PRINTABLE_ASCII).getElement(
 								protocolPoll.toString());
@@ -778,6 +823,7 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 											plaintexts);
 						}
 
+						// tally the vote only if it is valid
 						if (pg.verify(ballot.getValidityProof(),
 								ballot.getBallot()).getValue()) {
 							Log.d(CGS97ProtocolSingleEncryption.this.getClass()
@@ -808,6 +854,8 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 					i.putExtra("participants",
 							(Serializable) protocolPoll.getParticipants());
 					LocalBroadcastManager.getInstance(context).sendBroadcast(i);
+					
+					// if all votes have arrived we can start with the tallying
 					if (ballots.size() >= protocolPoll
 							.getNumberOfParticipants()) {
 						tallyDone = true;
@@ -826,6 +874,7 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 							computeResult(protocolPoll);
 						}
 					} else {
+						// the vote updater thread broadcasts the number of votes arrived
 						if (voteUpdaterThread == null) {
 							voteUpdaterThread = new VoteUpdaterThread();
 							voteUpdaterThread.start();
@@ -840,14 +889,14 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 		}.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
 
+	/**
+	 * This method creates a part decryption using the keyshare
+	 * 
+	 * @param poll
+	 */
 	private void partDecrypt(ProtocolPoll poll) {
 
 		Log.d(this.getClass().getSimpleName(), "Running part decryption...");
-
-		// progressDialog = new ProgressDialog(AndroidApplication.getInstance()
-		// .getCurrentActivity());
-		// progressDialog.setMessage("Starting tallying process...");
-		// progressDialog.show();
 
 		new AsyncTask<Object, Object, Object>() {
 
@@ -858,13 +907,10 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 						.getSimpleName(), "Number of shares combined: "
 						+ receivedShares.size());
 
-				Log.d(CGS97ProtocolSingleEncryption.this.getClass()
-						.getSimpleName(), "My Keyshare: " + keyShare);
-
-				Log.d(CGS97ProtocolSingleEncryption.this.getClass()
-						.getSimpleName(), "productLeft: " + productLeft);
 				GStarModElement partDecryption = productLeft.power(keyShare);
 
+				// creating a zero knowledge proof which proves that the part 
+				// decryption is indeed done using the keyshare
 				Function f1 = GeneratorFunction.getInstance(elGamal
 						.getGenerator());
 				Function f2 = GeneratorFunction.getInstance(productLeft);
@@ -880,26 +926,20 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 						.getInstance(scg, f1, f2);
 
 				Element privateInput = CGS97ProtocolSingleEncryption.this.keyShare;
-				Log.d(CGS97ProtocolSingleEncryption.this.getClass()
-						.getSimpleName(), "privateInput generate: "
-						+ privateInput);
+				
 				Element publicInput = Tuple
 						.getInstance(
 								((GStarModElement) elGamal.getGenerator())
 										.power(CGS97ProtocolSingleEncryption.this.keyShare),
 								partDecryption);
-				Log.d(CGS97ProtocolSingleEncryption.this.getClass()
-						.getSimpleName(), "publicInput generate: "
-						+ publicInput);
-
+				
 				Triple proof = pg.generate(privateInput, publicInput);
 
-				Log.d(CGS97ProtocolSingleEncryption.this.getClass()
-						.getSimpleName(), "proof generate: " + proof);
-
+				
 				ProtocolPartDecryption protocolPartDecryption = new ProtocolPartDecryption(
 						partDecryption, proof);
 
+				// broadcasting part decryption to all other participants
 				Log.d(CGS97ProtocolSingleEncryption.this.getClass()
 						.getSimpleName(), "Sending part decryption");
 				AndroidApplication
@@ -915,6 +955,15 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 
 	}
 
+	/**
+	 * Method is called when a part decryption of another participant arrives
+	 * 
+	 * 
+	 * @param protocolPartDecryption
+	 * 		the part decryption object
+	 * @param sender
+	 * 		the unique id of the sender
+	 */
 	protected void handlePartDecryption(
 			final ProtocolPartDecryption protocolPartDecryption,
 			final String sender) {
@@ -930,6 +979,8 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 			@Override
 			protected Object doInBackground(Object... params) {
 
+				// we have to wait until all votes have been counted, 
+				// otherwise the part decryption cannot be verified
 				while (tallyDone == false) {
 					try {
 						Log.d(CGS97ProtocolSingleEncryption.this.getClass()
@@ -940,6 +991,7 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 					}
 				}
 
+				// verify the proof of the part decryption
 				Function f1 = GeneratorFunction.getInstance(elGamal
 						.getGenerator());
 				Function f2 = GeneratorFunction.getInstance(productLeft);
@@ -966,9 +1018,11 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 					Log.d(CGS97ProtocolSingleEncryption.this.getClass()
 							.getSimpleName(), "Accepting part decryption of "
 							+ sender);
-					// senderParticipant.setPartDecryption(partDecryption);
+					
 					partDecryptions.put(sender, protocolPartDecryption);
 
+					// as soon as enough (= threshold value) shares are available,
+					// we can start with the interpolation
 					if (partDecryptions.size() == protocolPoll.getThreshold()) {
 						Log.d(CGS97ProtocolSingleEncryption.this.getClass()
 								.getSimpleName(),
@@ -991,6 +1045,7 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 			@Override
 			protected void onPostExecute(Object result) {
 
+				// display a message if too many part decryptions are invalid
 				if (partDecryptionRejections > protocolPoll
 						.getNumberOfParticipants()
 						- protocolPoll.getThreshold()) {
@@ -1038,6 +1093,10 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 
 	}
 
+	/**
+	 * This method interpolates the part decryptions using the Lagrange interpolation
+	 * technique
+	 */
 	private synchronized void interpolateResult() {
 
 		Log.d(this.getClass().getSimpleName(), "interpolateResult started...");
@@ -1107,6 +1166,8 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 						+ protocolPoll.getOptions().size() + " options and "
 						+ ballots.size() + " ballots and "
 						+ numberOfBitsPerOption + " Bits per option.");
+		
+		// calculating the combinations of possible decryptions
 		getCombinations(protocolPoll.getOptions().size(), new Stack<Integer>(),
 				numberOfValidBallots);
 
@@ -1114,6 +1175,7 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 		Log.d(this.getClass().getSimpleName(),
 				"Map size: " + combinationsMap.size());
 
+		// check the hash map for the result
 		if (combinationsMap.containsKey(result)) {
 			resultFound = true;
 			BigInteger decodedResult = combinationsMap.get(result).getValue();
@@ -1123,6 +1185,7 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 			BigInteger mask = BigInteger.valueOf((long) (Math.pow(2,
 					numberOfBitsPerOption) - 1));
 
+			// decode the actual result values using bitshifts
 			for (int i = 0; i < protocolPoll.getOptions().size(); i++) {
 				protocolPoll
 						.getOptions()
@@ -1140,6 +1203,7 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 			Log.d(this.getClass().getSimpleName(),
 					"interpolateResult finished...");
 
+			// calculate the percentage
 			computeResult(protocolPoll);
 		} else {
 			resultFound = false;
@@ -1147,6 +1211,14 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 
 	}
 
+	/**
+	 * recursive method to create a hashmap of results where the 
+	 * sum in each sector of the bitvector is equal to the number of votes
+	 * 
+	 * @param length
+	 * @param used
+	 * @param val
+	 */
 	private void getCombinations(int length, Stack<Integer> used, int val) {
 		if (val == 0) {
 			Integer[] combination = new Integer[length];
@@ -1198,6 +1270,14 @@ public class CGS97ProtocolSingleEncryption extends ProtocolInterface {
 		return false;
 	}
 
+	/**
+	 * 
+	 * This thread is used to update the view when waiting for ballots.
+	 * It periodically sends a local broadcast to update the view accordingly.
+	 * 
+	 * @author Juerg Ritter
+	 *
+	 */
 	class VoteUpdaterThread extends Thread {
 
 		@Override

@@ -112,8 +112,16 @@ public class Utility {
 		return new IntentFilter[] { nfcIntentFilter };
 	}
 	
+	/**
+	 * Helper method to calculate factorials
+	 * 
+	 * @param n
+	 * 		the input for the factorial function
+	 * @return
+	 * 		the result of the calculation
+	 */
 	public static int factorial(int n) {
-        int fact = 1; // this  will be the result
+        int fact = 1; 
         for (int i = 1; i <= n; i++) {
             fact *= i;
         }

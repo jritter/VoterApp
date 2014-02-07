@@ -46,6 +46,8 @@ import ch.bfh.evoting.voterapp.cgs97.util.BroadcastIntentTypes;
 import ch.bfh.evoting.voterapp.cgs97.util.Utility;
 /**
  * Class displaying the activity that show the details of a poll
+ * 
+ * @author Jürg Ritter
  *
  */
 public class PollDetailActivity extends Activity implements OnClickListener, TextWatcher {

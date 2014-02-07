@@ -12,6 +12,12 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.TextView;
 
+/**
+ * Dialog fragment for displaying the help screens
+ * 
+ * @author Jürg Ritter
+ *
+ */
 public class HelpDialogFragment extends DialogFragment {
 
 	private AlertDialog dialog;

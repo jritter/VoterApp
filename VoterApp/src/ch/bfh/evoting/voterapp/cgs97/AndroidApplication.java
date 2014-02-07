@@ -453,21 +453,25 @@ public class AndroidApplication extends Application {
 		}
 	}
 	
+	/**
+	 * This method sets the ballot encoding according to the voting scenario,
+	 * depending on the number of steps which would be necessary for the single ballot
+	 * encryption strategy. The threshold value is defined by the constant STEP_THRESHOLD.
+	 * 
+	 * If the number of steps is bigger than STEP_THRESHOLD, the multi encryption ballot
+	 * strategy is sued, the single encryption ballot strategy otherwise.
+	 * 
+	 * 
+	 * @param poll
+	 */
 	public void setProtocol(final Poll poll) {
 
-		Log.d(this.getClass().getSimpleName(), "setProtocol(): Participants: " + poll.getNumberOfParticipants());
-		Log.d(this.getClass().getSimpleName(), "setProtocol(): Options: " + poll.getOptions().size());
-		
 		int n = poll.getOptions().size()
 				+ poll.getNumberOfParticipants() - 1;
 		int k = poll.getNumberOfParticipants() - 1;
 
 		int combinations = Utility.factorial(n)
 				/ (Utility.factorial((n - k)) * Utility.factorial(k));
-
-		Log.d(this.getClass().getSimpleName(),
-				"Number of combinations needed for singleencryptionballot: "
-						+ combinations);
 		
 		if (piSingle != null){
 			piSingle.deactivate();
